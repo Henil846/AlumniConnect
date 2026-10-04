@@ -29,7 +29,7 @@ class SuperAdminController {
             'title' => 'Super Admin Dashboard',
             'activePage' => 'super-admin-dashboard',
             'stats' => $stats,
-            'extraCss' => '/assets/css/super-admin.css'
+            
         ], 'super-admin');
     }
 
@@ -39,7 +39,7 @@ class SuperAdminController {
         return View::render('super-admin/analytics', [
             'title' => 'Platform Analytics',
             'activePage' => 'super-admin-analytics',
-            'extraCss' => '/assets/css/super-admin.css'
+            
         ], 'super-admin');
     }
 
@@ -53,7 +53,7 @@ class SuperAdminController {
             'title' => 'Manage Institutions',
             'activePage' => 'super-admin-institutions',
             'institutions' => $institutions,
-            'extraCss' => '/assets/css/super-admin.css'
+            
         ], 'super-admin');
     }
 
@@ -67,7 +67,7 @@ class SuperAdminController {
             'title' => 'Revenue & Payments',
             'activePage' => 'super-admin-revenue',
             'transactions' => $transactions,
-            'extraCss' => '/assets/css/super-admin.css'
+            
         ], 'super-admin');
     }
 
@@ -76,7 +76,7 @@ class SuperAdminController {
         return View::render('super-admin/settings', [
             'title' => 'Platform Settings',
             'activePage' => 'super-admin-settings',
-            'extraCss' => '/assets/css/super-admin.css'
+            
         ], 'super-admin');
     }
 }

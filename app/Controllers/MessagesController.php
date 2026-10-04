@@ -41,7 +41,7 @@ class MessagesController {
             'selectedUser' => $selectedUser,
             'messages' => $messages,
             'currentUserId' => $userId,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

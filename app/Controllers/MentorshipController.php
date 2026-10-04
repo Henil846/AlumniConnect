@@ -18,7 +18,7 @@ class MentorshipController {
             'title' => 'Mentorship — Alumni Connect',
             'activePage' => 'mentorship',
             'mentors' => $mentors,
-            'extraCss' => '/assets/css/mentorship.css'
+            
         ], 'app');
     }
 

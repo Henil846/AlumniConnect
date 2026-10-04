@@ -49,7 +49,7 @@ class SearchController {
             'activePage' => 'search',
             'query' => $query,
             'results' => $results,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 }

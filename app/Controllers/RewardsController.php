@@ -27,7 +27,7 @@ class RewardsController {
             'activePage' => 'rewards',
             'earnedBadges' => $earnedBadges,
             'unearnedBadges' => $unearnedBadges,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

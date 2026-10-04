@@ -36,7 +36,7 @@ class PaymentController {
             'activePage' => 'payment',
             'donation' => $donation,
             'sig' => $sig,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

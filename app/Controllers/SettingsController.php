@@ -18,7 +18,7 @@ class SettingsController {
             'title' => 'Account Settings',
             'activePage' => 'settings',
             'settings' => $settings,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

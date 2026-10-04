@@ -27,7 +27,7 @@ class CareerCenterController {
             'activePage' => 'career-center',
             'resources' => $resources,
             'type' => $type,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

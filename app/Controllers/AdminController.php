@@ -25,7 +25,7 @@ class AdminController {
             'activePage' => 'admin-dashboard',
             'userCount' => $userCount,
             'donationTotal' => $donationTotal,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 
@@ -39,7 +39,7 @@ class AdminController {
             'title' => 'Moderation & Reports',
             'activePage' => 'admin-moderation',
             'reports' => $reports,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 
@@ -65,7 +65,7 @@ class AdminController {
             'title' => 'Payments & Revenue',
             'activePage' => 'admin-payments',
             'payments' => $payments,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 
@@ -79,7 +79,7 @@ class AdminController {
             'title' => 'Analytics',
             'activePage' => 'admin-analytics',
             'views' => $views,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 }

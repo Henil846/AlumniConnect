@@ -59,7 +59,7 @@ class JobsController {
             'selectedJob' => $selectedJob,
             'currentPage' => $page,
             'totalPages' => $totalPages,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

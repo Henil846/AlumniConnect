@@ -17,7 +17,7 @@ class ProfileController {
             'title' => 'My Profile — Alumni Connect',
             'activePage' => 'profile',
             'user' => $user,
-            'extraCss' => '/assets/css/profile.css',
+            
             'extraJs' => '/assets/js/profile.js'
         ], 'app');
     }
@@ -68,7 +68,7 @@ class ProfileController {
             'title' => htmlspecialchars($user->full_name) . ' — Alumni Connect',
             'activePage' => 'directory',
             'user' => $user,
-            'extraCss' => '/assets/css/profile.css'
+            
         ], 'app');
     }
 }

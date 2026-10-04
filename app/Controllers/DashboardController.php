@@ -32,7 +32,7 @@ class DashboardController {
             'user' => $user,
             'mentorshipCount' => $mentorshipCount,
             'referralsCount' => $referralsCount,
-            'extraCss' => '/assets/css/dashboard.css'
+            
         ], 'app');
     }
 }

@@ -52,7 +52,7 @@ class EventsController {
             'events' => $events,
             'selectedEvent' => $selectedEvent,
             'registeredEventIds' => $registeredEventIds,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

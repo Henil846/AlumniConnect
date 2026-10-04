@@ -9,7 +9,7 @@ class ReferralsController {
         return View::render('referral-request', [
             'title' => 'Request a Referral — Alumni Connect',
             'activePage' => 'referral-request',
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

@@ -59,7 +59,7 @@ class DirectoryController {
             'alumni' => $alumni,
             'currentPage' => $page,
             'totalPages' => $totalPages,
-            'extraCss' => '/assets/css/directory.css'
+            
         ], 'app');
     }
 }

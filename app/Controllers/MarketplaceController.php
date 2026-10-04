@@ -28,7 +28,7 @@ class MarketplaceController {
             'activePage' => 'marketplace',
             'items' => $items,
             'category' => $category,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

@@ -28,7 +28,7 @@ class CommunityController {
             'title' => 'Alumni Community — Alumni Connect',
             'activePage' => 'community',
             'posts' => $posts,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

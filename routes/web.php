@@ -354,8 +354,6 @@ Router::get('/super-admin/settings', function() {
     return (new SuperAdminController())->settings();
 });
 
-Router::get('/', function() {
-    echo "Welcome to Alumni Connect. <a href='/login'>Login</a> | <a href='/signup'>Signup</a>";
-});
+Router::get('/', [\App\Controllers\LandingController::class, 'index']);
 
 Router::dispatch($uri, $_SERVER['REQUEST_METHOD']);

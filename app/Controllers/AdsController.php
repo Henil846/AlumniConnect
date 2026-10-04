@@ -18,7 +18,7 @@ class AdsController {
             'title' => 'Sponsors & Advertisements',
             'activePage' => 'ads',
             'ads' => $ads,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

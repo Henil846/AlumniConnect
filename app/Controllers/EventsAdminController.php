@@ -43,7 +43,7 @@ class EventsAdminController {
             'selectedEvent' => $selectedEvent,
             'registrations' => $registrations,
             'gallery' => $gallery,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

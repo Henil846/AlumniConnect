@@ -27,7 +27,7 @@ class BusinessController {
             'activePage' => 'business',
             'businesses' => $businesses,
             'category' => $category,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

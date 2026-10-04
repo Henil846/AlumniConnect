@@ -22,7 +22,7 @@ class NotificationsController {
             'title' => 'Notifications',
             'activePage' => 'notifications',
             'notifications' => $notifications,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

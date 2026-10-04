@@ -20,7 +20,7 @@ class DonationsController {
             'activePage' => 'donations',
             'campaigns' => $campaigns,
             'recentDonations' => $recentDonations,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 

@@ -27,7 +27,7 @@ class StartupHubController {
             'activePage' => 'startups',
             'startups' => $startups,
             'stage' => $stage,
-            'extraCss' => '/assets/css/extended.css'
+            
         ], 'app');
     }
 
