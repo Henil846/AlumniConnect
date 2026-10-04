@@ -1,0 +1,13 @@
+{
+    "name": "henil846/alumni-connect",
+    "description": "Alumni Connect Platform",
+    "type": "project",
+    "require": {
+        "dompdf/dompdf": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}

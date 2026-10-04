@@ -1,0 +1,328 @@
+/* ===========================
+   Alumni Directory Styles
+   =========================== */
+
+.directory-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* ---- Filters Sidebar ---- */
+.filters-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filters-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.filters-header a {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+.filters-header a:hover { color: var(--color-text); }
+
+.filter-group {
+  margin-bottom: 24px;
+}
+
+.filter-group-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input-bg);
+  font-size: 0.85rem;
+  color: var(--color-text);
+  outline: none;
+  appearance: none;
+}
+
+.filter-select-wrap {
+  position: relative;
+}
+.filter-select-wrap::after {
+  content: '▼';
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.filter-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.filter-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.filter-input-wrap svg {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+}
+.filter-input-wrap input {
+  width: 100%;
+  padding: 10px 12px 10px 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input-bg);
+  font-size: 0.85rem;
+  outline: none;
+}
+.filter-input-wrap input:focus { border-color: var(--color-primary); }
+
+.btn-filter-apply {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-accent);
+  color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.btn-filter-apply:hover { background: var(--color-accent-dark); }
+
+/* ---- Directory Main ---- */
+.directory-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.directory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.directory-title h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.directory-title p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.view-toggles {
+  display: flex;
+  gap: 4px;
+}
+.view-toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.view-toggle-btn.active { background: var(--color-bg); color: var(--color-text); border-color: var(--color-text-muted); }
+.view-toggle-btn:hover:not(.active) { background: var(--color-bg); color: var(--color-text); }
+
+/* ---- Alumni Grid ---- */
+.alumni-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.alumni-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.alumni-card-cover {
+  height: 90px;
+  width: 100%;
+  position: relative;
+}
+.alumni-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.class-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--color-accent);
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.alumni-card-body {
+  padding: 0 20px 20px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.alumni-company-logo {
+  width: 56px;
+  height: 56px;
+  background: var(--color-white);
+  border: 2px solid var(--color-bg);
+  border-radius: var(--radius-md);
+  margin-top: -28px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+.alumni-company-logo img {
+  max-width: 70%;
+  max-height: 70%;
+}
+
+.alumni-card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.alumni-card-role {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.alumni-card-loc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.alumni-card-loc svg { width: 12px; height: 12px; }
+
+.alumni-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-connect {
+  flex: 1;
+  padding: 10px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-connect:hover { background: var(--color-primary-light); }
+
+.btn-more {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+.btn-more:hover { background: var(--color-bg); color: var(--color-text); }
+
+/* ---- Pagination ---- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.page-btn:hover { background: var(--color-bg); color: var(--color-text); }
+.page-btn.active { background: var(--color-primary); color: var(--color-white); }

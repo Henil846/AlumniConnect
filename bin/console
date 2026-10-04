@@ -1,0 +1,30 @@
+<?php
+require __DIR__ . '/../public/router.php'; // Just for autoloader and basic setup
+
+use App\Core\Database;
+
+$command = $argv[1] ?? 'help';
+
+if ($command === 'migrate:fresh') {
+    echo "Running migrations...\n";
+    $pdo = Database::getConnection();
+    
+    // Read schema
+    $schema = file_get_contents(__DIR__ . '/../database/schema.sql');
+    
+    // Execute schema
+    try {
+        $pdo->exec($schema);
+        echo "Migrations executed successfully.\n";
+    } catch (\Exception $e) {
+        echo "Migration failed: " . $e->getMessage() . "\n";
+        exit(1);
+    }
+    
+    echo "Running seeders...\n";
+    require __DIR__ . '/../database/seed.php';
+    echo "Seeding completed.\n";
+} else {
+    echo "Available commands:\n";
+    echo "  migrate:fresh    Drop all tables, re-run migrations, and seed the database.\n";
+}

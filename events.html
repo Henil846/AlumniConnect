@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events & Reunions — Alumni Connect</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="app.css" />
+  <link rel="stylesheet" href="extended.css" />
+  <link rel="stylesheet" href="admin-chat.css" />
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- DARK SIDEBAR -->
+    <aside class="sidebar dark-theme">
+      <div class="sidebar-header">
+        <a href="alumni-dashboard.html" class="logo">
+          Alumni Connect
+          <span style="color:rgba(255,255,255,0.6);">The Modern Collegiate</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="alumni-dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Home
+        </a>
+        <a href="profile.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <a href="events.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Events
+        </a>
+        <a href="community.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Community
+        </a>
+        <a href="mentorship-dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Mentorship
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Jobs
+        </a>
+        <a href="messages.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Messages
+        </a>
+        <a href="events-admin.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Events Admin
+        </a>
+        <a href="super-admin-settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-gold-action" onclick="window.location.href='jobs.html'">
+          Post an Opportunity
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-search" style="width: 420px; background:#f3f4f6; border-radius:var(--radius-full);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search events, mixers, workshops..." style="background:transparent; border:none;" />
+        </div>
+        <div class="header-actions">
+          <span class="font-bold text-sm text-primary" style="cursor:pointer;">Give Back</span>
+          <button class="header-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2-2z"/></svg>
+          </button>
+          <button class="header-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notification-dot"></span>
+          </button>
+          <img src="mentor_elena.png" alt="Profile" class="header-profile" />
+        </div>
+      </header>
+
+      <!-- SCROLLABLE CONTENT -->
+      <div class="content-scrollable">
+        <div class="page-container">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+            <div>
+              <h1 class="page-title">Heritage & Horizon</h1>
+              <p class="page-subtitle mb-0">Connect with fellow alumni, attend exclusive workshops, and return to campus for memorable reunions.</p>
+            </div>
+            
+            <!-- Toggle Pills -->
+            <div style="background:#f1f5f9; padding:4px; border-radius:32px; display:flex;">
+              <button class="btn-primary" style="background:#ffffff; color:var(--color-text); padding:12px 28px; border-radius:28px; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-weight:700;">Upcoming</button>
+              <button class="btn-cancel" style="background:transparent; border:none; padding:12px 24px; font-weight:600;">Registered (3)</button>
+            </div>
+          </div>
+
+          <!-- Events 3-Column Grid -->
+          <div class="events-grid">
+            
+            <!-- Event 1 -->
+            <div class="event-card-modern">
+              <div class="event-img-wrap">
+                <img src="campus_cover.png" alt="ev1" style="object-fit:cover;" />
+                <div class="event-date-pill">
+                  <div class="mth">OCT</div>
+                  <div class="day">24</div>
+                </div>
+              </div>
+              <div class="event-card-body">
+                <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                  <span class="job-tag gold" style="font-size:0.65rem;">REUNION</span>
+                  <span class="text-xs text-muted">📍 Main Quad</span>
+                </div>
+                <h3 class="font-bold text-lg mb-2" style="line-height:1.3;">Autumn Legacy Gala & Networking Mixer</h3>
+                <p class="text-xs text-muted mb-4" style="line-height:1.6; flex:1;">Reconnect with your cohort under the historic oaks for an evening of fine dining, inspiring talks, and professional networking.</p>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:16px;">
+                  <div class="avatar-stack">
+                    <img src="mentor_marcus.png" alt="a" />
+                    <img src="mentor_elena.png" alt="a" />
+                    <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+42</div>
+                  </div>
+                  <button class="btn-primary" style="background:#000; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">RSVP</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event 2 -->
+            <div class="event-card-modern">
+              <div class="event-img-wrap">
+                <img src="login_side_img.png" alt="ev2" style="object-fit:cover; object-position:center;" />
+                <div class="event-date-pill">
+                  <div class="mth" style="color:#059669;">NOV</div>
+                  <div class="day">02</div>
+                </div>
+              </div>
+              <div class="event-card-body">
+                <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                  <span class="job-tag green" style="font-size:0.65rem;">WORKSHOP</span>
+                  <span class="text-xs text-muted">📹 Virtual Session</span>
+                </div>
+                <h3 class="font-bold text-lg mb-2" style="line-height:1.3;">AI in the Workplace: Strategies for 2025</h3>
+                <p class="text-xs text-muted mb-4" style="line-height:1.6; flex:1;">Master the latest generative tools and strategic frameworks with industry leaders currently building enterprise automation systems.</p>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:16px;">
+                  <div class="avatar-stack">
+                    <img src="signup_side_img.png" alt="a" style="object-position:top;" />
+                    <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+156</div>
+                  </div>
+                  <button class="btn-primary" style="background:#000; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">RSVP</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event 3 -->
+            <div class="event-card-modern">
+              <div class="event-img-wrap">
+                <img src="hero_bg.png" alt="ev3" style="object-fit:cover;" />
+                <div class="event-date-pill">
+                  <div class="mth">DEC</div>
+                  <div class="day">15</div>
+                </div>
+              </div>
+              <div class="event-card-body">
+                <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                  <span class="job-tag gold" style="font-size:0.65rem;">SOCIAL</span>
+                  <span class="text-xs text-muted">📍 Founders Hall</span>
+                </div>
+                <h3 class="font-bold text-lg mb-2" style="line-height:1.3;">Holiday Heritage Dinner & Silent Auction</h3>
+                <p class="text-xs text-muted mb-4" style="line-height:1.6; flex:1;">An elegant evening supporting the Student Scholarship Fund. Formal dress code with live jazz ensemble and charity auction.</p>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:16px;">
+                  <div class="avatar-stack">
+                    <img src="mentor_marcus.png" alt="a" />
+                    <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+89</div>
+                  </div>
+                  <button class="btn-primary" style="background:#000; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">RSVP</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Area: 2 Columns (Host Mixer & Statistics) -->
+          <div class="layout-2col">
+            
+            <!-- Left Large Banner -->
+            <div class="col-main" style="background:#0b1329; color:#fff; border-radius:var(--radius-lg); padding:48px; display:flex; flex-direction:column; justify-content:flex-end; position:relative; min-height:360px;">
+              <div style="max-width:500px; z-index:2;">
+                <h2 style="font-size:2.4rem; font-weight:800; line-height:1.2; margin-bottom:16px;">Host Your Own Regional Mixer</h2>
+                <p style="font-size:1rem; color:rgba(255,255,255,0.8); line-height:1.6; margin-bottom:32px;">Leading a city chapter? Use our platform to organize local events, manage RSVPs, and receive alumni funding grants.</p>
+                <button class="btn-primary" style="background:var(--color-accent); color:var(--color-primary); padding:12px 28px; font-size:1rem;">Get Started</button>
+              </div>
+            </div>
+
+            <!-- Right Statistics Card -->
+            <div class="col-side" style="background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:32px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <h3 class="font-bold text-lg mb-2">Member Statistics</h3>
+                <p class="text-xs text-muted mb-6" style="line-height:1.5;">Our community is growing faster than ever.</p>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span class="text-xs font-semibold text-muted">Active Monthly Events</span>
+                  <span class="font-bold text-md">124+</span>
+                </div>
+                <div style="height:6px; background:#e5e5e5; border-radius:3px; margin-bottom:20px;">
+                  <div style="width:75%; height:100%; background:var(--color-accent-dark); border-radius:3px;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span class="text-xs font-semibold text-muted">RSVPs this Month</span>
+                  <span class="font-bold text-md">2,480</span>
+                </div>
+                <div style="height:6px; background:#e5e5e5; border-radius:3px; margin-bottom:32px;">
+                  <div style="width:55%; height:100%; background:#34d399; border-radius:3px;"></div>
+                </div>
+              </div>
+
+              <!-- Gold badge card -->
+              <div style="background:#f8fafc; border:1px solid var(--color-border); border-radius:12px; padding:16px; display:flex; gap:12px; align-items:center;">
+                <div style="width:40px; height:40px; border-radius:8px; background:var(--color-accent); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">✨</div>
+                <p class="text-xs text-muted" style="margin-bottom:0; line-height:1.4;">You've attended 4 events this year. <strong style="color:var(--color-text);">2 more for Gold status!</strong></p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // Upcoming / Registered toggle
+    const toggleBtns = document.querySelectorAll('.btn-primary[style*="background:#ffffff"], .btn-cancel[style*="background:transparent"]');
+    const upcomingBtn = document.querySelector('button.btn-primary[style*="background:#ffffff"]');
+    const registeredBtn = document.querySelector('button.btn-cancel[style*="background:transparent"]');
+    if (upcomingBtn && registeredBtn) {
+      registeredBtn.addEventListener('click', function() {
+        registeredBtn.style.background = '#ffffff';
+        registeredBtn.style.color = 'var(--color-text)';
+        registeredBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        upcomingBtn.style.background = 'transparent';
+        upcomingBtn.style.boxShadow = 'none';
+      });
+      upcomingBtn.addEventListener('click', function() {
+        upcomingBtn.style.background = '#ffffff';
+        upcomingBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        registeredBtn.style.background = 'transparent';
+        registeredBtn.style.boxShadow = 'none';
+      });
+    }
+
+    // RSVP buttons
+    let rsvpCount = 0;
+    document.querySelectorAll('.event-card-modern .btn-primary[style*="background:#000"]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (this.textContent === 'RSVP') {
+          this.textContent = "RSVP'd ✓";
+          this.style.background = '#15803d';
+          rsvpCount++;
+          if (registeredBtn) registeredBtn.textContent = `Registered (${rsvpCount + 3})`;
+        } else {
+          this.textContent = 'RSVP';
+          this.style.background = '#000';
+          rsvpCount = Math.max(0, rsvpCount - 1);
+          if (registeredBtn) registeredBtn.textContent = `Registered (${rsvpCount + 3})`;
+        }
+      });
+    });
+
+    // Host Your Own Mixer - Get Started
+    document.querySelector('.col-main .btn-primary').addEventListener('click', () => {
+      window.location.href = 'events-admin.html';
+    });
+  </script>
+
+</body>
+</html>
