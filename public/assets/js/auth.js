@@ -59,4 +59,43 @@ document.head.appendChild(shakeStyle);
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   initPasswordToggles();
+
+  // Handle Login Form
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = loginForm.querySelector('button[type="submit"]');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Loading...';
+          btn.disabled = true;
+
+          try {
+              const formData = new FormData(loginForm);
+              const response = await fetch(loginForm.action, {
+                  method: 'POST',
+                  body: formData,
+                  headers: { 'Accept': 'application/json' }
+              });
+              const data = await response.json();
+              
+              if (data.success) {
+                  showToast(data.message, 'success');
+                  if (data.redirect) {
+                      setTimeout(() => window.location.href = data.redirect, 1000);
+                  }
+              } else {
+                  showToast(data.message || 'Login failed', 'error');
+                  if (data.errors) {
+                      // You can add logic to highlight specific fields here
+                  }
+              }
+          } catch (err) {
+              showToast('An unexpected error occurred.', 'error');
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
+      });
+  }
 });

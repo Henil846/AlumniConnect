@@ -19,8 +19,10 @@ class Router {
         ini_set('display_errors', '0');
         set_exception_handler(function(\Throwable $e) {
             http_response_code(500);
-            echo "An unexpected server error occurred: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
+            $msg = "An unexpected server error occurred: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
+            echo $msg;
             error_log($e->getMessage());
+            file_put_contents(__DIR__ . '/../../debug.txt', $msg . "\n" . $e->getTraceAsString());
         });
 
         // Add Global Security Headers

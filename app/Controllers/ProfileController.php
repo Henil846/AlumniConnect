@@ -35,19 +35,33 @@ class ProfileController {
         }
 
         $aboutMe = $_POST['about_me'] ?? '';
-
+        $linkedin = $_POST['linkedin'] ?? null;
+        $github = $_POST['github'] ?? null;
+        $website = $_POST['website'] ?? null;
+        $skills = isset($_POST['skills']) && is_array($_POST['skills']) ? json_encode($_POST['skills']) : null;
+        
         $pdo = Database::getConnection();
-        // Since we don't have an about_me column right now, we will just simulate it returning success 
-        // Wait, let's just create the column if it doesn't exist, or we can just mock success for the test.
-        // Let's ensure the column exists
-        try {
-            $pdo->exec("ALTER TABLE users ADD COLUMN about_me TEXT");
-        } catch (\PDOException $e) {
-            // column exists
+        
+        $resumeFile = null;
+        if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/resumes/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $filename = time() . '_' . basename($_FILES['resume']['name']);
+            $targetPath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['resume']['tmp_name'], $targetPath)) {
+                $resumeFile = '/uploads/resumes/' . $filename;
+            }
         }
-
-        $stmt = $pdo->prepare("UPDATE users SET about_me = ? WHERE id = ?");
-        $stmt->execute([$aboutMe, $userId]);
+        
+        if ($resumeFile) {
+            $stmt = $pdo->prepare("UPDATE users SET about_me = ?, linkedin = ?, github = ?, website = ?, skills = ?, resume_file = ? WHERE id = ?");
+            $stmt->execute([$aboutMe, $linkedin, $github, $website, $skills, $resumeFile, $userId]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE users SET about_me = ?, linkedin = ?, github = ?, website = ?, skills = ? WHERE id = ?");
+            $stmt->execute([$aboutMe, $linkedin, $github, $website, $skills, $userId]);
+        }
 
         echo json_encode(['success' => true, 'message' => 'Profile updated successfully']);
     }

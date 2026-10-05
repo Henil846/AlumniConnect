@@ -287,8 +287,12 @@
     </div>
     </div>
     <div class="profile-header-actions">
-    <button class="btn-primary" onclick="window.location.href='/mentorship'">Request Mentorship</button>
-    <button class="btn-outline" onclick="window.location.href='/messages'">Message</button>
+    <form action="/mentorship/book" method="POST" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+        <input type="hidden" name="mentor_id" value="<?= $user->id ?>">
+        <button type="submit" class="btn-primary">Request Mentorship</button>
+    </form>
+    <button class="btn-outline" onclick="window.location.href='/messages?new=<?= $user->id ?>'">Message</button>
     </div>
 </div>
 
@@ -304,7 +308,7 @@
             About
         </div>
         <p class="about-text">
-            I am a passionate software engineer eager to connect with fellow alumni and share experiences. My journey started in the labs of the Computer Science building, where I fell in love with complex problem-solving.
+            <?= nl2br(htmlspecialchars($user->about_me ?? 'No bio provided.')) ?>
         </p>
         </div>
     </div>
@@ -338,9 +342,18 @@
             Core Competencies
         </div>
         <div class="competency-chips">
-            <div class="comp-chip">Software Engineering</div>
-            <div class="comp-chip">Project Management</div>
-            <div class="comp-chip">Leadership</div>
+            <?php 
+                $skills = !empty($user->skills) ? json_decode($user->skills, true) : [];
+                if (!empty($skills)): 
+                    foreach ($skills as $skill):
+            ?>
+            <div class="comp-chip"><?= htmlspecialchars($skill) ?></div>
+            <?php 
+                    endforeach;
+                else: 
+            ?>
+            <div style="font-size:0.8rem;color:var(--color-text-muted);">No skills listed.</div>
+            <?php endif; ?>
         </div>
         </div>
     </div>
@@ -370,7 +383,7 @@
             Contact Privacy
         </div>
         <p>This profile is verified. Personal contact information is hidden to protect privacy.</p>
-        <button class="btn-message" onclick="window.location.href='/messages'">
+        <button class="btn-message" onclick="window.location.href='/messages?new=<?= $user->id ?>'">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             Message <?= htmlspecialchars(explode(' ', $user->full_name)[0]) ?>
         </button>

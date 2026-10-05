@@ -14,7 +14,7 @@ class DirectoryController {
         $params = [$collegeId];
 
         if (!empty($_GET['batch'])) {
-            $sql .= " AND YEAR(created_at) = ?";
+            $sql .= " AND strftime('%Y', created_at) = ?";
             $params[] = $_GET['batch'];
         }
 

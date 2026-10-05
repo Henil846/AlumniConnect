@@ -352,12 +352,12 @@ textarea.form-textarea {
     <p>Keep your information up to date to attract mentors and recruiters.</p>
 </div>
 <div class="profile-actions">
-    <button type="button" class="btn-cancel">Cancel</button>
+    <button type="button" class="btn-cancel" onclick="window.location.href='/dashboard'">Cancel</button>
     <button type="submit" form="profileForm" class="btn-save">Save Changes</button>
 </div>
 </div>
 
-<form id="profileForm" action="/profile/update" method="POST">
+<form id="profileForm" action="/profile/update" method="POST" enctype="multipart/form-data">
 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
 
 <div class="row">
@@ -415,7 +415,7 @@ textarea.form-textarea {
         <label>LinkedIn URL</label>
         <div class="link-input-wrap">
             <div class="link-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
-            <input type="text" value="linkedin.com/in/alexrivers" />
+            <input type="text" name="linkedin" value="<?= htmlspecialchars($user->linkedin ?? '') ?>" placeholder="linkedin.com/in/username" />
         </div>
         </div>
 
@@ -423,7 +423,7 @@ textarea.form-textarea {
         <label>GitHub Profile</label>
         <div class="link-input-wrap">
             <div class="link-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
-            <input type="text" value="github.com/arivers-dev" />
+            <input type="text" name="github" value="<?= htmlspecialchars($user->github ?? '') ?>" placeholder="github.com/username" />
         </div>
         </div>
 
@@ -431,7 +431,7 @@ textarea.form-textarea {
         <label>Portfolio / Website</label>
         <div class="link-input-wrap">
             <div class="link-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-            <input type="text" value="alexrivers.me" />
+            <input type="text" name="website" value="<?= htmlspecialchars($user->website ?? '') ?>" placeholder="www.yourwebsite.com" />
         </div>
         </div>
 
@@ -456,15 +456,43 @@ textarea.form-textarea {
     <div class="app-card-body">
         <h3 class="section-title-sm">
         Core Skills
-        <a class="add-link">+ Add Skill</a>
+        <a class="add-link" onclick="addSkill()">+ Add Skill</a>
         </h3>
-        <div class="chips-container">
-        <div class="skill-chip">React.js <button><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-        <div class="skill-chip">Python <button><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-        <div class="skill-chip">UI Design <button><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-        <div class="skill-chip">Machine Learning <button><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-        <div class="skill-chip">Tailwind CSS <button><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+        <div class="chips-container" id="skillsContainer">
+        <?php 
+            $skills = !empty($user->skills) ? json_decode($user->skills, true) : [];
+            if (empty($skills)): 
+        ?>
+            <p style="font-size:0.8rem; color:var(--color-text-muted);">No skills added yet.</p>
+        <?php else: ?>
+            <?php foreach ($skills as $skill): ?>
+            <div class="skill-chip"><?= htmlspecialchars($skill) ?> <button type="button" onclick="removeSkill(this, '<?= htmlspecialchars($skill) ?>')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <input type="hidden" name="skills[]" value="<?= htmlspecialchars($skill) ?>">
+            </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
         </div>
+        
+        <script>
+        function addSkill() {
+            let skill = prompt('Enter a skill:');
+            if (skill) {
+                let container = document.getElementById('skillsContainer');
+                let chip = document.createElement('div');
+                chip.className = 'skill-chip';
+                chip.innerHTML = skill + ' <button type="button" onclick="removeSkill(this, \'' + skill.replace(/'/g, "\\'") + '\')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><input type="hidden" name="skills[]" value="' + skill.replace(/"/g, "&quot;") + '">';
+                
+                // Remove the "No skills added yet." paragraph if it exists
+                let emptyP = container.querySelector('p');
+                if (emptyP) container.removeChild(emptyP);
+                
+                container.appendChild(chip);
+            }
+        }
+        function removeSkill(btn, skill) {
+            btn.parentNode.remove();
+        }
+        </script>
     </div>
     </div>
 
@@ -472,24 +500,27 @@ textarea.form-textarea {
     <div class="app-card">
     <div class="app-card-body">
         <h3 class="section-title-sm">Resume / CV</h3>
-        <div class="upload-box">
+        <div class="upload-box" style="position:relative;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <div>
-            <h5>Drag and drop your resume here</h5>
+            <h5>Upload your resume here</h5>
             <p>PDF, DOCX up to 10MB</p>
         </div>
-        <button class="btn-cancel" style="padding:6px 16px; margin-top:8px;">Browse Files</button>
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="document.getElementById('file-name').innerText = this.files[0].name">
+        <button type="button" class="btn-cancel" style="padding:6px 16px; margin-top:8px;">Browse Files</button>
         </div>
-        <div class="file-item">
+        <p id="file-name" style="font-size:0.8rem; font-weight:bold; color:var(--color-primary); text-align:center;"></p>
+        <?php if (!empty($user->resume_file)): ?>
+        <div class="file-item" style="margin-top:10px;">
         <div class="file-item-info">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             <div>
-            <h6>Rivers_Resume_2024.pdf</h6>
-            <p>Last updated Oct 12, 2023</p>
+            <h6><?= htmlspecialchars(basename($user->resume_file)) ?></h6>
+            <p>Current resume</p>
             </div>
         </div>
-        <button class="edit-icon-btn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
         </div>
+        <?php endif; ?>
     </div>
     </div>
 

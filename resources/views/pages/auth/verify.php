@@ -111,7 +111,6 @@
     <span id="toastMsg"></span>
   </div>
 
-  <script src="auth.js"></script>
-  <script src="verify.js"></script>
+  <script src="/assets/js/verify.js"></script>
 </body>
 </html>

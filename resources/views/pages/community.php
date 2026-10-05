@@ -586,7 +586,7 @@
                     <span class="job-tag gold" style="font-size:0.65rem; margin-bottom:12px; display:inline-block;">SPOTLIGHT</span>
                     <h3 class="font-bold text-lg mb-2">Ready to pay it forward?</h3>
                     <p class="text-xs mb-6" style="color:rgba(255,255,255,0.8); line-height:1.6;">Join 400+ alumni already mentoring the next generation of leaders. Your experience is their map.</p>
-                    <button class="btn-primary" style="background:var(--color-white); color:var(--color-primary); width:100%; padding:12px; font-size:0.9rem;">Become a Mentor</button>
+                    <button class="btn-primary" onclick="window.location.href='/profile'" style="background:var(--color-white); color:var(--color-primary); width:100%; padding:12px; font-size:0.9rem;">Become a Mentor</button>
                 </div>
 
             </div>

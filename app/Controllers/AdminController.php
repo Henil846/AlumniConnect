@@ -15,13 +15,19 @@ class AdminController {
     public function dashboard() {
         $this->checkAdmin();
         $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
         
         // Basic analytics
-        $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-        $donationTotal = $pdo->query("SELECT SUM(amount) FROM donations WHERE status='completed'")->fetchColumn();
+        $userCount = $pdo->prepare("SELECT COUNT(*) FROM users WHERE college_id = ?");
+        $userCount->execute([$collegeId]);
+        $userCount = $userCount->fetchColumn();
+        
+        $donationTotal = $pdo->prepare("SELECT SUM(amount) FROM donations d JOIN campaigns c ON d.campaign_id = c.id WHERE d.status='completed' AND c.college_id = ?");
+        $donationTotal->execute([$collegeId]);
+        $donationTotal = $donationTotal->fetchColumn();
         
         return View::render('admin/dashboard', [
-            'title' => 'Super Admin Dashboard',
+            'title' => 'Admin Dashboard',
             'activePage' => 'admin-dashboard',
             'userCount' => $userCount,
             'donationTotal' => $donationTotal,
@@ -32,8 +38,11 @@ class AdminController {
     public function moderation() {
         $this->checkAdmin();
         $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
         
-        $reports = $pdo->query("SELECT * FROM reports ORDER BY created_at DESC")->fetchAll(\PDO::FETCH_OBJ);
+        $stmt = $pdo->prepare("SELECT * FROM reports WHERE college_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$collegeId]);
+        $reports = $stmt->fetchAll(\PDO::FETCH_OBJ);
         
         return View::render('admin/moderation', [
             'title' => 'Moderation & Reports',
@@ -48,8 +57,9 @@ class AdminController {
         $id = $_POST['id'] ?? null;
         if ($id) {
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare("UPDATE reports SET status = 'resolved' WHERE id = ?");
-            $stmt->execute([$id]);
+            $collegeId = \App\Core\Auth::user()->college_id ?? null;
+            $stmt = $pdo->prepare("UPDATE reports SET status = 'resolved' WHERE id = ? AND college_id = ?");
+            $stmt->execute([$id, $collegeId]);
         }
         header("Location: /admin/moderation");
         exit;
@@ -58,8 +68,11 @@ class AdminController {
     public function payments() {
         $this->checkAdmin();
         $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
         
-        $payments = $pdo->query("SELECT * FROM donations ORDER BY created_at DESC")->fetchAll(\PDO::FETCH_OBJ);
+        $stmt = $pdo->prepare("SELECT d.* FROM donations d JOIN campaigns c ON d.campaign_id = c.id WHERE c.college_id = ? ORDER BY d.created_at DESC");
+        $stmt->execute([$collegeId]);
+        $payments = $stmt->fetchAll(\PDO::FETCH_OBJ);
         
         return View::render('admin/payments', [
             'title' => 'Payments & Revenue',
@@ -72,8 +85,11 @@ class AdminController {
     public function analytics() {
         $this->checkAdmin();
         $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
         
-        $views = $pdo->query("SELECT page_url, COUNT(*) as count FROM page_views GROUP BY page_url ORDER BY count DESC LIMIT 10")->fetchAll(\PDO::FETCH_OBJ);
+        $stmt = $pdo->prepare("SELECT page_url, COUNT(*) as count FROM page_views WHERE college_id = ? GROUP BY page_url ORDER BY count DESC LIMIT 10");
+        $stmt->execute([$collegeId]);
+        $views = $stmt->fetchAll(\PDO::FETCH_OBJ);
         
         return View::render('admin/analytics', [
             'title' => 'Analytics',

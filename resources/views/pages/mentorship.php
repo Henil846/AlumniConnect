@@ -159,13 +159,13 @@
 </div>
 
 <div class="mentor-filters">
-<button class="filter-pill active">All Mentors</button>
-<button class="filter-pill">Product Design</button>
-<button class="filter-pill">Engineering</button>
-<button class="filter-pill">Marketing</button>
-<button class="filter-pill with-icon">
+<button class="filter-pill <?= empty($_GET['industry']) ? 'active' : '' ?>" onclick="window.location.href='/mentorship'">All Mentors</button>
+<button class="filter-pill <?= ($_GET['industry'] ?? '') === 'Product Design' ? 'active' : '' ?>" onclick="window.location.href='?industry=Product+Design'">Product Design</button>
+<button class="filter-pill <?= ($_GET['industry'] ?? '') === 'Engineering' ? 'active' : '' ?>" onclick="window.location.href='?industry=Engineering'">Engineering</button>
+<button class="filter-pill <?= ($_GET['industry'] ?? '') === 'Marketing' ? 'active' : '' ?>" onclick="window.location.href='?industry=Marketing'">Marketing</button>
+<button class="filter-pill with-icon" onclick="window.location.href='/directory'">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-    More Filters
+    Full Directory
 </button>
 </div>
 
@@ -177,7 +177,7 @@
         <span class="mentor-badge">ALUMNI '<?= date('y', strtotime($mentor->created_at)) ?></span>
         <img src="/assets/img/mentor_elena.png" alt="<?= htmlspecialchars($mentor->full_name) ?>" />
         </div>
-        <div class="mentor-body">
+        <div class="mentor-body" style="cursor:pointer;" onclick="if(event.target.tagName !== 'BUTTON') window.location.href='/profile/<?= $mentor->id ?>'">
         <div class="mentor-header">
             <h3><?= htmlspecialchars($mentor->full_name) ?></h3>
             <div class="mentor-rating">
@@ -185,10 +185,14 @@
             4.9
             </div>
         </div>
-        <p class="mentor-role">Mentorship Volunteer</p>
+        <p class="mentor-role"><?= htmlspecialchars($mentor->industry ?? 'Professional') ?></p>
         <div class="mentor-skills">
-            <span class="mentor-skill-chip">LEADERSHIP</span>
-            <span class="mentor-skill-chip">INDUSTRY EXPERT</span>
+            <?php 
+                $skills = !empty($mentor->skills) ? json_decode($mentor->skills, true) : ['LEADERSHIP', 'INDUSTRY EXPERT'];
+                foreach (array_slice($skills, 0, 3) as $skill):
+            ?>
+            <span class="mentor-skill-chip"><?= htmlspecialchars($skill) ?></span>
+            <?php endforeach; ?>
         </div>
         <form action="/mentorship/book" method="POST" style="margin:0;">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">

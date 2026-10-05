@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     otpInputs.forEach(inp => inp.classList.remove('error'));
 
-    // Simulate verification
+    // Simulate verification -> Real verification
     verifyBtn.disabled = true;
     verifyBtn.innerHTML = 'Verifying...<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
 
@@ -135,24 +135,39 @@ document.addEventListener('DOMContentLoaded', () => {
     spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
     document.head.appendChild(spinStyle);
 
-    await new Promise(r => setTimeout(r, 1400));
+    try {
+        const formData = new FormData();
+        formData.append('otp', code);
+        const storedEmail = sessionStorage.getItem('userEmail') || sessionStorage.getItem('signupEmail');
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailParam = urlParams.get('email');
+        formData.append('email', emailParam || storedEmail || '');
 
-    // Demo: any 6-digit code works
-    clearInterval(timerInterval);
-    showToast('Email verified successfully! Welcome to Alumni Connect 🎉', 'success');
+        const response = await fetch('/verify', {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+        const data = await response.json();
 
-    // Mark verified
-    sessionStorage.setItem('emailVerified', 'true');
-
-    // Redirect based on role
-    const role = sessionStorage.getItem('userRole') || sessionStorage.getItem('signupRole') || 'student';
-    setTimeout(() => {
-      if (role === 'admin') {
-        window.location.href = 'super-admin-dashboard.html';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
-    }, 2000);
+        if (data.success) {
+            clearInterval(timerInterval);
+            showToast(data.message || 'Email verified successfully!', 'success');
+            sessionStorage.setItem('emailVerified', 'true');
+            if (data.redirect) {
+                setTimeout(() => window.location.href = data.redirect, 1500);
+            }
+        } else {
+            showToast(data.message || 'Invalid OTP', 'error');
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = 'Verify Account <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            otpInputs.forEach(inp => inp.classList.add('error'));
+        }
+    } catch (err) {
+        showToast('An unexpected error occurred', 'error');
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = 'Verify Account <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }
   });
 
 });

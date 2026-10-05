@@ -33,12 +33,12 @@ class UserRepository {
     }
 
     public function createEmailVerification($userId, $otp) {
-        $stmt = $this->pdo->prepare("INSERT INTO email_verifications (user_id, otp, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))");
+        $stmt = $this->pdo->prepare("INSERT INTO email_verifications (user_id, otp, expires_at) VALUES (?, ?, datetime('now', '+1 hour'))");
         $stmt->execute([$userId, $otp]);
     }
 
     public function verifyEmail($userId, $otp) {
-        $stmt = $this->pdo->prepare("SELECT * FROM email_verifications WHERE user_id = ? AND otp = ? AND expires_at > NOW()");
+        $stmt = $this->pdo->prepare("SELECT * FROM email_verifications WHERE user_id = ? AND otp = ? AND expires_at > datetime('now')");
         $stmt->execute([$userId, $otp]);
         if ($stmt->fetch()) {
             $this->pdo->prepare("UPDATE users SET is_verified = 1 WHERE id = ?")->execute([$userId]);
@@ -49,7 +49,7 @@ class UserRepository {
     }
 
     public function createSession($userId, $refreshToken) {
-        $stmt = $this->pdo->prepare("INSERT INTO user_sessions (user_id, refresh_token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY))");
+        $stmt = $this->pdo->prepare("INSERT INTO user_sessions (user_id, refresh_token, expires_at) VALUES (?, ?, datetime('now', '+30 days'))");
         $stmt->execute([$userId, $refreshToken]);
     }
 
@@ -62,11 +62,11 @@ class UserRepository {
     }
 
     public function createPasswordReset($email, $token) {
-        $this->pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))")->execute([$email, $token]);
+        $this->pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, datetime('now', '+1 hour'))")->execute([$email, $token]);
     }
 
     public function getValidPasswordReset($token) {
-        $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND used = 0 AND expires_at > NOW()");
+        $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND used = 0 AND expires_at > datetime('now')");
         $stmt->execute([$token]);
         return $stmt->fetch();
     }
@@ -86,7 +86,7 @@ class UserRepository {
     }
 
     public function checkRateLimit($email, $ip) {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM login_attempts WHERE (email = ? OR ip_address = ?) AND attempt_time > DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM login_attempts WHERE (email = ? OR ip_address = ?) AND attempt_time > datetime('now', '-15 minutes')");
         $stmt->execute([$email, $ip]);
         $row = $stmt->fetch();
         return $row['count'] >= 5; // Lockout after 5 failed attempts

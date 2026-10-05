@@ -1,5 +1,41 @@
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-primary: #1a2340;
+  --color-primary-light: #243060;
+  --color-accent: #F5A623;
+  --color-accent-dark: #e09518;
+  --color-bg: #F5F4F0;
+  --color-white: #ffffff;
+  --color-text: #1a2340;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-input-bg: #f9fafb;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+  --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: var(--color-text); }
+a { text-decoration: none; }
+
 /* Embedded from landing.css */
 /* ===========================
    Landing Page Styles
@@ -54,7 +90,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background-image: url('hero_bg.png');
+  background-image: url('/assets/img/hero_bg.png');
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -654,6 +690,6 @@
     <span id="toastMsg"></span>
   </div>
 
-  <script src="landing.js"></script>
+  <script src="/assets/js/landing.js"></script>
 </body>
 </html>

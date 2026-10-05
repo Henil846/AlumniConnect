@@ -423,19 +423,25 @@
     </div>
     <div class="app-card-body">
     
-    <div class="request-item">
-        <div class="request-info">
-        <img src="/assets/img/mentor_marcus.png" alt="Sarah" class="request-avatar" />
-        <div class="request-details">
-            <h4>Sarah Jenkins</h4>
-            <p>Senior PM at TechFlow • 12 years exp.</p>
+    <?php if (empty($mentorshipRequests)): ?>
+        <p style="font-size:0.85rem; color:var(--color-text-muted); padding:10px;">No pending mentorship requests.</p>
+    <?php else: ?>
+        <?php foreach ($mentorshipRequests as $req): ?>
+        <div class="request-item">
+            <div class="request-info">
+            <img src="/assets/img/default-avatar.png" alt="Mentee" class="request-avatar" />
+            <div class="request-details">
+                <h4><?= htmlspecialchars($req->full_name) ?></h4>
+                <p><?= htmlspecialchars($req->industry ?? 'Student') ?></p>
+            </div>
+            </div>
+            <div class="request-actions">
+            <button class="btn-small primary" onclick="acceptMentorship(<?= $req->id ?>)">Accept</button>
+            <button class="btn-small" onclick="window.location.href='/profile/<?= $req->mentee_id ?>'">Details</button>
+            </div>
         </div>
-        </div>
-        <div class="request-actions">
-        <button class="btn-small primary">Accept Invitation</button>
-        <button class="btn-small">Details</button>
-        </div>
-    </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
     </div>
 </div>
@@ -447,16 +453,22 @@
     </div>
     <div class="app-card-body">
     
-    <div class="referral-item">
-        <div class="referral-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-        <div class="referral-info">
-        <h4>UX Designer Referral</h4>
-        <p>Sent by Alex Rivera to Google</p>
-        <span class="badge badge-reviewed">REVIEWED</span>
+    <?php if (empty($referralRequestsData)): ?>
+        <p style="font-size:0.85rem; color:var(--color-text-muted); padding:10px;">No pending referrals.</p>
+    <?php else: ?>
+        <?php foreach ($referralRequestsData as $ref): ?>
+        <div class="referral-item">
+            <div class="referral-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+            <div class="referral-info">
+            <h4>Referral Request</h4>
+            <p>From <?= htmlspecialchars($ref->full_name) ?></p>
+            <span class="badge badge-pending" style="background:#fef3c7;color:#d97706;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">PENDING</span>
+            </div>
         </div>
-    </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
-    <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="window.location.href='/referrals'">Request Referral</button>
+    <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="window.location.href='/referral-request'">Request Referral</button>
     </div>
 </div>
 </div>
@@ -472,16 +484,36 @@
 </div>
 
 <div class="mentors-scroll">
-    <div class="mentor-card-mini">
-    <div style="position:relative; display:inline-block; margin-bottom:8px;">
-        <img src="/assets/img/mentor_elena.png" alt="Julia" style="display:block;" />
-        <span style="position:absolute; top:-4px; right:-4px; background:#dcfce7; color:#15803d; font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:10px; white-space:nowrap;">Available</span>
-    </div>
-    <h4>Julia Moretti</h4>
-    <p>Finance Lead @ JPM</p>
-    <p style="font-size:0.65rem; color:var(--color-accent-dark); font-weight:700; margin:4px 0 10px; background:var(--color-bg); border-radius:8px; padding:2px 8px; display:inline-block;">Finance • VC</p>
-    <button class="btn-small primary" style="width:100%; margin-bottom:6px; font-size:0.75rem;" onclick="window.location.href='/mentorship'">Request Mentorship</button>
-    <button class="btn-small" style="width:100%; font-size:0.75rem;" onclick="window.location.href='/profile'">View Profile</button>
-    </div>
+    <?php if (empty($topMentors)): ?>
+        <p style="font-size:0.85rem; color:var(--color-text-muted); padding:10px;">No mentors available right now.</p>
+    <?php else: ?>
+        <?php foreach ($topMentors as $mentor): ?>
+        <div class="mentor-card-mini">
+        <div style="position:relative; display:inline-block; margin-bottom:8px;">
+            <img src="/assets/img/default-avatar.png" alt="<?= htmlspecialchars($mentor->full_name) ?>" style="display:block;" />
+            <span style="position:absolute; top:-4px; right:-4px; background:#dcfce7; color:#15803d; font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:10px; white-space:nowrap;">Available</span>
+        </div>
+        <h4><?= htmlspecialchars($mentor->full_name) ?></h4>
+        <p><?= htmlspecialchars($mentor->industry ?? 'Professional') ?></p>
+        <p style="font-size:0.65rem; color:var(--color-accent-dark); font-weight:700; margin:4px 0 10px; background:var(--color-bg); border-radius:8px; padding:2px 8px; display:inline-block;"><?= htmlspecialchars($mentor->department ?? 'General') ?></p>
+        <button class="btn-small primary" style="width:100%; margin-bottom:6px; font-size:0.75rem;" onclick="window.location.href='/mentorship'">Request Mentorship</button>
+        <button class="btn-small" style="width:100%; font-size:0.75rem;" onclick="window.location.href='/profile/<?= $mentor->id ?>'">View Profile</button>
+        </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 </div>
+
+<form id="mentorshipActionForm" method="POST" action="/mentorship/update-status" style="display:none;">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+    <input type="hidden" name="session_id" id="mentorshipSessionId">
+    <input type="hidden" name="status" value="accepted">
+</form>
+
+<script>
+function acceptMentorship(id) {
+    document.getElementById('mentorshipSessionId').value = id;
+    document.getElementById('mentorshipActionForm').submit();
+}
+</script>
+

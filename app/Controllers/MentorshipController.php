@@ -9,9 +9,17 @@ class MentorshipController {
         $pdo = Database::getConnection();
         
         // Fetch users who are considered mentors. 
-        // For now, let's just fetch Alumni to serve as mentors.
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE role = 'alumni' ORDER BY created_at ASC LIMIT 10");
-        $stmt->execute();
+        $sql = "SELECT * FROM users WHERE role = 'alumni'";
+        $params = [];
+        
+        if (!empty($_GET['industry'])) {
+            $sql .= " AND industry = ?";
+            $params[] = $_GET['industry'];
+        }
+        
+        $sql .= " ORDER BY created_at ASC LIMIT 10";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         $mentors = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
         return View::render('mentorship', [

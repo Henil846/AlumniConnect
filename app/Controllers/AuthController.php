@@ -18,7 +18,7 @@ class AuthController {
         $csrf = bin2hex(random_bytes(32));
         $_COOKIE['csrf_token'] = $csrf;
         setcookie('csrf_token', $csrf, time() + 3600, '/', '', false, true);
-        return View::render('auth/signup', ['title' => 'Create Account — Alumni Connect', 'csrf' => $csrf], 'auth');
+        return View::render('auth/signup', ['title' => 'Create Account — Alumni Connect', 'csrf' => $csrf, 'extraScript' => '/assets/js/signup.js'], 'auth');
     }
 
     public function processSignup() {

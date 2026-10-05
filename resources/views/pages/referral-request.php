@@ -5,9 +5,9 @@
 <div class="layout-2col">
     
 <!-- LEFT COLUMN: Stepper -->
-<form action="/referral-request/submit" method="POST" class="col-main">
+<form action="/referral-request/submit" method="POST" enctype="multipart/form-data" class="col-main">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
-    <input type="hidden" name="alumni_id" value="2"> <!-- Hardcoded for now -->
+    <input type="hidden" name="alumni_id" value="<?= $alumni->id ?? '' ?>">
     
     <div class="step-card">
     
@@ -16,41 +16,41 @@
         <div class="step-title">Select Target Alumni</div>
     </div>
     <div class="target-alumni-grid mb-8">
+        <?php if (!empty($alumni)): ?>
         <div class="alumni-select-card selected">
         <svg class="check-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
         <div class="alumni-logo-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
         <div>
-            <div class="font-bold">Sarah Chen</div>
-            <div class="text-xs text-muted">Lead Eng @ Google</div>
+            <div class="font-bold"><?= htmlspecialchars($alumni->full_name) ?></div>
+            <div class="text-xs text-muted"><?= htmlspecialchars($alumni->industry ?? 'Alumni') ?></div>
         </div>
         </div>
-        <div class="alumni-select-card">
-        <svg class="check-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-        <div class="alumni-logo-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
-        <div>
-            <div class="font-bold">Marcus Thorne</div>
-            <div class="text-xs text-muted">VP @ Goldman Sachs</div>
+        <?php else: ?>
+        <div style="padding:20px; text-align:center;">
+            <p>Please select an alumni from the directory.</p>
+            <a href="/directory" class="btn-outline" style="margin-top:12px;display:inline-block;">Go to Directory</a>
         </div>
-        </div>
+        <?php endif; ?>
     </div>
 
     <div class="step-header">
         <div class="step-number">2</div>
         <div class="step-title">Upload Latest Resume</div>
     </div>
-    <div class="upload-box" style="margin-bottom:32px; background:var(--color-white);">
+    <div class="upload-box" style="margin-bottom:32px; background:var(--color-white); position:relative;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <div>
-        <h5 class="font-semibold text-md mb-1">Drag and drop your PDF here</h5>
+        <h5 class="font-semibold text-md mb-1">Upload your PDF here</h5>
         <p class="text-xs text-muted">or click to browse from your device (Max 5MB)</p>
         </div>
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" required style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="this.previousElementSibling.querySelector('h5').innerText = this.files[0].name">
     </div>
 
     <div class="step-header">
         <div class="step-number">3</div>
         <div class="step-title">Personal Introduction</div>
     </div>
-    <textarea class="form-textarea mb-6" rows="4" placeholder="Briefly explain why you're interested in this role and how the alumni's experience inspires you..."></textarea>
+    <textarea name="message" class="form-textarea mb-6" rows="4" placeholder="Briefly explain why you're interested in this role and how the alumni's experience inspires you..." required></textarea>
 
     <button type="submit" class="btn-primary" style="width:100%; padding:16px; border-radius:var(--radius-md); font-size:1rem; display:flex; justify-content:center; gap:8px; align-items:center;">
         Submit Referral Request

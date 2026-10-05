@@ -6,10 +6,19 @@ use App\Core\Database;
 
 class ReferralsController {
     public function index() {
+        $pdo = Database::getConnection();
+        $alumniId = $_GET['alumni_id'] ?? null;
+        $alumni = null;
+        if ($alumniId) {
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = 'alumni'");
+            $stmt->execute([$alumniId]);
+            $alumni = $stmt->fetch(\PDO::FETCH_OBJ);
+        }
+
         return View::render('referral-request', [
             'title' => 'Request a Referral — Alumni Connect',
             'activePage' => 'referral-request',
-            
+            'alumni' => $alumni
         ], 'app');
     }
 

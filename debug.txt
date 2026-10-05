@@ -1,0 +1,9 @@
+An unexpected server error occurred: SQLSTATE[HY000]: General error: 25 column index out of range in C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\app\Controllers\JobsController.php on line 42
+#0 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\app\Controllers\JobsController.php(42): PDOStatement->execute(Array)
+#1 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\routes\web.php(114): App\Controllers\JobsController->index()
+#2 [internal function]: {closure}()
+#3 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\app\Core\Router.php(63): call_user_func_array(Object(Closure), Array)
+#4 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\app\Core\Router.php(37): App\Core\Router::invoke(Object(Closure))
+#5 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\routes\web.php(359): App\Core\Router::dispatch('/jobs', 'GET')
+#6 C:\Users\HENIL\OneDrive\Desktop\WT Project\Alumni-Connect-master\public\index.php(35): require_once('C:\\Users\\HENIL\\...')
+#7 {main}

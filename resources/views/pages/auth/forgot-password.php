@@ -94,7 +94,6 @@
     <span id="toastMsg"></span>
   </div>
 
-  <script src="auth.js"></script>
-  <script src="forgot-password.js"></script>
+  <script src="/assets/js/forgot-password.js"></script>
 </body>
 </html>
