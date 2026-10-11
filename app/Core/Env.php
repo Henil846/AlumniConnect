@@ -24,6 +24,10 @@ class Env {
         if (!self::$loaded) {
             self::load(__DIR__ . '/../../.env');
         }
-        return self::$vars[$key] ?? $default;
+        $val = self::$vars[$key] ?? $default;
+        if ($key === 'APP_ENV' && (empty($val) || $val === false)) {
+            return 'production';
+        }
+        return $val;
     }
 }

@@ -14,22 +14,37 @@ class Database {
     public static function getConnection() {
         if (self::$pdo === null) {
             $connection = Env::get('DB_CONNECTION', 'sqlite');
-            
-            // Allow test database override via HTTP header (dev/testing mode only) or DB_PATH env
-            $testDb = null;
-            if (Env::get('APP_ENV', 'development') !== 'production') {
-                if (!empty($_SERVER['HTTP_X_TEST_DB'])) {
-                    $headerDb = trim($_SERVER['HTTP_X_TEST_DB']);
-                    // Prevent path traversal outside project
-                    if (strpos($headerDb, '..') === false && (strpos($headerDb, 'test') !== false || substr($headerDb, -7) === '.sqlite')) {
-                        $testDb = $headerDb;
+            $appEnv = Env::get('APP_ENV', 'production');
+            if (empty($appEnv)) {
+                $appEnv = 'production';
+            }
+
+            // DB_PATH from environment is accepted ONLY if APP_ENV === 'testing' exactly,
+            // and only if the resolved real path is inside the project's database/ folder and matches test*.sqlite.
+            $customDb = null;
+            $envDbPath = getenv('DB_PATH') ?: ($_SERVER['DB_PATH'] ?? ($_ENV['DB_PATH'] ?? null));
+
+            if (!empty($envDbPath)) {
+                if ($appEnv === 'testing') {
+                    $projectDbDir = realpath(__DIR__ . '/../../database');
+                    $candidate = $envDbPath;
+                    if (strpos($candidate, '/') !== 0 && strpos($candidate, ':\\') !== 1 && strpos($candidate, ':/') !== 1) {
+                        $candidate = __DIR__ . '/../../' . $candidate;
                     }
-                } elseif (getenv('DB_PATH')) {
-                    $testDb = getenv('DB_PATH');
+                    $candidateDir = realpath(dirname($candidate));
+                    $filename = basename($candidate);
+
+                    if ($candidateDir !== false && $projectDbDir !== false && $candidateDir === $projectDbDir && preg_match('/^test.*\.sqlite$/i', $filename)) {
+                        $customDb = $candidate;
+                    } else {
+                        error_log("SECURITY WARNING: Rejected unauthorized DB_PATH '{$envDbPath}'. Path must reside in database/ and match test*.sqlite.");
+                    }
+                } else {
+                    error_log("SECURITY WARNING: DB_PATH environment override is forbidden when APP_ENV is '{$appEnv}' (allowed only in 'testing').");
                 }
             }
 
-            $database = $testDb ?: Env::get('DB_DATABASE', __DIR__ . '/../../database/database.sqlite');
+            $database = $customDb ?: Env::get('DB_DATABASE', __DIR__ . '/../../database/database.sqlite');
             
             try {
                 if ($connection === 'sqlite') {

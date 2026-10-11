@@ -46,6 +46,11 @@ Router::get('/reset-password', [AuthController::class, 'showResetPassword']);
 Router::post('/reset-password', [AuthController::class, 'processResetPassword']);
 
 Router::get('/dev/mailbox', function() {
+    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+        http_response_code(404);
+        echo "404 Not Found";
+        return;
+    }
     $logFile = __DIR__ . '/../storage/logs/mail.log';
     if (file_exists($logFile)) {
         echo "<pre>" . htmlspecialchars(file_get_contents($logFile)) . "</pre>";
@@ -55,18 +60,34 @@ Router::get('/dev/mailbox', function() {
 });
 
 Router::get('/dev/selftest-error', function() {
+    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+        http_response_code(404);
+        return;
+    }
     echo "<b>Notice</b>: Undefined variable \$uninitialized_var in /app/Controllers/TestController.php on line 42";
 });
 
 Router::get('/dev/selftest-empty', function() {
+    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+        http_response_code(404);
+        return;
+    }
     echo "    ";
 });
 
 Router::get('/dev/forced-exception', function() {
+    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+        http_response_code(404);
+        return;
+    }
     throw new \RuntimeException('Forced test exception for 500 verification');
 });
 
 Router::get('/dev/display-errors-check', function() {
+    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+        http_response_code(404);
+        return;
+    }
     echo json_encode(['display_errors' => ini_get('display_errors')]);
 });
 
