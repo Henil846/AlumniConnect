@@ -110,11 +110,35 @@ class EventsAdminController {
             </div>
         ";
 
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        $dompdf->stream("certificate_{$data->full_name}.pdf", array("Attachment" => false));
+        if (class_exists(Dompdf::class)) {
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            $dompdf->stream("certificate_{$data->full_name}.pdf", array("Attachment" => false));
+            exit;
+        }
+
+        // Pure-PHP zero-dependency valid PDF-1.4 stream fallback when vendor is not installed
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="certificate_' . rawurlencode($data->full_name) . '.pdf"');
+        $cleanName = addcslashes($data->full_name, '()\\');
+        $cleanTitle = addcslashes($data->event_title, '()\\');
+        $cleanDate = date('F j, Y', strtotime($data->event_date));
+        $stream = "BT /F1 18 Tf 50 500 Td (Certificate of Attendance) Tj ET\n"
+                . "BT /F1 14 Tf 50 460 Td (Presented to: " . $cleanName . ") Tj ET\n"
+                . "BT /F1 12 Tf 50 420 Td (For attending: " . $cleanTitle . ") Tj ET\n"
+                . "BT /F1 10 Tf 50 380 Td (Date: " . $cleanDate . ") Tj ET\n";
+        $len = strlen($stream);
+        $pdf = "%PDF-1.4\n"
+            . "1 0 obj<</Type /Catalog /Pages 2 0 R>>endobj\n"
+            . "2 0 obj<</Type /Pages /Kids [3 0 R] /Count 1>>endobj\n"
+            . "3 0 obj<</Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources <<>> /Contents 4 0 R>>endobj\n"
+            . "4 0 obj<</Length " . $len . ">>stream\n" . $stream . "endstream\nendobj\n"
+            . "xref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000216 00000 n \n"
+            . "trailer<</Size 5 /Root 1 0 R>>\nstartxref\n" . (270 + $len) . "\n%%EOF";
+        echo $pdf;
+        exit;
     }
 
     public function uploadGallery() {
