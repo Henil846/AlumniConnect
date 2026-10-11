@@ -32,6 +32,10 @@ class StartupHubController {
     }
 
     public function create() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");
 

@@ -49,6 +49,7 @@ class PaymentController {
             $secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');
             $expectedSig = hash_hmac('sha256', $txnId, $secret);
             if (!hash_equals($expectedSig, $sig)) {
+                http_response_code(403);
                 die("Invalid callback signature");
             }
             $pdo = Database::getConnection();
@@ -57,6 +58,12 @@ class PaymentController {
             $donation = $stmt->fetch(\PDO::FETCH_OBJ);
 
             if ($donation) {
+                if ($donation->status === 'completed') {
+                    // Replayed callback: Prevent double-counting campaign total
+                    header("Location: /donations?already_completed=1");
+                    exit;
+                }
+
                 if ($status === 'success') {
                     $pdo->prepare("UPDATE donations SET status = 'completed' WHERE transaction_id = ?")->execute([$txnId]);
                     
@@ -71,7 +78,7 @@ class PaymentController {
                     $collegeId = $camp ? $camp->college_id : $donation->college_id;
 
                     // Notification for Donor
-                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'donation', ?, ?)");
+                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'donation', ?, ?, '/donations')");
                     $notifStmt->execute([$donation->user_id, "Thank you! Your donation of ₹" . number_format($donation->amount, 2) . " to '$campTitle' was successful.", $collegeId]);
 
                     // Notification for Campaign Creator

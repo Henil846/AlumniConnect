@@ -23,18 +23,37 @@ class AdsController {
     }
 
     public function create() {
-        // Mock admin creation
-        $sponsor = $_POST['sponsor_name'] ?? '';
-        $link = $_POST['link_url'] ?? '';
-        $image = $_POST['image_url'] ?? 'https://via.placeholder.com/300x150';
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $sponsor = trim($_POST['sponsor_name'] ?? '');
+        $link = trim($_POST['link_url'] ?? '');
+        $image = trim($_POST['image_url'] ?? '/assets/img/login_side_img.png');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
 
         if ($sponsor && $link) {
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare("INSERT INTO advertisements (sponsor_name, image_url, link_url) VALUES (?, ?, ?)");
-            $stmt->execute([$sponsor, $image, $link]);
+            $stmt = $pdo->prepare("INSERT INTO advertisements (sponsor_name, image_url, link_url, status, college_id) VALUES (?, ?, ?, 'active', ?)");
+            $stmt->execute([$sponsor, $image, $link, $collegeId]);
         }
 
         header("Location: /ads?added=1");
+        exit;
+    }
+
+    public function disable() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $id = (int)($_POST['id'] ?? 0);
+        $status = ($_POST['status'] ?? 'disabled') === 'active' ? 'active' : 'disabled';
+        if ($id > 0) {
+            $pdo = Database::getConnection();
+            $pdo->prepare("UPDATE advertisements SET status = ? WHERE id = ?")->execute([$status, $id]);
+        }
+        header("Location: /ads?status_updated=1");
         exit;
     }
 }

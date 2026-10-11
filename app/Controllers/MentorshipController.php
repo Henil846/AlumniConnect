@@ -8,9 +8,11 @@ class MentorshipController {
     public function index() {
         $pdo = Database::getConnection();
         
-        // Fetch users who are considered mentors. 
-        $sql = "SELECT * FROM users WHERE role = 'alumni'";
-        $params = [];
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        
+        // Fetch users who are considered mentors within the same college. 
+        $sql = "SELECT * FROM users WHERE role = 'alumni' AND college_id = ?";
+        $params = [$collegeId];
         
         if (!empty($_GET['industry'])) {
             $sql .= " AND industry = ?";
@@ -39,15 +41,7 @@ class MentorshipController {
         if ($mentorId) {
             $pdo = Database::getConnection();
             try {
-                $pdo->exec("CREATE TABLE IF NOT EXISTS mentorship_sessions (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    mentor_id INT NOT NULL,
-                    mentee_id INT NOT NULL,
-                    status VARCHAR(50) DEFAULT 'pending',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )");
-                
-                $stmt = $pdo->prepare("INSERT INTO mentorship_sessions (mentor_id, mentee_id, college_id) VALUES (?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO mentorship_sessions (mentor_id, mentee_id, status, college_id) VALUES (?, ?, 'pending', ?)");
                 $menteeId = \App\Core\Auth::id() ?? null;
                 $collegeId = \App\Core\Auth::user()->college_id ?? null;
                 
@@ -62,7 +56,7 @@ class MentorshipController {
                     
                     // Generate Notification for Mentor
                     $menteeName = \App\Core\Auth::user()->full_name ?? 'Someone';
-                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'mentorship', ?, ?)");
+                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'mentorship', ?, ?, '/mentorship')");
                     $notifStmt->execute([$mentorId, "$menteeName booked a mentorship session with you.", $collegeId]);
                 }
             } catch (\PDOException $e) {}
@@ -81,7 +75,7 @@ class MentorshipController {
         $status = $_POST['status'] ?? null;
         $mentorId = \App\Core\Auth::id() ?? null;
         
-        if ($sessionId && in_array($status, ['accepted', 'rejected', 'rescheduled'])) {
+        if ($sessionId && in_array($status, ['accepted', 'declined', 'rejected', 'rescheduled', 'completed'])) {
             $pdo = Database::getConnection();
             
             // Verify ownership
@@ -95,7 +89,7 @@ class MentorshipController {
                 // Generate Notification for Mentee
                 $mentorName = \App\Core\Auth::user()->full_name ?? 'Your mentor';
                 $collegeId = \App\Core\Auth::user()->college_id ?? null;
-                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'mentorship_update', ?, ?)");
+                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'mentorship_update', ?, ?, '/mentorship')");
                 $notifStmt->execute([$menteeId, "$mentorName has $status your mentorship session request.", $collegeId]);
             } else {
                 http_response_code(403);
@@ -104,6 +98,33 @@ class MentorshipController {
         }
         
         header('Location: /mentorship?updated=1');
+        exit;
+    }
+
+    public function cancel() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die('CSRF validation failed.');
+        }
+        $sessionId = (int)($_POST['session_id'] ?? 0);
+        $userId = \App\Core\Auth::id() ?? null;
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $pdo = Database::getConnection();
+
+        $stmt = $pdo->prepare("SELECT * FROM mentorship_sessions WHERE id = ?");
+        $stmt->execute([$sessionId]);
+        $session = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$session || ($session->mentee_id != $userId && $session->mentor_id != $userId)) {
+            http_response_code(403);
+            die("Unauthorized to cancel this session");
+        }
+        $pdo->prepare("UPDATE mentorship_sessions SET status = 'cancelled' WHERE id = ?")->execute([$sessionId]);
+        
+        $targetUser = ($session->mentee_id == $userId) ? $session->mentor_id : $session->mentee_id;
+        $cancellerName = \App\Core\Auth::user()->full_name ?? 'Someone';
+        $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'mentorship_cancel', ?, ?, '/mentorship')");
+        $notifStmt->execute([$targetUser, "$cancellerName cancelled the mentorship session.", $collegeId]);
+
+        header("Location: /mentorship?cancelled=1");
         exit;
     }
 }

@@ -6,13 +6,17 @@ use App\Services\JwtService;
 class AuthMiddleware {
     public static function handle() {
         if (!isset($_COOKIE['auth_token'])) {
-            header('Location: /login');
+            $uri = $_SERVER['REQUEST_URI'] ?? '';
+            $returnParam = ($uri && $uri !== '/' && $uri !== '/login' && $uri !== '/logout') ? '?return=' . urlencode($uri) : '';
+            header('Location: /login' . $returnParam);
             exit;
         }
 
         $payload = JwtService::decode($_COOKIE['auth_token']);
         if (!$payload) {
-            header('Location: /login');
+            $uri = $_SERVER['REQUEST_URI'] ?? '';
+            $returnParam = ($uri && $uri !== '/' && $uri !== '/login' && $uri !== '/logout') ? '?return=' . urlencode($uri) : '';
+            header('Location: /login' . $returnParam);
             exit;
         }
 

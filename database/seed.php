@@ -1,4 +1,15 @@
 <?php
+require_once __DIR__ . '/../app/Core/Env.php';
+require_once __DIR__ . '/../app/Core/Database.php';
+
+App\Core\Env::load(__DIR__ . '/../.env');
+
+// DEV-ONLY GUARD: Block execution in production environments
+if (getenv('APP_ENV') === 'production' || ($_ENV['APP_ENV'] ?? '') === 'production') {
+    fwrite(STDERR, "FATAL: Seed scripts and demo data generation are strictly disabled in production mode (APP_ENV=production).\n");
+    exit(1);
+}
+
 use App\Core\Database;
 
 $pdo = Database::getConnection();

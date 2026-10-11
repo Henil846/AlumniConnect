@@ -23,6 +23,7 @@ class AuthController {
 
     public function processSignup() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
             return;
         }
@@ -69,6 +70,7 @@ class AuthController {
 
     public function processLogin() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
             return;
         }
@@ -77,6 +79,7 @@ class AuthController {
         $email = $_POST['email'] ?? '';
 
         if ($this->userRepo->checkRateLimit($email, $ip)) {
+            http_response_code(429);
             echo json_encode(['success' => false, 'message' => 'Too many failed login attempts. Try again later.']);
             return;
         }
@@ -98,6 +101,29 @@ class AuthController {
         if (!$user->is_verified) {
             echo json_encode(['success' => false, 'message' => 'Please verify your email before logging in.']);
             return;
+        }
+
+        // Check if institution or user is suspended
+        if ($user->status === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'Your account has been suspended.']);
+            return;
+        }
+
+        if ($user->college_id) {
+            $pdo = \App\Core\Database::getConnection();
+            $colStatus = $pdo->query("SELECT status FROM colleges WHERE id = " . intval($user->college_id))->fetchColumn();
+            if ($colStatus === 'suspended' && $user->role !== 'super_admin') {
+                http_response_code(403);
+                $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') 
+                       || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+                       || (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+                if ($isAjax) {
+                    echo json_encode(['success' => false, 'message' => 'Your institution has been suspended.']);
+                } else {
+                    die("Your institution has been suspended.");
+                }
+                return;
+            }
         }
 
         $this->userRepo->clearLoginAttempts($email);
@@ -140,6 +166,10 @@ class AuthController {
     }
 
     public function logout() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
         if (isset($_COOKIE['refresh_token'])) {
             $this->userRepo->invalidateSession($_COOKIE['refresh_token']);
         }
@@ -150,6 +180,10 @@ class AuthController {
     }
 
     public function logoutAllDevices() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
         // Assume user id is decoded from token (not fully implemented here, just demonstrating the DB call)
         $token = $_COOKIE['auth_token'] ?? '';
         $payload = JwtService::decode($token);
@@ -167,6 +201,11 @@ class AuthController {
     }
 
     public function processVerify() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
+            return;
+        }
         $email = $_POST['email'] ?? '';
         $otp = $_POST['otp'] ?? '';
         $user = $this->userRepo->findByEmail($email);
@@ -182,6 +221,11 @@ class AuthController {
     }
 
     public function processForgotPassword() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
+            return;
+        }
         $email = $_POST['email'] ?? '';
         $user = $this->userRepo->findByEmail($email);
         if ($user) {
@@ -198,6 +242,11 @@ class AuthController {
     }
 
     public function processResetPassword() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
+            return;
+        }
         $token = $_POST['token'] ?? '';
         $password = $_POST['password'] ?? '';
         if (strlen($password) < 8) {

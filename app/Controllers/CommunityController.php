@@ -33,6 +33,10 @@ class CommunityController {
     }
 
     public function createPost() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");
 
@@ -108,11 +112,81 @@ class CommunityController {
                 die("Unauthorized to comment on this post");
             }
             
-            $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, user_id, content) VALUES (?, ?, ?)");
-            $stmt->execute([$postId, $userId, $content]);
+            $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, user_id, content, college_id) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$postId, $userId, $content, $collegeId]);
         }
         
         header("Location: /community");
+        exit;
+    }
+
+    public function deletePost() {
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $postId = (int)($_POST['post_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $role = \App\Core\Auth::user()->role ?? null;
+        
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = ?");
+        $stmt->execute([$postId]);
+        $post = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$post) {
+            http_response_code(404);
+            die("Post not found");
+        }
+        if ($post->college_id != $collegeId || ($post->user_id != $userId && $role !== 'admin' && $role !== 'college_admin')) {
+            http_response_code(403);
+            die("Forbidden: Cannot delete post");
+        }
+        $pdo->prepare("DELETE FROM posts WHERE id = ?")->execute([$postId]);
+        $pdo->prepare("DELETE FROM post_comments WHERE post_id = ?")->execute([$postId]);
+        $pdo->prepare("DELETE FROM post_likes WHERE post_id = ?")->execute([$postId]);
+        header("Location: /community?deleted=1");
+        exit;
+    }
+
+    public function editPost() {
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $postId = (int)($_POST['post_id'] ?? 0);
+        $content = trim($_POST['content'] ?? '');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = ?");
+        $stmt->execute([$postId]);
+        $post = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$post) {
+            http_response_code(404);
+            die("Post not found");
+        }
+        if ($post->college_id != $collegeId || $post->user_id != $userId) {
+            http_response_code(403);
+            die("Forbidden: Cannot edit post");
+        }
+        if (!empty($content)) {
+            $pdo->prepare("UPDATE posts SET content = ? WHERE id = ?")->execute([$content, $postId]);
+        }
+        header("Location: /community?updated=1");
+        exit;
+    }
+
+    public function pollVote() {
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $postId = (int)($_POST['post_id'] ?? 0);
+        $option = trim($_POST['option'] ?? 'Option A');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT id FROM posts WHERE id = ? AND college_id = ?");
+        $stmt->execute([$postId, $collegeId]);
+        if (!$stmt->fetch()) {
+            http_response_code(403);
+            die("Forbidden: Cannot vote on cross-college poll");
+        }
+        header("Location: /community?voted=1");
         exit;
     }
 }

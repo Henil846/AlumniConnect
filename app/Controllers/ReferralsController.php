@@ -53,7 +53,7 @@ class ReferralsController {
                     
                     // Generate Notification for Alumni
                     $studentName = \App\Core\Auth::user()->full_name ?? 'Someone';
-                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'referral', ?, ?)");
+                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'referral', ?, ?, '/referral-request')");
                     $notifStmt->execute([$alumniId, "$studentName requested a referral from you.", $collegeId]);
                 }
             } catch (\PDOException $e) {}
@@ -86,7 +86,7 @@ class ReferralsController {
                 // Generate Notification for Student
                 $alumniName = \App\Core\Auth::user()->full_name ?? 'An alumni';
                 $collegeId = \App\Core\Auth::user()->college_id ?? null;
-                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'referral_update', ?, ?)");
+                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'referral_update', ?, ?, '/referral-request')");
                 $notifStmt->execute([$studentId, "$alumniName has $status your referral request.", $collegeId]);
             } else {
                 http_response_code(403);

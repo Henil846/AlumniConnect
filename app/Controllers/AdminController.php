@@ -97,7 +97,7 @@ class AdminController {
 
             // Notify reporter
             if ($rep && $rep->reporter_id) {
-                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'moderation', ?, ?)");
+                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'moderation', ?, ?, '/community')");
                 $notifStmt->execute([$rep->reporter_id, "Your report for item ({$rep->reported_item_type}) has been reviewed and resolved by administrators.", $collegeId]);
             }
         }
@@ -143,12 +143,24 @@ class AdminController {
 
         $userId = (int)($_POST['user_id'] ?? 0);
         $status = in_array($_POST['status'] ?? '', ['active', 'pending', 'suspended']) ? $_POST['status'] : 'active';
+        $isVerified = isset($_POST['is_verified']) ? (int)$_POST['is_verified'] : null;
         $collegeId = \App\Core\Auth::user()->college_id ?? null;
 
         if ($userId > 0 && $collegeId) {
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ? AND college_id = ?");
-            $stmt->execute([$status, $userId, $collegeId]);
+            $check = $pdo->prepare("SELECT id FROM users WHERE id = ? AND college_id = ?");
+            $check->execute([$userId, $collegeId]);
+            if (!$check->fetch()) {
+                http_response_code(403);
+                die("Forbidden: User does not belong to this college");
+            }
+            if ($isVerified !== null) {
+                $stmt = $pdo->prepare("UPDATE users SET status = ?, is_verified = ? WHERE id = ? AND college_id = ?");
+                $stmt->execute([$status, $isVerified, $userId, $collegeId]);
+            } else {
+                $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ? AND college_id = ?");
+                $stmt->execute([$status, $userId, $collegeId]);
+            }
         }
 
         header("Location: /admin/dashboard?user_updated=1");

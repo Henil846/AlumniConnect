@@ -24,9 +24,12 @@
         <button class="role-tab" id="tabAdmin" data-role="admin" role="tab" aria-selected="false">College Admin</button>
     </div>
 
-    <form id="loginForm" action="/login" method="POST" novalidate>
+    <form id="loginForm" action="/login<?= !empty($_GET['return']) ? '?return=' . urlencode($_GET['return']) : '' ?>" method="POST" novalidate>
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf ?? '') ?>">
         <input type="hidden" name="role" id="loginRoleInput" value="student">
+        <?php if (!empty($_GET['return'])): ?>
+        <input type="hidden" name="return" value="<?= htmlspecialchars($_GET['return']) ?>">
+        <?php endif; ?>
         <!-- Email -->
         <div class="form-group" style="margin-top: 24px;">
         <label class="form-label" for="loginEmail">Email Address</label>

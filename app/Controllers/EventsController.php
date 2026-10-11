@@ -93,7 +93,7 @@ class EventsController {
         
         // Generate Notification for Attendee
         $eventTitle = $pdo->query("SELECT title FROM events WHERE id = " . intval($eventId))->fetchColumn() ?: 'an event';
-        $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'event_reminder', ?, ?)");
+        $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'event_reminder', ?, ?, '/events')");
         $notifStmt->execute([$userId, "You have successfully registered for '$eventTitle'.", $collegeId]);
 
         header("Location: /events?registered=1&event_id=$eventId");

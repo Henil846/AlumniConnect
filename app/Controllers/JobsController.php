@@ -87,7 +87,7 @@ class JobsController {
 
         // Generate Notification for Applicant
         $jobTitle = $pdo->query("SELECT title FROM jobs WHERE id = " . intval($jobId))->fetchColumn() ?: 'a job';
-        $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'job_update', ?, ?)");
+        $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'job_update', ?, ?, '/jobs')");
         $notifStmt->execute([$userId, "Your application for '$jobTitle' has been received.", $collegeId]);
 
         header("Location: /jobs?applied=1");
@@ -120,6 +120,64 @@ class JobsController {
             $stmt->execute([$title, $company, $location, $type, $industry, $salaryRange, $description, $requirements, $collegeId]);
         }
         header("Location: /jobs?created=1");
+        exit;
+    }
+
+    public function delete() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $jobId = (int)($_POST['job_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $role = \App\Core\Auth::user()->role ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM jobs WHERE id = ?");
+        $stmt->execute([$jobId]);
+        $job = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$job) {
+            http_response_code(404);
+            die("Job not found");
+        }
+        if ($job->college_id != $collegeId || ($role !== 'admin' && $role !== 'college_admin')) {
+            http_response_code(403);
+            die("Forbidden: Cannot delete job");
+        }
+        $pdo->prepare("DELETE FROM jobs WHERE id = ?")->execute([$jobId]);
+        header("Location: /jobs?deleted=1");
+        exit;
+    }
+
+    public function edit() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF Token Verification Failed");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $jobId = (int)($_POST['job_id'] ?? 0);
+        $title = trim($_POST['title'] ?? '');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $role = \App\Core\Auth::user()->role ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM jobs WHERE id = ?");
+        $stmt->execute([$jobId]);
+        $job = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$job) {
+            http_response_code(404);
+            die("Job not found");
+        }
+        if ($job->college_id != $collegeId || ($role !== 'admin' && $role !== 'college_admin' && $role !== 'alumni')) {
+            http_response_code(403);
+            die("Forbidden: Cannot edit job");
+        }
+        if (!empty($title)) {
+            $pdo->prepare("UPDATE jobs SET title = ? WHERE id = ?")->execute([$title, $jobId]);
+        }
+        header("Location: /jobs?updated=1");
         exit;
     }
 }

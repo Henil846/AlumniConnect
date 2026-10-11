@@ -292,7 +292,7 @@
         <input type="hidden" name="mentor_id" value="<?= $user->id ?>">
         <button type="submit" class="btn-primary">Request Mentorship</button>
     </form>
-    <button class="btn-outline" onclick="window.location.href='/messages?new=<?= $user->id ?>'">Message</button>
+    <button class="btn-outline" onclick="window.location.href='/messages?user_id=<?= $user->id ?>'">Message</button>
     </div>
 </div>
 
@@ -383,7 +383,7 @@
             Contact Privacy
         </div>
         <p>This profile is verified. Personal contact information is hidden to protect privacy.</p>
-        <button class="btn-message" onclick="window.location.href='/messages?new=<?= $user->id ?>'">
+        <button class="btn-message" onclick="window.location.href='/messages?user_id=<?= $user->id ?>'">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             Message <?= htmlspecialchars(explode(' ', $user->full_name)[0]) ?>
         </button>

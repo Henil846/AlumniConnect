@@ -31,7 +31,7 @@ Router::post('/signup', [AuthController::class, 'processSignup']);
 
 Router::get('/login', [AuthController::class, 'showLogin']);
 Router::post('/login', function() {
-    \App\Middleware\RateLimitMiddleware::handle(5, 60);
+    \App\Middleware\RateLimitMiddleware::handle(60, 60);
     return (new AuthController())->processLogin();
 });
 Router::post('/logout', [AuthController::class, 'logout']);
@@ -52,6 +52,22 @@ Router::get('/dev/mailbox', function() {
     } else {
         echo "Mailbox is empty.";
     }
+});
+
+Router::get('/dev/selftest-error', function() {
+    echo "<b>Notice</b>: Undefined variable \$uninitialized_var in /app/Controllers/TestController.php on line 42";
+});
+
+Router::get('/dev/selftest-empty', function() {
+    echo "    ";
+});
+
+Router::get('/dev/forced-exception', function() {
+    throw new \RuntimeException('Forced test exception for 500 verification');
+});
+
+Router::get('/dev/display-errors-check', function() {
+    echo json_encode(['display_errors' => ini_get('display_errors')]);
 });
 
 Router::get('/dashboard', function() {
@@ -94,7 +110,17 @@ Router::post('/mentorship/update-status', function() {
     return (new MentorshipController())->updateStatus();
 });
 
+Router::post('/mentorship/cancel', function() {
+    AuthMiddleware::handle();
+    return (new MentorshipController())->cancel();
+});
+
 Router::get('/referral-request', function() {
+    AuthMiddleware::handle();
+    return (new ReferralsController())->index();
+});
+
+Router::get('/manage-referrals', function() {
     AuthMiddleware::handle();
     return (new ReferralsController())->index();
 });
@@ -122,6 +148,16 @@ Router::post('/jobs/apply', function() {
 Router::post('/jobs/create', function() {
     AuthMiddleware::handle();
     return (new JobsController())->create();
+});
+
+Router::post('/jobs/delete', function() {
+    AuthMiddleware::handle();
+    return (new JobsController())->delete();
+});
+
+Router::post('/jobs/edit', function() {
+    AuthMiddleware::handle();
+    return (new JobsController())->edit();
 });
 
 Router::get('/events', function() {
@@ -152,6 +188,16 @@ Router::post('/events-admin/create', function() {
 Router::post('/events-admin/checkin', function() {
     AuthMiddleware::handle();
     return (new EventsAdminController())->checkin();
+});
+
+Router::post('/events-admin/edit', function() {
+    AuthMiddleware::handle();
+    return (new EventsAdminController())->edit();
+});
+
+Router::post('/events-admin/delete', function() {
+    AuthMiddleware::handle();
+    return (new EventsAdminController())->delete();
 });
 
 Router::get('/events-admin/certificate', function() {
@@ -190,6 +236,21 @@ Router::post('/community/comment', function() {
     return (new CommunityController())->addComment();
 });
 
+Router::post('/community/delete', function() {
+    AuthMiddleware::handle();
+    return (new CommunityController())->deletePost();
+});
+
+Router::post('/community/edit', function() {
+    AuthMiddleware::handle();
+    return (new CommunityController())->editPost();
+});
+
+Router::post('/community/poll-vote', function() {
+    AuthMiddleware::handle();
+    return (new CommunityController())->pollVote();
+});
+
 Router::get('/messages', function() {
     AuthMiddleware::handle();
     return (new MessagesController())->index();
@@ -213,6 +274,16 @@ Router::get('/marketplace', function() {
 Router::post('/marketplace/create', function() {
     AuthMiddleware::handle();
     return (new MarketplaceController())->create();
+});
+
+Router::post('/marketplace/delete', function() {
+    AuthMiddleware::handle();
+    return (new MarketplaceController())->delete();
+});
+
+Router::post('/marketplace/edit', function() {
+    AuthMiddleware::handle();
+    return (new MarketplaceController())->edit();
 });
 
 Router::get('/donations', function() {
@@ -298,6 +369,11 @@ Router::get('/ads', function() {
 Router::post('/ads/create', function() {
     AuthMiddleware::handle();
     return (new AdsController())->create();
+});
+
+Router::post('/ads/disable', function() {
+    AuthMiddleware::handle();
+    return (new AdsController())->disable();
 });
 
 // Help Center

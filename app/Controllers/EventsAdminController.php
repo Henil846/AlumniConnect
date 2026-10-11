@@ -118,7 +118,11 @@ class EventsAdminController {
     }
 
     public function uploadGallery() {
-        $eventId = $_POST['event_id'];
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $eventId = (int)($_POST['event_id'] ?? 0);
         
         if (!isset($_FILES['gallery_image']) || $_FILES['gallery_image']['error'] !== UPLOAD_ERR_OK) {
             header("Location: /events-admin?error=Upload+Failed&event_id=$eventId");
@@ -135,12 +139,18 @@ class EventsAdminController {
             exit;
         }
 
+        $ext = strtolower(pathinfo($_FILES['gallery_image']['name'], PATHINFO_EXTENSION));
+        $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+        if (!in_array($ext, $allowedExts)) {
+            header("Location: /events-admin?error=Invalid+File+Extension&event_id=$eventId");
+            exit;
+        }
+
         if ($_FILES['gallery_image']['size'] > 5 * 1024 * 1024) { // 5MB limit
             header("Location: /events-admin?error=File+Too+Large&event_id=$eventId");
             exit;
         }
 
-        $ext = pathinfo($_FILES['gallery_image']['name'], PATHINFO_EXTENSION);
         $filename = 'gallery_' . $eventId . '_' . time() . '.' . $ext;
         
         // Store outside web root if requested, but for serving via HTTP easily let's use a public folder
@@ -197,6 +207,57 @@ class EventsAdminController {
             $stmt->execute([$title, $description, $date, $location, $type, $collegeId, '/assets/img/login_side_img.png']);
         }
         header("Location: /events-admin?created=1");
+        exit;
+    }
+
+    public function edit() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'admin' && $role !== 'college_admin') {
+            http_response_code(403);
+            die("Unauthorized");
+        }
+        $eventId = (int)($_POST['event_id'] ?? 0);
+        $title = trim($_POST['title'] ?? '');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$eventId]);
+        $event = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$event || $event->college_id != $collegeId) {
+            http_response_code(403);
+            die("Unauthorized: Event outside college");
+        }
+        $pdo->prepare("UPDATE events SET title = ? WHERE id = ?")->execute([$title, $eventId]);
+        header("Location: /events-admin?updated=1&event_id=$eventId");
+        exit;
+    }
+
+    public function delete() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'admin' && $role !== 'college_admin') {
+            http_response_code(403);
+            die("Unauthorized");
+        }
+        $eventId = (int)($_POST['event_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$eventId]);
+        $event = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$event || $event->college_id != $collegeId) {
+            http_response_code(403);
+            die("Unauthorized: Event outside college");
+        }
+        $pdo->prepare("DELETE FROM events WHERE id = ?")->execute([$eventId]);
+        header("Location: /events-admin?deleted=1");
         exit;
     }
 }

@@ -15,14 +15,28 @@ class Router {
     public static function dispatch($uri, $method) {
         $uri = strtok($uri, '?');
         
-        // Prevent stack traces
+        // Prevent stack traces & ensure display_errors is 0
         ini_set('display_errors', '0');
         set_exception_handler(function(\Throwable $e) {
             http_response_code(500);
-            $msg = "An unexpected server error occurred: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
-            echo $msg;
-            error_log($e->getMessage());
-            file_put_contents(__DIR__ . '/../../debug.txt', $msg . "\n" . $e->getTraceAsString());
+            error_log($e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'An internal server error occurred.'
+                ]);
+                exit;
+            }
+
+            $errorView = __DIR__ . '/../../resources/views/pages/errors/500.php';
+            if (file_exists($errorView)) {
+                require $errorView;
+            } else {
+                echo "<!DOCTYPE html><html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1><p>An unexpected error occurred.</p></body></html>";
+            }
+            exit;
         });
 
         // Add Global Security Headers

@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', '0');
 
 // Basic Autoloader
 spl_autoload_register(function ($class) {

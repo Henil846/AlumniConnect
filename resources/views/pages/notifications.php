@@ -526,7 +526,11 @@
                             <?php if (!$notification->is_read): ?>
                                 <span style="display:inline-block; width:8px; height:8px; background:#2563eb; border-radius:50%; margin-right:8px; vertical-align:middle;"></span>
                             <?php endif; ?>
-                            <?= htmlspecialchars($notification->message) ?>
+                            <?php if (!empty($notification->link)): ?>
+                                <a href="<?= htmlspecialchars($notification->link) ?>" style="color:#0f172a; text-decoration:none; font-weight:500;" class="notification-link"><?= htmlspecialchars($notification->message) ?></a>
+                            <?php else: ?>
+                                <?= htmlspecialchars($notification->message) ?>
+                            <?php endif; ?>
                         </p>
                         <span style="font-size:0.8rem; color:#64748b;"><?= date('M j, g:i a', strtotime($notification->created_at)) ?></span>
                     </div>

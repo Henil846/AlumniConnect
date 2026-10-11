@@ -112,5 +112,60 @@ if (!hasColumn($pdo, 'users', 'status')) {
     echo "users already has status.\n";
 }
 
+// 9. post_comments table
+if (!hasColumn($pdo, 'post_comments', 'college_id')) {
+    echo "Adding college_id to post_comments...\n";
+    $pdo->exec("ALTER TABLE post_comments ADD COLUMN college_id INTEGER");
+    $pdo->exec("UPDATE post_comments SET college_id = (SELECT college_id FROM posts WHERE posts.id = post_comments.post_id) WHERE college_id IS NULL");
+} else {
+    echo "post_comments already has college_id.\n";
+}
+
+// 10. post_likes table
+if (!hasColumn($pdo, 'post_likes', 'college_id')) {
+    echo "Adding college_id to post_likes...\n";
+    $pdo->exec("ALTER TABLE post_likes ADD COLUMN college_id INTEGER");
+    $pdo->exec("UPDATE post_likes SET college_id = (SELECT college_id FROM posts WHERE posts.id = post_likes.post_id) WHERE college_id IS NULL");
+} else {
+    echo "post_likes already has college_id.\n";
+}
+
+// 11. event_gallery table
+if (!hasColumn($pdo, 'event_gallery', 'college_id')) {
+    echo "Adding college_id to event_gallery...\n";
+    $pdo->exec("ALTER TABLE event_gallery ADD COLUMN college_id INTEGER");
+    $pdo->exec("UPDATE event_gallery SET college_id = (SELECT college_id FROM events WHERE events.id = event_gallery.event_id) WHERE college_id IS NULL");
+} else {
+    echo "event_gallery already has college_id.\n";
+}
+
+// 12. user_badges table
+if (!hasColumn($pdo, 'user_badges', 'college_id')) {
+    echo "Adding college_id to user_badges...\n";
+    $pdo->exec("ALTER TABLE user_badges ADD COLUMN college_id INTEGER");
+    $pdo->exec("UPDATE user_badges SET college_id = (SELECT college_id FROM users WHERE users.id = user_badges.user_id) WHERE college_id IS NULL");
+} else {
+    echo "user_badges already has college_id.\n";
+}
+
+// 13. notifications link column
+if (!hasColumn($pdo, 'notifications', 'link')) {
+    echo "Adding link to notifications...\n";
+    $pdo->exec("ALTER TABLE notifications ADD COLUMN link VARCHAR(255) DEFAULT ''");
+    $pdo->exec("UPDATE notifications SET link = CASE 
+        WHEN type LIKE 'mentorship%' THEN '/mentorship'
+        WHEN type LIKE 'job%' THEN '/jobs'
+        WHEN type = 'referral' THEN '/manage-referrals'
+        WHEN type = 'referral_update' THEN '/referral-request'
+        WHEN type = 'donation' THEN '/donations'
+        WHEN type = 'moderation' THEN '/community'
+        WHEN type LIKE 'event%' THEN '/events'
+        WHEN type = 'message' THEN '/messages'
+        ELSE '/dashboard'
+    END WHERE link IS NULL OR link = ''");
+} else {
+    echo "notifications already has link.\n";
+}
+
 echo "Migration finished successfully.\n";
 

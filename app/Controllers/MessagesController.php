@@ -8,30 +8,34 @@ class MessagesController {
     public function index() {
         $pdo = Database::getConnection();
         $userId = \App\Core\Auth::id() ?? null;
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE id != ?");
-        $stmt->execute([$userId]);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id != ? AND college_id = ?");
+        $stmt->execute([$userId, $collegeId]);
         $users = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
         $selectedUserId = $_GET['user_id'] ?? ($users[0]->id ?? null);
         $selectedUser = null;
         $messages = [];
         if ($selectedUserId) {
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->execute([$selectedUserId]);
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND college_id = ?");
+            $stmt->execute([$selectedUserId, $collegeId]);
             $selectedUser = $stmt->fetch(\PDO::FETCH_OBJ);
 
-            $stmt = $pdo->prepare("
-                SELECT * FROM messages 
-                WHERE (sender_id = ? AND receiver_id = ?) 
-                   OR (sender_id = ? AND receiver_id = ?)
-                ORDER BY created_at ASC
-            ");
-            $stmt->execute([$userId, $selectedUserId, $selectedUserId, $userId]);
-            $messages = $stmt->fetchAll(\PDO::FETCH_OBJ);
-            
-            // Mark as read
-            $pdo->prepare("UPDATE messages SET is_read = 1 WHERE sender_id = ? AND receiver_id = ?")
-                ->execute([$selectedUserId, $userId]);
+            if ($selectedUser) {
+                $stmt = $pdo->prepare("
+                    SELECT * FROM messages 
+                    WHERE ((sender_id = ? AND receiver_id = ?) 
+                       OR (sender_id = ? AND receiver_id = ?))
+                       AND college_id = ?
+                    ORDER BY created_at ASC
+                ");
+                $stmt->execute([$userId, $selectedUserId, $selectedUserId, $userId, $collegeId]);
+                $messages = $stmt->fetchAll(\PDO::FETCH_OBJ);
+                
+                // Mark as read
+                $pdo->prepare("UPDATE messages SET is_read = 1 WHERE sender_id = ? AND receiver_id = ? AND college_id = ?")
+                    ->execute([$selectedUserId, $userId, $collegeId]);
+            }
         }
 
         return View::render('messages', [
@@ -46,6 +50,10 @@ class MessagesController {
     }
 
     public function send() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
         $senderId = \App\Core\Auth::id() ?? null;
         if (!$senderId) die("Unauthorized");
         
@@ -67,7 +75,7 @@ class MessagesController {
             // Notification trigger for recipient
             $senderName = \App\Core\Auth::user()->full_name ?? 'Someone';
             $preview = mb_substr($content, 0, 50);
-            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'message', ?, ?)");
+            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'message', ?, ?, '/messages')");
             $notifStmt->execute([$receiverId, "New message from $senderName: \"$preview\"", $collegeId]);
         }
         
