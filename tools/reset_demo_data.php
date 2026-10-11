@@ -46,11 +46,6 @@ App\Core\Database::resetConnection();
 @unlink($dbPath . '-shm');
 echo "[2/4] Removed existing database file.\n";
 
-// 3. Run migrations / create schema
-echo "[3/4] Running schema initialization and migrations...\n";
-putenv('DB_PATH=' . $dbPath);
-putenv('DB_DATABASE=' . $dbPath);
-
 // Initialize base tables
 $pdo = new PDO("sqlite:" . $dbPath);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

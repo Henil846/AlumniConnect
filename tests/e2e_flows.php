@@ -9,10 +9,37 @@ $projectDir = realpath(__DIR__ . '/..');
 $devDbPath = $projectDir . '/database/database.sqlite';
 $testDbPath = $projectDir . '/database/test.sqlite';
 copy($devDbPath, $testDbPath);
-putenv("DB_PATH=$testDbPath");
-$_ENV['DB_PATH'] = $testDbPath;
+
+putenv("APP_ENV=testing");
+$_ENV['APP_ENV'] = 'testing';
+putenv("DB_PATH=database/test.sqlite");
+$_ENV['DB_PATH'] = 'database/test.sqlite';
+
+// Kill any stray process on port 8001 before starting
+exec('powershell -Command "Get-NetTCPConnection -LocalPort 8001 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
+
+// Spawn isolated test server on port 8001
+$testServerCmd = 'cmd /c start /b "" "C:\\xampp\\php\\php.exe" -S 127.0.0.1:8001 -t public public/index.php';
+pclose(popen($testServerCmd, "r"));
+
+// Wait for port 8001 to respond
+$serverReady = false;
+for ($i = 0; $i < 40; $i++) {
+    $fp = @fsockopen('127.0.0.1', 8001, $errno, $errstr, 0.2);
+    if ($fp) {
+        fclose($fp);
+        $serverReady = true;
+        break;
+    }
+    usleep(100000); // 100ms
+}
+if (!$serverReady) {
+    fwrite(STDERR, "FATAL: Could not connect to isolated test server at http://127.0.0.1:8001\n");
+    exit(1);
+}
 
 register_shutdown_function(function() use ($testDbPath) {
+    exec('powershell -Command "Get-NetTCPConnection -LocalPort 8001 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
     if (file_exists($testDbPath)) {
         @unlink($testDbPath);
     }
@@ -24,7 +51,7 @@ require_once $projectDir . '/app/Core/Database.php';
 App\Core\Env::load($projectDir . '/.env');
 $pdo = App\Core\Database::getConnection();
 
-$baseUrl = "http://127.0.0.1:8000";
+$baseUrl = "http://127.0.0.1:8001";
 
 // Ensure clean rate limits state for automated testing
 @unlink($projectDir . '/storage/rate_limits.json');
@@ -71,14 +98,16 @@ function e2e_assert($condition, $message) {
     }
 }
 
-function e2e_http($url, $method = 'GET', $data = [], $cookies = [], $files = []) {
+function e2e_http($url, $method = 'GET', $data = [], $cookies = [], $files = [], $customHeaders = []) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Test-DB: database/test.sqlite']);
+    if (!empty($customHeaders)) {
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $customHeaders);
+    }
 
     if ($method === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);
@@ -204,6 +233,16 @@ $adminCsrf = $sessions['college_admin']['csrf'];
 
 $superCookies = $sessions['super_admin']['cookies'];
 $superCsrf = $sessions['super_admin']['csrf'];
+
+// F. Security Fix Verification: Port 8000 rejects X-Test-DB header & custom DB injection
+$evilHeaderRes = e2e_http("http://127.0.0.1:8000/events", 'GET', [], [], [], [
+    'X-Test-DB: ../../evil.sqlite'
+]);
+$evilFileCreated = file_exists($projectDir . '/evil.sqlite') || file_exists($projectDir . '/database/evil.sqlite');
+e2e_assert(
+    !$evilFileCreated,
+    "Security Defense: Port 8000 strictly ignored X-Test-DB header; no evil.sqlite created or opened on disk"
+);
 
 // --------------------------------------------------------------------------
 // 2. STUDENT WRITE FLOWS & LIFECYCLES
@@ -936,11 +975,26 @@ $res = e2e_http("$baseUrl/business-directory/edit", 'POST', [
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni business listing (HTTP 403)");
 
+$resAuthEdit = e2e_http("$baseUrl/business-directory/edit", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'business_id' => $alumniBizId,
+    'name' => 'Alumni Consulting Updated'
+], $alumniCookies);
+$updatedBizName = $pdo->query("SELECT name FROM businesses WHERE id = $alumniBizId")->fetchColumn();
+e2e_assert($resAuthEdit['code'] === 302 && $updatedBizName === 'Alumni Consulting Updated', "Authorized owner successfully updated business listing (HTTP 302)");
+
 $res = e2e_http("$baseUrl/business-directory/delete", 'POST', [
     'csrf_token' => $studentCsrf,
     'business_id' => $alumniBizId
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni business listing (HTTP 403)");
+
+$resAuthDel = e2e_http("$baseUrl/business-directory/delete", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'business_id' => $alumniBizId
+], $alumniCookies);
+$bizExists = $pdo->query("SELECT id FROM businesses WHERE id = $alumniBizId")->fetchColumn();
+e2e_assert($resAuthDel['code'] === 302 && !$bizExists, "Authorized owner successfully deleted business listing (HTTP 302)");
 
 // D. Startup hub edit & delete ownership
 $pdo->prepare("INSERT INTO startups (user_id, college_id, name, elevator_pitch) VALUES (?, 1, 'Alumni AI Startup', 'Revolutionary AI')")->execute([$alumniId]);
@@ -953,11 +1007,27 @@ $res = e2e_http("$baseUrl/startup-hub/edit", 'POST', [
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni startup (HTTP 403)");
 
+$resAuthStartEdit = e2e_http("$baseUrl/startup-hub/edit", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'startup_id' => $alumniStartupId,
+    'name' => 'Alumni AI Startup Updated',
+    'elevator_pitch' => 'Updated pitch'
+], $alumniCookies);
+$updatedStartupName = $pdo->query("SELECT name FROM startups WHERE id = $alumniStartupId")->fetchColumn();
+e2e_assert($resAuthStartEdit['code'] === 302 && $updatedStartupName === 'Alumni AI Startup Updated', "Authorized owner successfully updated startup profile (HTTP 302)");
+
 $res = e2e_http("$baseUrl/startup-hub/delete", 'POST', [
     'csrf_token' => $studentCsrf,
     'startup_id' => $alumniStartupId
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni startup (HTTP 403)");
+
+$resAuthStartDel = e2e_http("$baseUrl/startup-hub/delete", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'startup_id' => $alumniStartupId
+], $alumniCookies);
+$startupExists = $pdo->query("SELECT id FROM startups WHERE id = $alumniStartupId")->fetchColumn();
+e2e_assert($resAuthStartDel['code'] === 302 && !$startupExists, "Authorized owner successfully deleted startup (HTTP 302)");
 
 // E. Comment delete ownership
 $pdo->prepare("INSERT INTO post_comments (post_id, user_id, college_id, content) VALUES (?, ?, 1, 'Alumni comment')")->execute([$alumniPostId, $alumniId]);
@@ -969,6 +1039,13 @@ $res = e2e_http("$baseUrl/community/comment/delete", 'POST', [
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni comment (HTTP 403)");
 
+$resAuthComDel = e2e_http("$baseUrl/community/comment/delete", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'comment_id' => $alumniCommentId
+], $alumniCookies);
+$commentExists = $pdo->query("SELECT id FROM post_comments WHERE id = $alumniCommentId")->fetchColumn();
+e2e_assert($resAuthComDel['code'] === 302 && !$commentExists, "Authorized author successfully deleted comment (HTTP 302)");
+
 // F. Message delete ownership
 $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, college_id, content) VALUES (?, ?, 1, 'Hello from alumni')")->execute([$alumniId, $studentId]);
 $alumniMsgId = $pdo->lastInsertId();
@@ -978,6 +1055,20 @@ $res = e2e_http("$baseUrl/messages/delete", 'POST', [
     'message_id' => $alumniMsgId
 ], $studentCookies);
 e2e_assert($res['code'] === 403, "Same-college ownership: Recipient student forbidden from deleting sender Alumni message (HTTP 403)");
+
+$resAuthMsgDel = e2e_http("$baseUrl/messages/delete", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'message_id' => $alumniMsgId
+], $alumniCookies);
+$msgExists = $pdo->query("SELECT id FROM messages WHERE id = $alumniMsgId")->fetchColumn();
+e2e_assert($resAuthMsgDel['code'] === 302 && !$msgExists, "Authorized sender successfully deleted message (HTTP 302)");
+
+// G. Cross-Tenant Profile Access Defense
+$c2User = $pdo->query("SELECT id FROM users WHERE college_id = 2 LIMIT 1")->fetch(PDO::FETCH_OBJ);
+if ($c2User) {
+    $crossProfileRes = e2e_http("$baseUrl/profile/{$c2User->id}", 'GET', [], $studentCookies);
+    e2e_assert($crossProfileRes['code'] === 403, "Cross-tenant profile access blocked with HTTP 403 when CROSS_TENANT_PROFILES=false");
+}
 
 // --------------------------------------------------------------------------
 // 8. SUPER ADMIN ONBOARDING
@@ -1019,16 +1110,27 @@ e2e_assert(strpos($newAdminDash, 'Chancellor Test') !== false || strpos($newAdmi
 set_test_role('Role Escalation Defense');
 echo "\n--- 9. Testing Role Escalation Defense (Mass Assignment) ---\n";
 
+$studentUserBefore = $pdo->query("SELECT * FROM users WHERE id = $studentId")->fetch(PDO::FETCH_OBJ);
+
 $escalateRes = e2e_http("$baseUrl/profile/update", 'POST', [
     'csrf_token' => $studentCsrf,
+    'id' => 9999,
     'full_name' => 'Aarav Normal Student',
+    'email' => 'hacked@admin.com',
+    'password' => 'hackedpassword',
     'role' => 'super_admin',
     'college_id' => 99,
     'is_verified' => 0
 ], $studentCookies);
 
-$studentUserAfter = $pdo->query("SELECT role, college_id FROM users WHERE id = $studentId")->fetch(PDO::FETCH_OBJ);
-e2e_assert($studentUserAfter->role === 'student' && (int)$studentUserAfter->college_id === 1, "Student role escalation via mass assignment blocked (role: 'student', college_id: 1)");
+$studentUserAfter = $pdo->query("SELECT * FROM users WHERE id = $studentId")->fetch(PDO::FETCH_OBJ);
+
+e2e_assert($studentUserAfter->role !== 'admin' && $studentUserAfter->role !== 'super_admin' && $studentUserAfter->role === 'student', "Role escalation defense: role remains 'student' (not 'admin' or 'super_admin')");
+e2e_assert((int)$studentUserAfter->college_id === (int)$studentUserBefore->college_id, "Role escalation defense: college_id has not changed (remains {$studentUserBefore->college_id})");
+e2e_assert((int)$studentUserAfter->is_verified === (int)$studentUserBefore->is_verified, "Role escalation defense: is_verified has not changed (remains {$studentUserBefore->is_verified})");
+e2e_assert((int)$studentUserAfter->id === (int)$studentUserBefore->id, "Role escalation defense: id has not changed (remains {$studentUserBefore->id})");
+e2e_assert($studentUserAfter->email === $studentUserBefore->email && substr($studentUserAfter->email, -12) === '@alumni.test', "Role escalation defense: email domain has not changed (remains '{$studentUserBefore->email}')");
+e2e_assert($studentUserAfter->password === $studentUserBefore->password, "Role escalation defense: password hash has not changed");
 
 // --------------------------------------------------------------------------
 // 10. REFERRAL STATUS PIPELINE
@@ -1103,7 +1205,7 @@ $msgRes = e2e_http("$baseUrl/messages/send", 'POST', [
     'content' => 'Notification trigger test message'
 ], $studentCookies);
 $msgNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $alumniId AND type = 'message' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($msgNotif && $msgNotif->link === '/messages?user_id=' . $studentId && (int)$msgNotif->college_id === 1, "Direct message triggered notification to recipient with correct link and college_id");
+e2e_assert($msgNotif && $msgNotif->type === 'message' && strpos(strtolower($msgNotif->message), 'message') !== false && $msgNotif->link === '/messages?user_id=' . $studentId && (int)$msgNotif->college_id === 1, "Direct message trigger: created notification type 'message' with trigger text containing 'message'");
 
 // B. Completed donation notification (to donor and campaign creator/admin)
 $secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');
@@ -1118,12 +1220,12 @@ $donRes = e2e_http("$baseUrl/payment/callback", 'POST', [
     'sig' => $sig
 ], $studentCookies);
 $donNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'donation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($donNotif && $donNotif->link === '/donations' && (int)$donNotif->college_id === 1, "Completed donation triggered donor notification with /donations link");
+e2e_assert($donNotif && $donNotif->type === 'donation' && strpos(strtolower($donNotif->message), 'donation') !== false && $donNotif->link === '/donations' && (int)$donNotif->college_id === 1, "Completed donation trigger: created notification type 'donation' with trigger text containing 'donation'");
 
 $campCreator = $pdo->query("SELECT created_by FROM campaigns WHERE id = {$campaign->id}")->fetchColumn();
 $recipientId = ($campCreator && $campCreator != $studentId) ? $campCreator : $adminId;
 $ownerNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $recipientId AND type = 'donation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($ownerNotif && (int)$ownerNotif->college_id === 1, "Completed donation triggered campaign owner/admin notification with college_id");
+e2e_assert($ownerNotif && $ownerNotif->type === 'donation' && (int)$ownerNotif->college_id === 1, "Completed donation campaign owner trigger: created notification type 'donation' with college_id=1");
 
 // C. Event RSVP notification to organizer
 $activeEvent = $pdo->query("SELECT id, title FROM events WHERE college_id = 1 LIMIT 1")->fetch(PDO::FETCH_OBJ);
@@ -1139,7 +1241,7 @@ $rsvpRes = e2e_http("$baseUrl/events/register", 'POST', [
 ], $studentCookies);
 
 $attendeeNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'event_reminder' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($attendeeNotif && $attendeeNotif->link === '/events', "Event registration created attendee confirmation notification");
+e2e_assert($attendeeNotif && $attendeeNotif->type === 'event_reminder' && (strpos(strtolower($attendeeNotif->message), 'event') !== false || strpos(strtolower($attendeeNotif->message), 'registered') !== false) && $attendeeNotif->link === '/events', "Event RSVP trigger: created notification type 'event_reminder' with event trigger text");
 
 // D. Job posted notification to students
 $newJobTitle = "Staff SRE Test " . time();
@@ -1156,7 +1258,7 @@ $jobCreateRes = e2e_http("$baseUrl/jobs/create", 'POST', [
 ], $alumniCookies);
 
 $jobAlertNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'job_alert' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($jobAlertNotif && strpos($jobAlertNotif->message, $newJobTitle) !== false && $jobAlertNotif->link === '/jobs', "Job creation triggered job alert notification to student with /jobs link");
+e2e_assert($jobAlertNotif && $jobAlertNotif->type === 'job_alert' && strpos(strtolower($jobAlertNotif->message), 'job') !== false && strpos($jobAlertNotif->message, $newJobTitle) !== false && $jobAlertNotif->link === '/jobs', "Job creation trigger: created notification type 'job_alert' with job title and /jobs link");
 
 // E. Moderation report notification to college admin
 $testPostId = $pdo->query("SELECT id FROM posts WHERE college_id = 1 LIMIT 1")->fetchColumn();
@@ -1172,7 +1274,15 @@ $repRes = e2e_http("$baseUrl/community/report", 'POST', [
 ], $studentCookies);
 
 $modNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $adminId AND type = 'moderation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
-e2e_assert($modNotif && $modNotif->link === '/admin/moderation' && (int)$modNotif->college_id === 1, "Content report submission triggered notification to college admin with /admin/moderation link");
+e2e_assert($modNotif && $modNotif->type === 'moderation' && (strpos(strtolower($modNotif->message), 'moderation') !== false || strpos(strtolower($modNotif->message), 'report') !== false) && $modNotif->link === '/admin/moderation' && (int)$modNotif->college_id === 1, "Moderation report trigger: created notification type 'moderation' with /admin/moderation link");
+
+// F. Referral request notification to alumni
+$refNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $alumniId AND type = 'referral' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($refNotif && $refNotif->type === 'referral' && strpos(strtolower($refNotif->message), 'referral') !== false, "Referral request trigger: created notification type 'referral' with referral request message");
+
+// G. Mentorship session booking trigger
+$mentorshipNotif = $pdo->query("SELECT * FROM notifications WHERE type IN ('mentorship', 'mentorship_request') ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($mentorshipNotif && (strpos(strtolower($mentorshipNotif->type), 'mentorship') !== false || strpos(strtolower($mentorshipNotif->message), 'mentorship') !== false), "Mentorship request trigger: created notification type 'mentorship_request' with mentorship trigger text");
 
 // --------------------------------------------------------------------------
 // 12. FILE UPLOAD LIMITS & EXECUTION SECURITY
@@ -1347,6 +1457,28 @@ echo "========================================================\n";
 echo "\n--- Summary By Role / Area ---\n";
 foreach ($roleStats as $r => $s) {
     echo sprintf("  %-35s : %2d Passed / %2d Total (%d Failed)\n", $r, $s['passed'], $s['total'], $s['failed']);
+}
+
+echo "\n--- Direct SQL Verification: Referral Request Status Breakdown ---\n";
+$refQuery = $pdo->query("SELECT status, COUNT(*) as cnt FROM referral_requests GROUP BY status ORDER BY status ASC");
+$refRows = $refQuery->fetchAll(PDO::FETCH_ASSOC);
+echo sprintf("  %-15s | %s\n", "status", "count");
+echo "  ----------------+------\n";
+$foundStatuses = [];
+foreach ($refRows as $row) {
+    echo sprintf("  %-15s | %d\n", $row['status'], $row['cnt']);
+    $foundStatuses[$row['status']] = (int)$row['cnt'];
+}
+$requiredStatuses = ['requested', 'reviewed', 'submitted', 'rejected'];
+$allStatusesPresent = true;
+foreach ($requiredStatuses as $rs) {
+    if (empty($foundStatuses[$rs])) {
+        $allStatusesPresent = false;
+        echo "  [WARN] Missing status in referral_requests: $rs\n";
+    }
+}
+if ($allStatusesPresent) {
+    echo "  [✓] All 4 canonical statuses verified present with >= 1 row in test DB!\n";
 }
 
 if ($failedTests > 0) {

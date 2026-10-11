@@ -139,10 +139,11 @@ class ProfileController {
             exit;
         }
 
-        // Enforce cross-tenant isolation: cannot view user from another college (unless super_admin)
+        // Enforce cross-tenant isolation: cannot view user from another college unless super_admin or CROSS_TENANT_PROFILES=true
+        $crossTenantAllowed = filter_var(\App\Core\Env::get('CROSS_TENANT_PROFILES', 'false'), FILTER_VALIDATE_BOOLEAN);
         $myCollegeId = \App\Core\Auth::user()->college_id ?? null;
         $myRole = \App\Core\Auth::user()->role ?? null;
-        if ($myRole !== 'super_admin' && $user->college_id != $myCollegeId) {
+        if (!$crossTenantAllowed && $myRole !== 'super_admin' && $user->college_id != $myCollegeId) {
             http_response_code(403);
             die("Forbidden: Cross-tenant profile access denied");
         }

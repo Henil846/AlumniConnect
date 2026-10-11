@@ -6,3 +6,6 @@
 /database/test.sqlite
 /storage/rate_limits.json
 /node_modules/
+/database/*.bak
+/public/uploads/resumes/*
+!/public/uploads/resumes/.gitkeep

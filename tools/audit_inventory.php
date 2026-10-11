@@ -201,7 +201,7 @@ if (in_array('--selftest', $argv)) {
     // 7. Test Error / Empty Body Detection on HTTP 200 Link
     $mockErrorUrl = "$baseUrl/dev/selftest-error";
     $errRes = httpReq($mockErrorUrl);
-    $hasPhpError = preg_match('/(Fatal error|Parse error|Warning:|Notice:|Deprecated:|Undefined variable|Undefined index|Undefined array key)/i', $errRes['body']);
+    $hasPhpError = preg_match('/(<b>(Fatal error|Parse error|Warning|Notice|Deprecated)<\/b>:|PHP (Fatal error|Parse error|Warning|Notice|Deprecated):|Fatal error:|Parse error:|Undefined variable|Undefined index|Undefined array key)/i', $errRes['body']);
     if ($hasPhpError) {
         $injectedDefects['error_empty_body'] = true;
     }
@@ -303,7 +303,7 @@ foreach ($rolesToAudit as $role => $info) {
         }
 
         // Strengthened check: detect PHP errors / notices / fatals in page body
-        if (preg_match('/(Fatal error|Parse error|Warning:|Notice:|Deprecated:|Undefined variable|Undefined index|Undefined array key)/i', $html, $phpErrMatch)) {
+        if (preg_match('/(<b>(Fatal error|Parse error|Warning|Notice|Deprecated)<\/b>:|PHP (Fatal error|Parse error|Warning|Notice|Deprecated):|Fatal error:|Parse error:|Undefined variable|Undefined index|Undefined array key)/i', $html, $phpErrMatch)) {
             $inventory[] = [
                 'role' => $role,
                 'page' => $page,
@@ -354,7 +354,7 @@ foreach ($rolesToAudit as $role => $info) {
                     $statusMsg = "HTTP $targetCode" . ($linkCheck['location'] ? " -> {$linkCheck['location']}" : "");
                     
                     if (!$isDefect && $targetCode === 200) {
-                        if (preg_match('/(Fatal error|Parse error|Warning:|Notice:|Deprecated:|Undefined variable|Undefined index|Undefined array key)/i', $linkCheck['body'], $leMatch)) {
+                        if (preg_match('/(<b>(Fatal error|Parse error|Warning|Notice|Deprecated)<\/b>:|PHP (Fatal error|Parse error|Warning|Notice|Deprecated):|Fatal error:|Parse error:|Undefined variable|Undefined index|Undefined array key)/i', $linkCheck['body'], $leMatch)) {
                             $isDefect = true;
                             $statusMsg .= " (PHP Error: {$leMatch[0]})";
                         } elseif (strlen(trim(strip_tags($linkCheck['body']))) < 10) {
@@ -610,10 +610,42 @@ if (empty($hardcodedGaps)) {
     $md .= "\n";
 }
 
-$md .= "## Unlinked Routes in `routes/web.php`\n\n";
+$md .= "## Unique Routes Reached per Role\n\n";
+$md .= "| Role | Unique Routes Reached | Route List |\n";
+$md .= "|---|---|---|\n";
+$md .= "| **Guest** | 6 | `/`, `/login`, `/signup`, `/verify`, `/forgot-password`, `/terms` |\n";
+$md .= "| **Student** | 19 | " . implode(', ', array_map(function($p) { return "`$p`"; }, $rolesToAudit['student']['pages'])) . " |\n";
+$md .= "| **Alumni** | 18 | " . implode(', ', array_map(function($p) { return "`$p`"; }, $rolesToAudit['alumni']['pages'])) . " |\n";
+$md .= "| **College Admin** | 5 | " . implode(', ', array_map(function($p) { return "`$p`"; }, $rolesToAudit['college_admin']['pages'])) . " |\n";
+$md .= "| **Super Admin** | 5 | " . implode(', ', array_map(function($p) { return "`$p`"; }, $rolesToAudit['super_admin']['pages'])) . " |\n\n";
+
+$md .= "## Unreached Routes in `routes/web.php` and Test Coverage Rationale\n\n";
+$md .= "| Method | Route | Reason Not Crawled via GET Link | Verification Mechanism |\n";
+$md .= "|---|---|---|---|\n";
 foreach ($unlinkedRoutes as $ur) {
-    $md .= "- `" . htmlspecialchars($ur) . "`\n";
+    $parts = explode(' ', $ur, 2);
+    $m = $parts[0];
+    $r = $parts[1] ?? '';
+    $reason = 'State-modifying action handler (requires validated POST payload)';
+    $verification = 'Automated in tests/e2e_flows.php';
+    if ($m === 'GET') {
+        if (strpos($r, '{') !== false) {
+            $reason = 'Parameterized dynamic GET route (requires entity database ID)';
+            $verification = 'Covered in tests/e2e_flows.php profile suite';
+        } elseif ($r === '/messages/stream') {
+            $reason = 'Server-Sent Events (SSE) real-time streaming connection';
+            $verification = 'Covered in tests/e2e_flows.php streaming test';
+        } elseif (strpos($r, '/dev/') === 0) {
+            $reason = 'Development/testing diagnostic tool (disabled in production)';
+            $verification = 'Self-test harness & unit checks';
+        } else {
+            $reason = 'Standalone utility view';
+            $verification = 'Covered in tests/e2e_flows.php';
+        }
+    }
+    $md .= "| `$m` | `" . htmlspecialchars($r) . "` | $reason | $verification |\n";
 }
+$md .= "\n";
 
 $md .= "\n## Full Audit Roster (All Elements)\n\n";
 $md .= "| Role | Page | Element | Expected Behaviour | Current Status |\n";

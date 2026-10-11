@@ -104,7 +104,7 @@ class AuthController {
         }
 
         // Check if institution or user is suspended
-        if ($user->status === 'suspended') {
+        if (($user->status ?? 'active') === 'suspended') {
             echo json_encode(['success' => false, 'message' => 'Your account has been suspended.']);
             return;
         }
