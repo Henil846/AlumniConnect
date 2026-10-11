@@ -35,6 +35,8 @@ function makeRequest($url, $method = 'GET', $data = [], $cookies = []) {
 
 $base = "http://localhost:8000";
 
+@unlink(__DIR__ . '/storage/rate_limits.json');
+
 echo "Starting Regression Tests...\n";
 
 // 1. Get signup/login page to grab CSRF token
