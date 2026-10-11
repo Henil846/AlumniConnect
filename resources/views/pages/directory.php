@@ -395,8 +395,8 @@
     <p>Showing <?= count($alumni) ?> active alumni</p>
     </div>
     <div class="view-toggles">
-    <button class="view-toggle-btn active"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
-    <button class="view-toggle-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+    <button type="button" class="view-toggle-btn active" onclick="document.querySelector('.alumni-grid').style.gridTemplateColumns='repeat(auto-fill, minmax(280px, 1fr))'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+    <button type="button" class="view-toggle-btn" onclick="document.querySelector('.alumni-grid').style.gridTemplateColumns='1fr'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
     </div>
 </div>
 
@@ -419,8 +419,8 @@
         Alumni Connect Network
         </div>
         <div class="alumni-card-actions">
-        <button class="btn-connect" onclick="window.location.href='/profile/<?= $alum->id ?>'">Connect</button>
-        <button class="btn-more"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+        <button type="button" class="btn-connect" onclick="window.location.href='/profile/<?= $alum->id ?>'">Connect</button>
+        <button type="button" class="btn-more" title="Message" onclick="window.location.href='/messages?user=<?= $alum->id ?>'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
         </div>
     </div>
     </div>
@@ -431,19 +431,19 @@
 <div class="pagination">
     <?php if ($currentPage > 1): ?>
         <?php $q = $_GET; $q['page'] = $currentPage - 1; ?>
-        <button class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'">
+        <button type="button" class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
     <?php endif; ?>
 
     <?php for ($i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++): ?>
         <?php $q = $_GET; $q['page'] = $i; ?>
-        <button class="page-btn <?= $i === $currentPage ? 'active' : '' ?>" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'"><?= $i ?></button>
+        <button type="button" class="page-btn <?= $i === $currentPage ? 'active' : '' ?>" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'"><?= $i ?></button>
     <?php endfor; ?>
 
     <?php if ($currentPage < $totalPages): ?>
         <?php $q = $_GET; $q['page'] = $currentPage + 1; ?>
-        <button class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'">
+        <button type="button" class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
     <?php endif; ?>

@@ -512,10 +512,10 @@
                                     <input type="file" name="image" style="display: none;" accept="image/*">
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" class="text-muted"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Media
                                 </label>
-                                <button type="button" class="post-action-item">
+                                <button type="button" class="post-action-item" onclick="const input = document.querySelector('input[name=\'content\']'); const poll = prompt('Enter poll question:'); if(poll) { input.value = '[POLL] ' + poll; input.focus(); }">
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" class="text-muted"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> Poll
                                 </button>
-                                <button type="button" class="post-action-item">
+                                <button type="button" class="post-action-item" onclick="window.location.href='/events'">
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" class="text-muted"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Event
                                 </button>
                             </div>
@@ -561,6 +561,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; color:var(--color-text-muted); font-size:0.85rem;">
                         <div style="display:flex; gap:24px;">
                             <form action="/community/like" method="POST" style="margin:0;">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
                                 <input type="hidden" name="post_id" value="<?= $post->id ?>">
                                 <button type="submit" style="background:none; border:none; color:<?= $post->liked_by_me ? '#059669' : 'inherit' ?>; display:flex; align-items:center; gap:6px; cursor:pointer; padding:0;">
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="<?= $post->liked_by_me ? 'currentColor' : 'none' ?>" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 
@@ -586,7 +587,7 @@
                     <span class="job-tag gold" style="font-size:0.65rem; margin-bottom:12px; display:inline-block;">SPOTLIGHT</span>
                     <h3 class="font-bold text-lg mb-2">Ready to pay it forward?</h3>
                     <p class="text-xs mb-6" style="color:rgba(255,255,255,0.8); line-height:1.6;">Join 400+ alumni already mentoring the next generation of leaders. Your experience is their map.</p>
-                    <button class="btn-primary" onclick="window.location.href='/profile'" style="background:var(--color-white); color:var(--color-primary); width:100%; padding:12px; font-size:0.9rem;">Become a Mentor</button>
+                    <button type="button" class="btn-primary" onclick="window.location.href='/profile'" style="background:var(--color-white); color:var(--color-primary); width:100%; padding:12px; font-size:0.9rem;">Become a Mentor</button>
                 </div>
 
             </div>

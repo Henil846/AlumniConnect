@@ -500,8 +500,8 @@
         
         <!-- Toggle Pills -->
         <div style="background:#f1f5f9; padding:4px; border-radius:32px; display:flex;">
-            <button class="btn-primary" style="background:#ffffff; color:var(--color-text); padding:12px 28px; border-radius:28px; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-weight:700;">Upcoming</button>
-            <button class="btn-cancel" style="background:transparent; border:none; padding:12px 24px; font-weight:600;">Registered (<?= count($registeredEventIds) ?>)</button>
+            <button type="button" onclick="window.location.href='/events'" class="btn-primary" style="background:#ffffff; color:var(--color-text); padding:12px 28px; border-radius:28px; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-weight:700;">Upcoming</button>
+            <button type="button" onclick="window.location.href='/events?filter=registered'" class="btn-cancel" style="background:transparent; border:none; padding:12px 24px; font-weight:600;">Registered (<?= count($registeredEventIds) ?>)</button>
         </div>
         </div>
         
@@ -547,10 +547,14 @@
                 <div class="avatar-stack">
                 <img src="/assets/img/mentor_marcus.png" alt="a" />
                 <img src="/assets/img/mentor_elena.png" alt="a" />
-                <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+42</div>
+                <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+<?= count($registeredEventIds) ?></div>
                 </div>
                 <?php if ($isRegistered): ?>
-                    <button class="btn-primary" style="background:#15803d; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;" disabled>RSVP'd ✓</button>
+                    <form method="POST" action="/events/cancel" style="margin:0;">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                        <input type="hidden" name="event_id" value="<?= $event->id ?>">
+                        <button type="submit" class="btn-primary" style="background:#dc2626; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">Cancel RSVP</button>
+                    </form>
                 <?php else: ?>
                     <form method="POST" action="/events/register" style="margin:0;">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
@@ -573,7 +577,7 @@
             <div style="max-width:500px; z-index:2;">
             <h2 style="font-size:2.4rem; font-weight:800; line-height:1.2; margin-bottom:16px;">Host Your Own Regional Mixer</h2>
             <p style="font-size:1rem; color:rgba(255,255,255,0.8); line-height:1.6; margin-bottom:32px;">Leading a city chapter? Use our platform to organize local events, manage RSVPs, and receive alumni funding grants.</p>
-            <button class="btn-primary" style="background:var(--color-accent); color:var(--color-primary); padding:12px 28px; font-size:1rem;">Get Started</button>
+            <button type="button" onclick="window.location.href='/events-admin'" class="btn-primary" style="background:var(--color-accent); color:var(--color-primary); padding:12px 28px; font-size:1rem;">Get Started</button>
             </div>
         </div>
 
@@ -585,18 +589,18 @@
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <span class="text-xs font-semibold text-muted">Active Monthly Events</span>
-                <span class="font-bold text-md">124+</span>
+                <span class="font-bold text-md"><?= count($events) ?></span>
             </div>
             <div style="height:6px; background:#e5e5e5; border-radius:3px; margin-bottom:20px;">
-                <div style="width:75%; height:100%; background:var(--color-accent-dark); border-radius:3px;"></div>
+                <div style="width:<?= min(100, count($events) * 20) ?>%; height:100%; background:var(--color-accent-dark); border-radius:3px;"></div>
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span class="text-xs font-semibold text-muted">RSVPs this Month</span>
-                <span class="font-bold text-md">2,480</span>
+                <span class="text-xs font-semibold text-muted">Your RSVPs</span>
+                <span class="font-bold text-md"><?= count($registeredEventIds) ?></span>
             </div>
             <div style="height:6px; background:#e5e5e5; border-radius:3px; margin-bottom:32px;">
-                <div style="width:55%; height:100%; background:#34d399; border-radius:3px;"></div>
+                <div style="width:<?= min(100, count($registeredEventIds) * 25) ?>%; height:100%; background:#34d399; border-radius:3px;"></div>
             </div>
             </div>
 

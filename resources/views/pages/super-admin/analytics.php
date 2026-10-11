@@ -115,9 +115,9 @@
 
             <div style="display:flex; justify-content:center; align-items:center; position:relative; margin: 10px 0 24px;">
               <!-- Donut graphic simulation with border and center text -->
-              <div style="width:170px; height:170px; border-radius:50%; background: conic-gradient(#0f172a 0% 55%, #b45309 55% 85%, #065f46 85% 100%); display:flex; align-items:center; justify-content:center;">
+              <div style="width:170px; height:170px; border-radius:50%; background: conic-gradient(#0f172a 0% 55%, #b45309 55% 80%, #065f46 80% 100%); display:flex; align-items:center; justify-content:center;">
                 <div style="width:115px; height:115px; border-radius:50%; background:#ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                  <span style="font-size:1.4rem; font-weight:900; color:#0f172a; line-height:1;">$42.8M</span>
+                  <span style="font-size:1.4rem; font-weight:900; color:#0f172a; line-height:1;">$<?= number_format($totalDonations, 0) ?></span>
                   <span style="font-size:0.7rem; font-weight:800; color:#64748b; margin-top:4px;">TOTAL</span>
                 </div>
               </div>
@@ -148,7 +148,7 @@
           <div class="admin-card">
             <div class="admin-card-header" style="margin-bottom:28px;">
               <h3 class="admin-card-title">Placements by Department</h3>
-              <a href="super-admin-institutions.html" style="font-size:0.78rem; font-weight:800; color:#64748b; text-decoration:none; text-transform:uppercase;">VIEW FULL LIST</a>
+              <a href="/super-admin/institutions" style="font-size:0.78rem; font-weight:800; color:#64748b; text-decoration:none; text-transform:uppercase;">VIEW FULL LIST</a>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:22px;">
@@ -228,7 +228,7 @@
             <!-- Upcoming Major Event small box -->
             <div class="admin-card" style="padding:20px; background:#f8fafc;">
               <div style="font-size:0.75rem; font-weight:800; color:#64748b; margin-bottom:10px; text-transform:uppercase;">UPCOMING MAJOR EVENT</div>
-              <div style="display:flex; align-items:center; justify-content:space-between; background:#ffffff; padding:16px; border-radius:14px; border:1px solid #e2e8f0; cursor:pointer;" onclick="window.location.href='events-admin.html'">
+              <div style="display:flex; align-items:center; justify-content:space-between; background:#ffffff; padding:16px; border-radius:14px; border:1px solid #e2e8f0; cursor:pointer;" onclick="window.location.href='/events-admin'">
                 <div style="display:flex; align-items:center; gap:14px;">
                   <div style="background:#0f172a; color:#fff; padding:6px 12px; border-radius:10px; text-align:center;">
                     <div style="font-size:0.6rem; font-weight:800; text-transform:uppercase;">OCT</div>

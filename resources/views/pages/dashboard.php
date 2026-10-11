@@ -358,10 +358,10 @@
 <div class="profile-completion" style="cursor:pointer;" onclick="window.location.href='/profile'">
     <div class="completion-header">
     <span>PROFILE COMPLETION</span>
-    <span class="completion-percent">85%</span>
+    <span class="completion-percent"><?= $profileCompletion ?? 75 ?>%</span>
     </div>
     <div class="completion-bar-bg">
-    <div class="completion-bar-fill" style="width: 85%;"></div>
+    <div class="completion-bar-fill" style="width: <?= $profileCompletion ?? 75 ?>%;"></div>
     </div>
     <div style="margin-top:10px; display:flex; flex-direction:column; gap:5px;">
     <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#ef4444; font-weight:600;">
@@ -478,8 +478,8 @@
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <h2 style="font-size:1.1rem; font-weight:700;">Explore Top Mentors</h2>
     <div style="display:flex; gap:8px;">
-    <button class="header-icon-btn" style="border:1px solid var(--color-border); width:32px; height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <button class="header-icon-btn" style="border:1px solid var(--color-border); width:32px; height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg></button>
+    <button type="button" onclick="document.querySelector('.mentors-scroll').scrollBy({left:-200, behavior:'smooth'})" class="header-icon-btn" style="border:1px solid var(--color-border); width:32px; height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button type="button" onclick="document.querySelector('.mentors-scroll').scrollBy({left:200, behavior:'smooth'})" class="header-icon-btn" style="border:1px solid var(--color-border); width:32px; height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
 </div>
 

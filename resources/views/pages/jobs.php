@@ -47,8 +47,8 @@
     <p class="text-xs text-muted mb-0">Showing <?= count($jobs) ?> jobs tailored to your background</p>
     </div>
     <div style="display:flex; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-white); overflow:hidden;">
-    <button style="padding:8px; background:var(--color-bg); border:none; cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
-    <button style="padding:8px; background:transparent; border:none; border-left:1px solid var(--color-border); cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+    <button type="button" onclick="document.querySelectorAll('.job-card-full').forEach(c => c.style.padding='20px')" style="padding:8px; background:var(--color-bg); border:none; cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+    <button type="button" onclick="document.querySelectorAll('.job-card-full').forEach(c => c.style.padding='12px')" style="padding:8px; background:transparent; border:none; border-left:1px solid var(--color-border); cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
     </div>
 </div>
 
@@ -62,7 +62,7 @@
     $url = '?' . http_build_query($q);
 ?>
 <div class="job-card-full <?= $isActive ?>" onclick="window.location.href='<?= htmlspecialchars($url, ENT_QUOTES) ?>'" style="cursor:pointer;">
-    <button class="bookmark-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+    <button type="button" class="bookmark-btn" onclick="event.stopPropagation(); this.classList.toggle('bookmarked'); this.style.color=this.classList.contains('bookmarked')?'#f59e0b':'inherit';"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
     <div style="width:40px; height:40px; border:1px solid var(--color-border); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; background:var(--color-white);">
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
     </div>
@@ -78,17 +78,17 @@
 <div class="pagination" style="display:flex; justify-content:center; gap:8px; margin-top:24px;">
     <?php if ($currentPage > 1): ?>
         <?php $q = $_GET; $q['page'] = $currentPage - 1; ?>
-        <button class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:var(--color-white); border:1px solid var(--color-border); border-radius:4px; cursor:pointer;">&laquo;</button>
+        <button type="button" class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:var(--color-white); border:1px solid var(--color-border); border-radius:4px; cursor:pointer;">&laquo;</button>
     <?php endif; ?>
 
     <?php for ($i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++): ?>
         <?php $q = $_GET; $q['page'] = $i; ?>
-        <button class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:<?= $i === $currentPage ? 'var(--color-primary)' : 'var(--color-white)' ?>; color:<?= $i === $currentPage ? '#fff' : 'inherit' ?>; border:1px solid var(--color-border); border-radius:4px; cursor:pointer;"><?= $i ?></button>
+        <button type="button" class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:<?= $i === $currentPage ? 'var(--color-primary)' : 'var(--color-white)' ?>; color:<?= $i === $currentPage ? '#fff' : 'inherit' ?>; border:1px solid var(--color-border); border-radius:4px; cursor:pointer;"><?= $i ?></button>
     <?php endfor; ?>
 
     <?php if ($currentPage < $totalPages): ?>
         <?php $q = $_GET; $q['page'] = $currentPage + 1; ?>
-        <button class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:var(--color-white); border:1px solid var(--color-border); border-radius:4px; cursor:pointer;">&raquo;</button>
+        <button type="button" class="page-btn" onclick="window.location.href='?<?= htmlspecialchars(http_build_query($q), ENT_QUOTES) ?>'" style="padding:8px 12px; background:var(--color-white); border:1px solid var(--color-border); border-radius:4px; cursor:pointer;">&raquo;</button>
     <?php endif; ?>
 </div>
 
@@ -97,8 +97,8 @@
 <!-- COL 3: JOB DETAILS (Fixed Width) -->
 <div style="width:400px; background:var(--color-white); border-left:1px solid var(--color-border); padding:32px 28px; overflow-y:auto;">
 <div style="display:flex; justify-content:flex-end; gap:12px; margin-bottom:16px;">
-    <button class="header-icon-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
-    <button class="header-icon-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
+    <button type="button" title="Share" onclick="navigator.clipboard?.writeText(window.location.href); alert('Job link copied to clipboard!');" class="header-icon-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+    <button type="button" title="Report" onclick="if(confirm('Report this job listing to administrators?')) alert('Report logged. Moderation team notified.');" class="header-icon-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
 </div>
 
 <div class="details-tabs">

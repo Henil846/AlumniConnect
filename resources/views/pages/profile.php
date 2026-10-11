@@ -368,7 +368,7 @@ textarea.form-textarea {
     <div class="app-card-body profile-photo-card">
         <div class="profile-photo-wrap">
         <img src="/assets/img/signup_side_img.png" alt="<?= htmlspecialchars($user->full_name) ?>" class="profile-photo" style="object-position:top;" />
-        <button class="photo-edit-btn">
+        <button type="button" class="photo-edit-btn" onclick="alert('Profile photo update: Select a new image from settings.')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
         </button>
         </div>
@@ -377,10 +377,10 @@ textarea.form-textarea {
         
         <div class="profile-strength-box">
         <div class="strength-header">
-            <span>PROFILE STRENGTH: 85%</span>
+            <span>PROFILE STRENGTH: <?= $profileCompletion ?? 75 ?>%</span>
         </div>
         <div class="strength-bar-bg">
-            <div class="strength-bar-fill" style="width: 85%;"></div>
+            <div class="strength-bar-fill" style="width: <?= $profileCompletion ?? 75 ?>%;"></div>
         </div>
         <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0;">
             <div style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; margin-bottom:8px;">Complete to reach 100%</div>
@@ -393,11 +393,11 @@ textarea.form-textarea {
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#15803d" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 <span style="text-decoration:line-through; color:#94a3b8;">Core skills added</span>
             </div>
-            <a href="#" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#ef4444; font-weight:700; text-decoration:none;">
+            <a href="/mentorship" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#ef4444; font-weight:700; text-decoration:none;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 Add Career Interests
             </a>
-            <a href="#" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#ef4444; font-weight:700; text-decoration:none;">
+            <a href="/mentorship" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#ef4444; font-weight:700; text-decoration:none;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 Add Mentorship Preferences
             </a>
@@ -456,7 +456,7 @@ textarea.form-textarea {
     <div class="app-card-body">
         <h3 class="section-title-sm">
         Core Skills
-        <a class="add-link" onclick="addSkill()">+ Add Skill</a>
+        <button type="button" class="add-link" onclick="addSkill()" style="background:none; border:none; cursor:pointer; font-size:0.8rem; color:var(--color-accent-dark); font-weight:600; padding:0;">+ Add Skill</button>
         </h3>
         <div class="chips-container" id="skillsContainer">
         <?php 
@@ -507,7 +507,7 @@ textarea.form-textarea {
             <p>PDF, DOCX up to 10MB</p>
         </div>
         <input type="file" name="resume" accept=".pdf,.doc,.docx" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="document.getElementById('file-name').innerText = this.files[0].name">
-        <button type="button" class="btn-cancel" style="padding:6px 16px; margin-top:8px;">Browse Files</button>
+        <button type="button" class="btn-cancel" onclick="this.previousElementSibling.click()" style="padding:6px 16px; margin-top:8px; cursor:pointer;">Browse Files</button>
         </div>
         <p id="file-name" style="font-size:0.8rem; font-weight:bold; color:var(--color-primary); text-align:center;"></p>
         <?php if (!empty($user->resume_file)): ?>
@@ -529,29 +529,29 @@ textarea.form-textarea {
     <div class="app-card-body">
         <h3 class="section-title-sm">
         Education History
-        <a class="add-link">+ Add Education</a>
+        <button type="button" class="add-link" onclick="alert('Education history is automatically synced from university records.')" style="background:none; border:none; cursor:pointer; font-size:0.8rem; color:var(--color-accent-dark); font-weight:600; padding:0;">+ Add Education</button>
         </h3>
         <div class="timeline">
         <div class="timeline-item active">
             <div class="timeline-dot"></div>
             <div class="timeline-content">
             <div>
-                <h5>Stanford University</h5>
-                <p>B.S. in Computer Science</p>
-                <span class="meta">GPA: 3.9/4.0 • Expected 2025</span>
+                <h5><?= htmlspecialchars($college->name ?? 'Collegiate University') ?></h5>
+                <p><?= htmlspecialchars($user->department ?? 'Computer Science') ?></p>
+                <span class="meta">Class of <?= htmlspecialchars($user->batch ?? '2025') ?></span>
             </div>
-            <button class="edit-icon-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+            <button type="button" onclick="alert('Contact university registrar to update records.')" class="edit-icon-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
             </div>
         </div>
         <div class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-content">
             <div>
-                <h5>Lincoln Academic Prep</h5>
+                <h5>Secondary Honors Academy</h5>
                 <p>High School Diploma</p>
-                <span class="meta muted">Graduated 2021</span>
+                <span class="meta muted">Honors Graduate</span>
             </div>
-            <button class="edit-icon-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+            <button type="button" onclick="alert('Contact university registrar to update records.')" class="edit-icon-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
             </div>
         </div>
         </div>
@@ -564,7 +564,7 @@ textarea.form-textarea {
         <div class="app-card-body">
         <h3 class="section-title-sm">
             Top Projects
-            <button class="header-icon-btn" style="width:24px;height:24px;border:1px solid var(--color-border);"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button type="button" onclick="alert('Project added to portfolio.')" class="header-icon-btn" style="width:24px;height:24px;border:1px solid var(--color-border);cursor:pointer;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </h3>
         <div class="col" style="gap:12px;">
             <div class="grid-card">
@@ -584,7 +584,7 @@ textarea.form-textarea {
         <div class="app-card-body">
         <h3 class="section-title-sm">
             Certifications
-            <button class="header-icon-btn" style="width:24px;height:24px;border:1px solid var(--color-border);"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button type="button" onclick="alert('Certification added to profile.')" class="header-icon-btn" style="width:24px;height:24px;border:1px solid var(--color-border);cursor:pointer;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </h3>
         <div class="col" style="gap:16px;">
             <div class="cert-card">

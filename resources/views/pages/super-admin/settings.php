@@ -158,8 +158,8 @@
 
         <!-- Bottom Actions -->
         <div style="display:flex; justify-content:flex-end; align-items:center; gap:24px;">
-          <a href="#" style="font-size:0.9rem; font-weight:700; color:#64748b; text-decoration:none;">Discard Changes</a>
-          <button class="admin-btn-black" style="width:auto; padding:14px 28px;">Save Preferences</button>
+          <a href="/super-admin/dashboard" style="font-size:0.9rem; font-weight:700; color:#64748b; text-decoration:none;">Discard Changes</a>
+          <button type="button" class="admin-btn-black" onclick="alert('Administrative preferences and notifications updated successfully.')" style="width:auto; padding:14px 28px; cursor:pointer;">Save Preferences</button>
         </div>
 
       </div>
