@@ -63,6 +63,12 @@ class MessagesController {
             }
             $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, college_id) VALUES (?, ?, ?, ?)");
             $stmt->execute([$senderId, $receiverId, $content, $collegeId]);
+
+            // Notification trigger for recipient
+            $senderName = \App\Core\Auth::user()->full_name ?? 'Someone';
+            $preview = mb_substr($content, 0, 50);
+            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'message', ?, ?)");
+            $notifStmt->execute([$receiverId, "New message from $senderName: \"$preview\"", $collegeId]);
         }
         
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {

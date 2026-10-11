@@ -51,7 +51,11 @@ class Router {
         }
         
         http_response_code(404);
-        echo "404 Not Found";
+        try {
+            return \App\Core\View::render('errors/404', ['title' => 'Page Not Found — Alumni Connect', 'activePage' => ''], 'app');
+        } catch (\Throwable $t) {
+            echo "<!DOCTYPE html><html><head><title>404 Not Found</title></head><body style=\"font-family:sans-serif;text-align:center;padding:50px;\"><h1>404 Not Found</h1><p>The page you requested could not be found.</p><a href=\"/dashboard\">Go to Dashboard</a></body></html>";
+        }
     }
 
     private static function invoke($callback, $params = []) {

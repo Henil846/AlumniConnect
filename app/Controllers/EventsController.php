@@ -99,4 +99,21 @@ class EventsController {
         header("Location: /events?registered=1&event_id=$eventId");
         exit;
     }
+
+    public function cancel() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        
+        $eventId = (int)($_POST['event_id'] ?? 0);
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("DELETE FROM event_registrations WHERE event_id = ? AND user_id = ?");
+        $stmt->execute([$eventId, $userId]);
+
+        header("Location: /events?cancelled=1");
+        exit;
+    }
 }

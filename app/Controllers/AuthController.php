@@ -116,7 +116,27 @@ class AuthController {
         setcookie('auth_token', $token, time() + (86400 * 7), '/', '', false, true);
         setcookie('refresh_token', $refreshToken, time() + (86400 * 30), '/', '', false, true);
 
-        echo json_encode(['success' => true, 'message' => 'Login successful', 'redirect' => '/dashboard']);
+        // Determine role-based landing page or safe return URL
+        $redirect = '/dashboard';
+        $returnUrl = $_POST['return'] ?? ($_GET['return'] ?? '');
+        if ($returnUrl && strpos($returnUrl, '/') === 0 && strpos($returnUrl, '//') !== 0) {
+            $redirect = $returnUrl;
+        } elseif ($user->role === 'super_admin') {
+            $redirect = '/super-admin/dashboard';
+        } elseif ($user->role === 'college_admin' || $user->role === 'admin') {
+            $redirect = '/admin/dashboard';
+        }
+
+        $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') 
+               || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+               || (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+
+        if ($isAjax) {
+            echo json_encode(['success' => true, 'message' => 'Login successful', 'redirect' => $redirect]);
+        } else {
+            header("Location: $redirect");
+            exit;
+        }
     }
 
     public function logout() {

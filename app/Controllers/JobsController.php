@@ -93,4 +93,33 @@ class JobsController {
         header("Location: /jobs?applied=1");
         exit;
     }
+
+    public function create() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        $role = \App\Core\Auth::user()->role ?? null;
+        if (!$userId || ($role !== 'alumni' && $role !== 'admin' && $role !== 'college_admin')) {
+            http_response_code(403);
+            die("Unauthorized to post a job");
+        }
+        $title = trim($_POST['title'] ?? '');
+        $company = trim($_POST['company'] ?? '');
+        $location = trim($_POST['location'] ?? 'Remote');
+        $type = trim($_POST['type'] ?? 'Full-time');
+        $industry = trim($_POST['industry'] ?? 'Technology');
+        $salaryRange = trim($_POST['salary_range'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $requirements = trim($_POST['requirements'] ?? '');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        if ($title && $company) {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("INSERT INTO jobs (title, company, location, type, industry, salary_range, description, requirements, college_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')");
+            $stmt->execute([$title, $company, $location, $type, $industry, $salaryRange, $description, $requirements, $collegeId]);
+        }
+        header("Location: /jobs?created=1");
+        exit;
+    }
 }

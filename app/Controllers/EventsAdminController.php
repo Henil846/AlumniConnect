@@ -174,4 +174,29 @@ class EventsAdminController {
         header('Content-Type: ' . $finfo->file($path));
         readfile($path);
     }
+
+    public function create() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            die("CSRF Token Verification Failed");
+        }
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'admin' && $role !== 'college_admin' && $role !== 'super_admin') {
+            http_response_code(403);
+            die("Unauthorized to create events");
+        }
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $date = trim($_POST['date'] ?? date('Y-m-d H:i:s'));
+        $location = trim($_POST['location'] ?? 'Campus Grounds');
+        $type = trim($_POST['type'] ?? 'Networking');
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        if ($title) {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("INSERT INTO events (title, description, date, location, type, college_id, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $date, $location, $type, $collegeId, '/assets/img/login_side_img.png']);
+        }
+        header("Location: /events-admin?created=1");
+        exit;
+    }
 }

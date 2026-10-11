@@ -13,28 +13,55 @@ class ProfileController {
         $stmt->execute([$userId]);
         $user = $stmt->fetch(\PDO::FETCH_OBJ);
 
+        $college = null;
+        if ($user && $user->college_id) {
+            $cStmt = $pdo->prepare("SELECT * FROM colleges WHERE id = ?");
+            $cStmt->execute([$user->college_id]);
+            $college = $cStmt->fetch(\PDO::FETCH_OBJ);
+        }
+
+        // Compute dynamic profile completion
+        $fields = ['full_name', 'email', 'about_me', 'department', 'industry', 'location', 'linkedin', 'skills', 'resume_file'];
+        $filled = 0;
+        foreach ($fields as $f) {
+            if (!empty($user->$f)) $filled++;
+        }
+        $profileCompletion = (int)round(($filled / count($fields)) * 100);
+
         return View::render('profile', [
             'title' => 'My Profile — Alumni Connect',
             'activePage' => 'profile',
             'user' => $user,
-            
+            'college' => $college,
+            'profileCompletion' => $profileCompletion,
             'extraJs' => '/assets/js/profile.js'
         ], 'app');
     }
 
     public function update() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
-            return;
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
+                return;
+            }
+            die('CSRF validation failed.');
         }
 
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                return;
+            }
+            header('Location: /login');
+            exit;
         }
 
-        $aboutMe = $_POST['about_me'] ?? '';
+        $fullName = $_POST['full_name'] ?? null;
+        $aboutMe = $_POST['about_me'] ?? ($_POST['bio'] ?? null);
+        $department = $_POST['department'] ?? ($_POST['major'] ?? null);
+        $industry = $_POST['industry'] ?? null;
+        $location = $_POST['location'] ?? null;
         $linkedin = $_POST['linkedin'] ?? null;
         $github = $_POST['github'] ?? null;
         $website = $_POST['website'] ?? null;
@@ -55,15 +82,32 @@ class ProfileController {
             }
         }
         
-        if ($resumeFile) {
-            $stmt = $pdo->prepare("UPDATE users SET about_me = ?, linkedin = ?, github = ?, website = ?, skills = ?, resume_file = ? WHERE id = ?");
-            $stmt->execute([$aboutMe, $linkedin, $github, $website, $skills, $resumeFile, $userId]);
-        } else {
-            $stmt = $pdo->prepare("UPDATE users SET about_me = ?, linkedin = ?, github = ?, website = ?, skills = ? WHERE id = ?");
-            $stmt->execute([$aboutMe, $linkedin, $github, $website, $skills, $userId]);
+        $fields = [];
+        $params = [];
+        if ($fullName !== null) { $fields[] = "full_name = ?"; $params[] = $fullName; }
+        if ($aboutMe !== null) { $fields[] = "about_me = ?"; $params[] = $aboutMe; }
+        if ($department !== null) { $fields[] = "department = ?"; $params[] = $department; }
+        if ($industry !== null) { $fields[] = "industry = ?"; $params[] = $industry; }
+        if ($location !== null) { $fields[] = "location = ?"; $params[] = $location; }
+        if ($linkedin !== null) { $fields[] = "linkedin = ?"; $params[] = $linkedin; }
+        if ($github !== null) { $fields[] = "github = ?"; $params[] = $github; }
+        if ($website !== null) { $fields[] = "website = ?"; $params[] = $website; }
+        if ($skills !== null) { $fields[] = "skills = ?"; $params[] = $skills; }
+        if ($resumeFile !== null) { $fields[] = "resume_file = ?"; $params[] = $resumeFile; }
+        
+        if (!empty($fields)) {
+            $params[] = $userId;
+            $stmt = $pdo->prepare("UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?");
+            $stmt->execute($params);
         }
 
-        echo json_encode(['success' => true, 'message' => 'Profile updated successfully']);
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            echo json_encode(['success' => true, 'message' => 'Profile updated successfully']);
+            exit;
+        }
+
+        header("Location: /profile?updated=1");
+        exit;
     }
 
     public function viewProfile($id) {

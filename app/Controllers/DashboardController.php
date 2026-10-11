@@ -52,10 +52,19 @@ class DashboardController {
         $stmt_ref->execute([$userId]);
         $referralRequestsData = $stmt_ref->fetchAll(\PDO::FETCH_OBJ);
 
+        // Compute dynamic profile completion
+        $fields = ['full_name', 'email', 'about_me', 'department', 'industry', 'location', 'linkedin', 'skills', 'resume_file'];
+        $filled = 0;
+        foreach ($fields as $f) {
+            if (!empty($user->$f)) $filled++;
+        }
+        $profileCompletion = (int)round(($filled / count($fields)) * 100);
+
         return View::render('dashboard', [
             'title' => 'Dashboard — Alumni Connect',
             'activePage' => 'dashboard',
             'user' => $user,
+            'profileCompletion' => $profileCompletion,
             'mentorshipCount' => $mentorshipCount,
             'referralsCount' => $referralsCount,
             'mentorshipRequests' => $mentorshipRequests,

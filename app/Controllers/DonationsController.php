@@ -43,8 +43,8 @@ class DonationsController {
             $txnId = 'TXN_' . strtoupper(uniqid());
             
             // Insert donation as pending
-            $stmt = $pdo->prepare("INSERT INTO donations (user_id, campaign_id, amount, status, transaction_id) VALUES (?, ?, ?, 'pending', ?)");
-            $stmt->execute([$userId, $campaignId, $amount, $txnId]);
+            $stmt = $pdo->prepare("INSERT INTO donations (user_id, campaign_id, amount, status, transaction_id, college_id) VALUES (?, ?, ?, 'pending', ?, ?)");
+            $stmt->execute([$userId, $campaignId, $amount, $txnId, $collegeId]);
             
             // Generate HMAC signature to prevent callback forgery
             $secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');

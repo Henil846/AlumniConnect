@@ -63,6 +63,23 @@ class PaymentController {
                     // Update campaign total
                     $pdo->prepare("UPDATE campaigns SET raised_amount = raised_amount + ? WHERE id = ?")->execute([$donation->amount, $donation->campaign_id]);
                     
+                    // Fetch campaign details
+                    $campStmt = $pdo->prepare("SELECT title, created_by, college_id FROM campaigns WHERE id = ?");
+                    $campStmt->execute([$donation->campaign_id]);
+                    $camp = $campStmt->fetch(\PDO::FETCH_OBJ);
+                    $campTitle = $camp ? $camp->title : 'Campaign';
+                    $collegeId = $camp ? $camp->college_id : $donation->college_id;
+
+                    // Notification for Donor
+                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id) VALUES (?, 'donation', ?, ?)");
+                    $notifStmt->execute([$donation->user_id, "Thank you! Your donation of ₹" . number_format($donation->amount, 2) . " to '$campTitle' was successful.", $collegeId]);
+
+                    // Notification for Campaign Creator
+                    if ($camp && $camp->created_by && $camp->created_by != $donation->user_id) {
+                        $donorName = $pdo->query("SELECT full_name FROM users WHERE id = " . intval($donation->user_id))->fetchColumn() ?: 'An anonymous donor';
+                        $notifStmt->execute([$camp->created_by, "New donation of ₹" . number_format($donation->amount, 2) . " received from $donorName for '$campTitle'.", $collegeId]);
+                    }
+
                     header("Location: /donations?success=1");
                     exit;
                 } else {

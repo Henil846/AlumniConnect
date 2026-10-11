@@ -119,6 +119,11 @@ Router::post('/jobs/apply', function() {
     return (new JobsController())->apply();
 });
 
+Router::post('/jobs/create', function() {
+    AuthMiddleware::handle();
+    return (new JobsController())->create();
+});
+
 Router::get('/events', function() {
     AuthMiddleware::handle();
     return (new EventsController())->index();
@@ -129,9 +134,19 @@ Router::post('/events/register', function() {
     return (new EventsController())->register();
 });
 
+Router::post('/events/cancel', function() {
+    AuthMiddleware::handle();
+    return (new EventsController())->cancel();
+});
+
 Router::get('/events-admin', function() {
     AuthMiddleware::handle();
     return (new EventsAdminController())->index();
+});
+
+Router::post('/events-admin/create', function() {
+    AuthMiddleware::handle();
+    return (new EventsAdminController())->create();
 });
 
 Router::post('/events-admin/checkin', function() {
@@ -285,6 +300,11 @@ Router::post('/ads/create', function() {
     return (new AdsController())->create();
 });
 
+// Help Center
+Router::get('/help', function() {
+    return \App\Core\View::render('help', ['title' => 'Help Center — Alumni Connect', 'activePage' => 'help'], 'app');
+});
+
 // Admin Routes
 Router::get('/admin/dashboard', function() {
     AuthMiddleware::handle();
@@ -309,6 +329,16 @@ Router::get('/admin/payments', function() {
 Router::get('/admin/analytics', function() {
     AuthMiddleware::handle();
     return (new AdminController())->analytics();
+});
+
+Router::post('/admin/users/status', function() {
+    AuthMiddleware::handle();
+    return (new AdminController())->updateUserStatus();
+});
+
+Router::post('/admin/users/role', function() {
+    AuthMiddleware::handle();
+    return (new AdminController())->updateUserRole();
 });
 
 // Settings
@@ -344,6 +374,26 @@ Router::get('/super-admin/analytics', function() {
 Router::get('/super-admin/institutions', function() {
     AuthMiddleware::handle();
     return (new SuperAdminController())->institutions();
+});
+Router::post('/super-admin/institutions/create', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->createInstitution();
+});
+Router::post('/super-admin/institutions/status', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->updateInstitutionStatus();
+});
+Router::post('/super-admin/institutions/tier', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->updateInstitutionTier();
+});
+Router::post('/super-admin/users/verify', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->verifyUser();
+});
+Router::post('/super-admin/users/decline', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->declineUser();
 });
 Router::get('/super-admin/revenue', function() {
     AuthMiddleware::handle();
