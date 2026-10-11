@@ -9,6 +9,18 @@
  */
 
 $projectDir = realpath(__DIR__ . '/..');
+$devDbPath = $projectDir . '/database/database.sqlite';
+$testDbPath = $projectDir . '/database/test.sqlite';
+copy($devDbPath, $testDbPath);
+putenv("DB_PATH=$testDbPath");
+$_ENV['DB_PATH'] = $testDbPath;
+
+register_shutdown_function(function() use ($testDbPath) {
+    if (file_exists($testDbPath)) {
+        @unlink($testDbPath);
+    }
+});
+
 require_once $projectDir . '/app/Core/Env.php';
 require_once $projectDir . '/app/Core/Database.php';
 
@@ -92,6 +104,7 @@ function mut_http($url, $method = 'GET', $data = [], $cookies = []) {
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Test-DB: database/test.sqlite']);
 
     if ($method === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);

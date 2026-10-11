@@ -46,6 +46,31 @@ class MarketplaceController {
         $condition = $_POST['item_condition'] ?? 'used';
         $category = $_POST['category'] ?? 'other';
 
+        $imageUrl = null;
+        if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+                http_response_code(422);
+                die("Image exceeds maximum allowed size of 5MB");
+            }
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['image']['tmp_name']);
+            finfo_close($finfo);
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']) && in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $filename = 'market_' . bin2hex(random_bytes(16)) . '.' . $ext;
+                $uploadDir = __DIR__ . '/../../public/assets/uploads/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename)) {
+                    $imageUrl = '/assets/uploads/' . $filename;
+                }
+            } else {
+                http_response_code(422);
+                die("Invalid image file type");
+            }
+        }
+
         if ($title && $description) {
             $pdo = Database::getConnection();
             $collegeId = \App\Core\Auth::user()->college_id ?? null;

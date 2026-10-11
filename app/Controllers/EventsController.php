@@ -44,6 +44,11 @@ class EventsController {
             $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND college_id = ?");
             $stmt->execute([$selectedEventId, $collegeId]);
             $selectedEvent = $stmt->fetch(\PDO::FETCH_OBJ);
+
+            if (!empty($_GET['event_id']) && !$selectedEvent) {
+                http_response_code(403);
+                die("Forbidden: Cross-tenant event access denied");
+            }
         }
 
         return View::render('events', [
@@ -58,7 +63,8 @@ class EventsController {
 
     public function register() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            die("CSRF Token Verification Failed");
+            http_response_code(403);
+            die("CSRF validation failed.");
         }
         
         $eventId = $_POST['event_id'];
@@ -96,13 +102,24 @@ class EventsController {
         $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'event_reminder', ?, ?, '/events')");
         $notifStmt->execute([$userId, "You have successfully registered for '$eventTitle'.", $collegeId]);
 
+        // Generate Notification for Event Organizer / College Admin
+        $organizerId = $pdo->query("SELECT created_by FROM events WHERE id = " . intval($eventId))->fetchColumn();
+        if (!$organizerId) {
+            $organizerId = $pdo->query("SELECT id FROM users WHERE college_id = " . intval($collegeId) . " AND role = 'college_admin' LIMIT 1")->fetchColumn();
+        }
+        if ($organizerId && $organizerId != $userId) {
+            $attendeeName = \App\Core\Auth::user()->full_name ?? 'A student';
+            $notifStmt->execute([$organizerId, "$attendeeName has registered for your event '$eventTitle'.", $collegeId]);
+        }
+
         header("Location: /events?registered=1&event_id=$eventId");
         exit;
     }
 
     public function cancel() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            die("CSRF Token Verification Failed");
+            http_response_code(403);
+            die("CSRF validation failed.");
         }
         
         $eventId = (int)($_POST['event_id'] ?? 0);

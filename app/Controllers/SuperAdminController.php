@@ -115,12 +115,13 @@ class SuperAdminController {
         $stmt->execute([$name, $slug, $plan, $city, $state]);
         $collegeId = $pdo->lastInsertId();
 
-        // If admin email provided, create college admin account
-        if (!empty($adminEmail)) {
-            $hashed = password_hash($adminPassword, PASSWORD_DEFAULT);
-            $uStmt = $pdo->prepare("INSERT INTO users (email, password, full_name, role, college_id, status) VALUES (?, ?, ?, 'college_admin', ?, 'active')");
-            $uStmt->execute([$adminEmail, $hashed, $adminName ?: ($name . ' Admin'), $collegeId]);
+        // Automatically create and verify initial college admin account
+        if (empty($adminEmail)) {
+            $adminEmail = 'admin@' . $slug . '.edu';
         }
+        $hashed = password_hash($adminPassword, PASSWORD_DEFAULT);
+        $uStmt = $pdo->prepare("INSERT INTO users (email, password, full_name, role, college_id, status, is_verified) VALUES (?, ?, ?, 'college_admin', ?, 'active', 1)");
+        $uStmt->execute([$adminEmail, $hashed, $adminName ?: ($name . ' Admin'), $collegeId]);
 
         header("Location: /super-admin/institutions?created=1");
         exit;

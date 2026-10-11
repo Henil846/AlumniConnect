@@ -6,6 +6,18 @@
  */
 
 $projectDir = realpath(__DIR__ . '/..');
+$devDbPath = $projectDir . '/database/database.sqlite';
+$testDbPath = $projectDir . '/database/test.sqlite';
+copy($devDbPath, $testDbPath);
+putenv("DB_PATH=$testDbPath");
+$_ENV['DB_PATH'] = $testDbPath;
+
+register_shutdown_function(function() use ($testDbPath) {
+    if (file_exists($testDbPath)) {
+        @unlink($testDbPath);
+    }
+});
+
 require_once $projectDir . '/app/Core/Env.php';
 require_once $projectDir . '/app/Core/Database.php';
 
@@ -29,6 +41,12 @@ $roleStats = [
     'College Admin' => ['total' => 0, 'passed' => 0, 'failed' => 0],
     'Super Admin' => ['total' => 0, 'passed' => 0, 'failed' => 0],
     'Multi-Tenant Isolation' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'Same-College Ownership' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'Super Admin Onboarding' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'Role Escalation Defense' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'Referral Pipeline' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'Notification Triggers' => ['total' => 0, 'passed' => 0, 'failed' => 0],
+    'File Upload Limits' => ['total' => 0, 'passed' => 0, 'failed' => 0],
     'Security / CSRF / Rate-Limit' => ['total' => 0, 'passed' => 0, 'failed' => 0],
 ];
 $currentSuiteRole = 'General / Auth';
@@ -60,6 +78,7 @@ function e2e_http($url, $method = 'GET', $data = [], $cookies = [], $files = [])
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Test-DB: database/test.sqlite']);
 
     if ($method === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);
@@ -528,7 +547,7 @@ if (!empty($refId)) {
         'status' => 'approved'
     ], $alumniCookies);
     $refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
-    e2e_assert($refStatus === 'approved', "Alumni approved referral request (status: 'approved')");
+    e2e_assert($refStatus === 'submitted', "Alumni approved referral request (mapped to 'submitted')");
 
     $notif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'referral_update' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
     e2e_assert($notif && $notif->link === '/referral-request', "Referral approval triggered notification with link='/referral-request'");
@@ -753,20 +772,20 @@ $hasHeaderAndData = count($csvLines) >= 2;
 e2e_assert($csvRes['code'] === 200 && $isCsv && $hasHeaderAndData, "Super admin revenue CSV export generated valid multi-row CSV file with header and data rows");
 
 // --------------------------------------------------------------------------
-// 6. MULTI-TENANT ISOLATION ASSERTIONS
+// 6. MULTI-TENANT ISOLATION ASSERTIONS (WRITES & READS)
 // --------------------------------------------------------------------------
 set_test_role('Multi-Tenant Isolation');
 echo "\n--- 6. Testing Multi-Tenant Isolation (Cross-College Barriers) ---\n";
 
 @unlink($projectDir . '/storage/rate_limits.json');
 $c2Login = e2e_login($baseUrl, 'student2@alumni.test', 'Password123!');
-if ($c2Login['location'] !== '/dashboard') {
-    echo "    [DEBUG c2Login] Code: {$c2Login['code']}, Loc: {$c2Login['location']}, Body: {$c2Login['body']}\n";
-}
 $c2Cookies = $c2Login['cookies'];
 $c2Csrf = $c2Login['csrf'];
 
-// Cross-tenant job application attempt
+$c2AdminLogin = e2e_login($baseUrl, 'admin2@alumni.test', 'Password123!');
+$c2AdminCookies = $c2AdminLogin['cookies'];
+
+// A. Cross-tenant writes
 if ($job) {
     $res = e2e_http("$baseUrl/jobs/apply", 'POST', [
         'csrf_token' => $c2Csrf,
@@ -775,7 +794,6 @@ if ($job) {
     e2e_assert($res['code'] === 403, "Cross-tenant job application blocked with HTTP 403");
 }
 
-// Cross-tenant direct message attempt
 $res = e2e_http("$baseUrl/messages/send", 'POST', [
     'csrf_token' => $c2Csrf,
     'receiver_id' => $studentId,
@@ -783,7 +801,6 @@ $res = e2e_http("$baseUrl/messages/send", 'POST', [
 ], $c2Cookies);
 e2e_assert($res['code'] === 403, "Cross-tenant direct messaging blocked with HTTP 403");
 
-// Cross-tenant donation attempt
 if ($campaign) {
     $res = e2e_http("$baseUrl/donations/donate", 'POST', [
         'csrf_token' => $c2Csrf,
@@ -793,7 +810,6 @@ if ($campaign) {
     e2e_assert($res['code'] === 403, "Cross-tenant campaign donation blocked with HTTP 403");
 }
 
-// Direct-ID tampering: College 2 student attempts deleting College 1 post
 $c1Post = $pdo->query("SELECT id FROM posts WHERE college_id = 1 LIMIT 1")->fetchColumn();
 if ($c1Post) {
     $res = e2e_http("$baseUrl/community/delete", 'POST', [
@@ -801,10 +817,7 @@ if ($c1Post) {
         'post_id' => $c1Post
     ], $c2Cookies);
     e2e_assert($res['code'] === 403, "Direct-ID tampering: College 2 student blocked from deleting College 1 post (HTTP 403)");
-}
 
-// Direct-ID tampering: College 2 student attempts voting on College 1 poll
-if ($c1Post) {
     $res = e2e_http("$baseUrl/community/poll-vote", 'POST', [
         'csrf_token' => $c2Csrf,
         'post_id' => $c1Post,
@@ -813,11 +826,407 @@ if ($c1Post) {
     e2e_assert($res['code'] === 403, "Direct-ID tampering: College 2 student blocked from voting on College 1 poll (HTTP 403)");
 }
 
+// B. Cross-tenant reads (Lists & Direct-ID)
+$c1EventTitle = $pdo->query("SELECT title FROM events WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2EventsHtml = e2e_http("$baseUrl/events", 'GET', [], $c2Cookies)['body'];
+e2e_assert($c1EventTitle && strpos($c2EventsHtml, $c1EventTitle) === false, "Cross-tenant read: College 2 student cannot see College 1 events in list");
+
+$c1EventId = $pdo->query("SELECT id FROM events WHERE college_id = 1 LIMIT 1")->fetchColumn();
+if ($c1EventId) {
+    $c2EventDetail = e2e_http("$baseUrl/events?event_id=$c1EventId", 'GET', [], $c2Cookies);
+    e2e_assert($c2EventDetail['code'] === 403, "Cross-tenant read: College 2 student blocked from viewing College 1 event by direct ID (HTTP 403)");
+}
+
+$c1JobTitle = $pdo->query("SELECT title FROM jobs WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2JobsHtml = e2e_http("$baseUrl/jobs", 'GET', [], $c2Cookies)['body'];
+e2e_assert($c1JobTitle && strpos($c2JobsHtml, $c1JobTitle) === false, "Cross-tenant read: College 2 student cannot see College 1 jobs in list");
+
+$c1JobId = $pdo->query("SELECT id FROM jobs WHERE college_id = 1 LIMIT 1")->fetchColumn();
+if ($c1JobId) {
+    $c2JobDetail = e2e_http("$baseUrl/jobs?job_id=$c1JobId", 'GET', [], $c2Cookies);
+    e2e_assert($c2JobDetail['code'] === 403, "Cross-tenant read: College 2 student blocked from viewing College 1 job by direct ID (HTTP 403)");
+}
+
+$c2MsgWithC1User = e2e_http("$baseUrl/messages?user_id=$studentId", 'GET', [], $c2Cookies);
+e2e_assert($c2MsgWithC1User['code'] === 403, "Cross-tenant read: College 2 student blocked from messaging thread with College 1 user (HTTP 403)");
+
+$c2ViewC1Profile = e2e_http("$baseUrl/profile/$studentId", 'GET', [], $c2Cookies);
+e2e_assert($c2ViewC1Profile['code'] === 403, "Cross-tenant read: College 2 student blocked from viewing College 1 user profile (HTTP 403)");
+
+$c1NotifMsg = $pdo->query("SELECT message FROM notifications WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2NotifsHtml = e2e_http("$baseUrl/notifications", 'GET', [], $c2Cookies)['body'];
+e2e_assert($c1NotifMsg && strpos($c2NotifsHtml, $c1NotifMsg) === false, "Cross-tenant read: College 2 student cannot see College 1 notifications");
+
+$c1MarketTitle = $pdo->query("SELECT title FROM marketplace_items WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2MarketHtml = e2e_http("$baseUrl/marketplace", 'GET', [], $c2Cookies)['body'];
+e2e_assert(!$c1MarketTitle || strpos($c2MarketHtml, $c1MarketTitle) === false, "Cross-tenant read: College 2 student cannot see College 1 marketplace items");
+
+$c1BizName = $pdo->query("SELECT name FROM businesses WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2BizHtml = e2e_http("$baseUrl/business-directory", 'GET', [], $c2Cookies)['body'];
+e2e_assert(!$c1BizName || strpos($c2BizHtml, $c1BizName) === false, "Cross-tenant read: College 2 student cannot see College 1 business directory listings");
+
+$c1StartupName = $pdo->query("SELECT name FROM startups WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2StartupHtml = e2e_http("$baseUrl/startup-hub", 'GET', [], $c2Cookies)['body'];
+e2e_assert(!$c1StartupName || strpos($c2StartupHtml, $c1StartupName) === false, "Cross-tenant read: College 2 student cannot see College 1 startups");
+
+$c1CareerTitle = $pdo->query("SELECT title FROM career_resources WHERE college_id = 1 LIMIT 1")->fetchColumn();
+$c2CareerHtml = e2e_http("$baseUrl/career-center", 'GET', [], $c2Cookies)['body'];
+e2e_assert(!$c1CareerTitle || strpos($c2CareerHtml, $c1CareerTitle) === false, "Cross-tenant read: College 2 student cannot see College 1 career resources");
+
+// C. College 2 Admin Isolation (Users, Reports, Analytics)
+$c2AdminDash = e2e_http("$baseUrl/admin/dashboard", 'GET', [], $c2AdminCookies)['body'];
+$c1UserCount = $pdo->query("SELECT COUNT(*) FROM users WHERE college_id = 1")->fetchColumn();
+$c2UserCount = $pdo->query("SELECT COUNT(*) FROM users WHERE college_id = 2")->fetchColumn();
+e2e_assert(strpos($c2AdminDash, "College Administrator Dashboard") !== false, "College 2 admin dashboard loaded successfully");
+
+$c2AdminMod = e2e_http("$baseUrl/admin/moderation", 'GET', [], $c2AdminCookies)['body'];
+$c1ReportReason = $pdo->query("SELECT reason FROM reports WHERE college_id = 1 LIMIT 1")->fetchColumn();
+e2e_assert(!$c1ReportReason || strpos($c2AdminMod, $c1ReportReason) === false, "Cross-tenant read: College 2 admin cannot see College 1 moderation reports");
+
 // --------------------------------------------------------------------------
-// 7. SECURITY, FORM VALIDATION, CSRF & RATE-LIMITING
+// 7. SAME-COLLEGE OWNERSHIP BARRIERS
+// --------------------------------------------------------------------------
+set_test_role('Same-College Ownership');
+echo "\n--- 7. Testing Same-College Ownership Barriers (User A vs User B) ---\n";
+
+// A. Post edit & delete ownership
+$alumniPostId = $pdo->query("SELECT id FROM posts WHERE user_id = $alumniId LIMIT 1")->fetchColumn();
+if (!$alumniPostId) {
+    $pdo->prepare("INSERT INTO posts (user_id, college_id, content) VALUES (?, 1, 'Alumni test post')")->execute([$alumniId]);
+    $alumniPostId = $pdo->lastInsertId();
+}
+$res = e2e_http("$baseUrl/community/edit", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'post_id' => $alumniPostId,
+    'content' => 'Tampered by student'
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni post (HTTP 403)");
+
+$res = e2e_http("$baseUrl/community/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'post_id' => $alumniPostId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni post (HTTP 403)");
+
+// B. Marketplace item edit & delete ownership
+$pdo->prepare("INSERT INTO marketplace_items (user_id, college_id, title, description, price) VALUES (?, 1, 'Alumni Book', 'Great book', 50)")->execute([$alumniId]);
+$alumniMarketId = $pdo->lastInsertId();
+
+$res = e2e_http("$baseUrl/marketplace/edit", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'item_id' => $alumniMarketId,
+    'title' => 'Student Tamper'
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni marketplace item (HTTP 403)");
+
+$res = e2e_http("$baseUrl/marketplace/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'item_id' => $alumniMarketId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni marketplace item (HTTP 403)");
+
+// C. Business directory edit & delete ownership
+$pdo->prepare("INSERT INTO businesses (user_id, college_id, name, description) VALUES (?, 1, 'Alumni Consulting', 'Expert advice')")->execute([$alumniId]);
+$alumniBizId = $pdo->lastInsertId();
+
+$res = e2e_http("$baseUrl/business-directory/edit", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'business_id' => $alumniBizId,
+    'name' => 'Student Tampered Biz'
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni business listing (HTTP 403)");
+
+$res = e2e_http("$baseUrl/business-directory/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'business_id' => $alumniBizId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni business listing (HTTP 403)");
+
+// D. Startup hub edit & delete ownership
+$pdo->prepare("INSERT INTO startups (user_id, college_id, name, elevator_pitch) VALUES (?, 1, 'Alumni AI Startup', 'Revolutionary AI')")->execute([$alumniId]);
+$alumniStartupId = $pdo->lastInsertId();
+
+$res = e2e_http("$baseUrl/startup-hub/edit", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'startup_id' => $alumniStartupId,
+    'name' => 'Student Tampered Startup'
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from editing Alumni startup (HTTP 403)");
+
+$res = e2e_http("$baseUrl/startup-hub/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'startup_id' => $alumniStartupId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni startup (HTTP 403)");
+
+// E. Comment delete ownership
+$pdo->prepare("INSERT INTO post_comments (post_id, user_id, college_id, content) VALUES (?, ?, 1, 'Alumni comment')")->execute([$alumniPostId, $alumniId]);
+$alumniCommentId = $pdo->lastInsertId();
+
+$res = e2e_http("$baseUrl/community/comment/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'comment_id' => $alumniCommentId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Student forbidden from deleting Alumni comment (HTTP 403)");
+
+// F. Message delete ownership
+$pdo->prepare("INSERT INTO messages (sender_id, receiver_id, college_id, content) VALUES (?, ?, 1, 'Hello from alumni')")->execute([$alumniId, $studentId]);
+$alumniMsgId = $pdo->lastInsertId();
+
+$res = e2e_http("$baseUrl/messages/delete", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'message_id' => $alumniMsgId
+], $studentCookies);
+e2e_assert($res['code'] === 403, "Same-college ownership: Recipient student forbidden from deleting sender Alumni message (HTTP 403)");
+
+// --------------------------------------------------------------------------
+// 8. SUPER ADMIN ONBOARDING
+// --------------------------------------------------------------------------
+set_test_role('Super Admin Onboarding');
+echo "\n--- 8. Testing Super Admin Institution Onboarding & Admin Provisioning ---\n";
+
+$newInstSlug = "onboard-univ-" . time();
+$newInstAdminEmail = "onboard_admin_" . time() . "@univ.edu";
+
+$onboardRes = e2e_http("$baseUrl/super-admin/institutions/create", 'POST', [
+    'csrf_token' => $superCsrf,
+    'name' => 'Onboarding University Test',
+    'slug' => $newInstSlug,
+    'plan' => 'Enterprise',
+    'city' => 'Hyderabad',
+    'state' => 'Telangana',
+    'admin_email' => $newInstAdminEmail,
+    'admin_name' => 'Chancellor Test',
+    'admin_password' => 'Password123!'
+], $superCookies);
+
+$newCollegeId = $pdo->query("SELECT id FROM colleges WHERE slug = '$newInstSlug'")->fetchColumn();
+$newAdminUser = $pdo->query("SELECT * FROM users WHERE email = '$newInstAdminEmail'")->fetch(PDO::FETCH_OBJ);
+
+e2e_assert($newCollegeId && $newAdminUser, "Super admin institution creation provisioned college and college admin user");
+e2e_assert($newAdminUser && $newAdminUser->role === 'college_admin' && (int)$newAdminUser->college_id === (int)$newCollegeId && (int)$newAdminUser->is_verified === 1, "Provisioned admin has role 'college_admin', matching college_id, and is verified");
+
+// Test that the new admin can log in and sees only their college
+$newAdminLogin = e2e_login($baseUrl, $newInstAdminEmail, 'Password123!');
+e2e_assert($newAdminLogin['location'] === '/admin/dashboard', "Newly provisioned college admin logged in successfully to /admin/dashboard");
+
+$newAdminDash = e2e_http("$baseUrl/admin/dashboard", 'GET', [], $newAdminLogin['cookies'])['body'];
+e2e_assert(strpos($newAdminDash, 'Chancellor Test') !== false || strpos($newAdminDash, 'College Admin') !== false, "New college admin dashboard rendered scoped data");
+
+// --------------------------------------------------------------------------
+// 9. ROLE ESCALATION DEFENSE (MASS ASSIGNMENT)
+// --------------------------------------------------------------------------
+set_test_role('Role Escalation Defense');
+echo "\n--- 9. Testing Role Escalation Defense (Mass Assignment) ---\n";
+
+$escalateRes = e2e_http("$baseUrl/profile/update", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'full_name' => 'Aarav Normal Student',
+    'role' => 'super_admin',
+    'college_id' => 99,
+    'is_verified' => 0
+], $studentCookies);
+
+$studentUserAfter = $pdo->query("SELECT role, college_id FROM users WHERE id = $studentId")->fetch(PDO::FETCH_OBJ);
+e2e_assert($studentUserAfter->role === 'student' && (int)$studentUserAfter->college_id === 1, "Student role escalation via mass assignment blocked (role: 'student', college_id: 1)");
+
+// --------------------------------------------------------------------------
+// 10. REFERRAL STATUS PIPELINE
+// --------------------------------------------------------------------------
+set_test_role('Referral Pipeline');
+echo "\n--- 10. Testing Referral Status Pipeline (requested -> reviewed -> submitted -> rejected) ---\n";
+
+// A. Student submits referral request -> status is requested
+$pdo->prepare("DELETE FROM referral_requests WHERE student_id = ?")->execute([$studentId]);
+$refSubRes = e2e_http("$baseUrl/referral-request/submit", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'alumni_id' => $alumniId,
+    'job_title' => 'Software Engineer Pipeline Test',
+    'company' => 'Google Test Inc',
+    'job_url' => 'https://careers.google.com/test',
+    'message' => 'Please refer me!'
+], $studentCookies);
+
+$refId = $pdo->query("SELECT id FROM referral_requests WHERE student_id = $studentId ORDER BY id DESC LIMIT 1")->fetchColumn();
+$refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
+e2e_assert($refStatus === 'requested', "Referral submission initialized with canonical status 'requested'");
+
+// B. Alumni reviews referral -> status reviewed
+$res = e2e_http("$baseUrl/referral-request/update-status", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'request_id' => $refId,
+    'status' => 'reviewed'
+], $alumniCookies);
+$refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
+e2e_assert($refStatus === 'reviewed', "Alumni updated referral status to 'reviewed'");
+
+// C. Alumni submits referral -> status submitted
+$res = e2e_http("$baseUrl/referral-request/update-status", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'request_id' => $refId,
+    'status' => 'submitted'
+], $alumniCookies);
+$refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
+e2e_assert($refStatus === 'submitted', "Alumni updated referral status to 'submitted'");
+
+// D. Alumni rejects referral -> status rejected
+$res = e2e_http("$baseUrl/referral-request/update-status", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'request_id' => $refId,
+    'status' => 'rejected'
+], $alumniCookies);
+$refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
+e2e_assert($refStatus === 'rejected', "Alumni updated referral status to 'rejected'");
+
+// E. Legacy alias 'approved' maps to 'submitted'
+$res = e2e_http("$baseUrl/referral-request/update-status", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'request_id' => $refId,
+    'status' => 'approved'
+], $alumniCookies);
+$refStatus = $pdo->query("SELECT status FROM referral_requests WHERE id = $refId")->fetchColumn();
+e2e_assert($refStatus === 'submitted', "Legacy status 'approved' correctly aliased to canonical 'submitted'");
+
+// --------------------------------------------------------------------------
+// 11. NOTIFICATION TRIGGERS
+// --------------------------------------------------------------------------
+set_test_role('Notification Triggers');
+echo "\n--- 11. Testing Notification Triggers Across All Modules ---\n";
+
+$adminId = $pdo->query("SELECT id FROM users WHERE role = 'college_admin' AND college_id = 1 LIMIT 1")->fetchColumn();
+
+// A. Direct message notification
+$pdo->prepare("DELETE FROM notifications WHERE user_id = ? AND type = 'message'")->execute([$alumniId]);
+$msgRes = e2e_http("$baseUrl/messages/send", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'receiver_id' => $alumniId,
+    'content' => 'Notification trigger test message'
+], $studentCookies);
+$msgNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $alumniId AND type = 'message' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($msgNotif && $msgNotif->link === '/messages?user_id=' . $studentId && (int)$msgNotif->college_id === 1, "Direct message triggered notification to recipient with correct link and college_id");
+
+// B. Completed donation notification (to donor and campaign creator/admin)
+$secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');
+$txnId = 'TXN_NOTIF_' . time();
+$pdo->prepare("INSERT INTO donations (campaign_id, user_id, college_id, amount, status, transaction_id) VALUES (?, ?, 1, 500, 'pending', ?)")->execute([$campaign->id, $studentId, $txnId]);
+$sig = hash_hmac('sha256', $txnId, $secret);
+
+$donRes = e2e_http("$baseUrl/payment/callback", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'txn_id' => $txnId,
+    'status' => 'success',
+    'sig' => $sig
+], $studentCookies);
+$donNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'donation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($donNotif && $donNotif->link === '/donations' && (int)$donNotif->college_id === 1, "Completed donation triggered donor notification with /donations link");
+
+$campCreator = $pdo->query("SELECT created_by FROM campaigns WHERE id = {$campaign->id}")->fetchColumn();
+$recipientId = ($campCreator && $campCreator != $studentId) ? $campCreator : $adminId;
+$ownerNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $recipientId AND type = 'donation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($ownerNotif && (int)$ownerNotif->college_id === 1, "Completed donation triggered campaign owner/admin notification with college_id");
+
+// C. Event RSVP notification to organizer
+$activeEvent = $pdo->query("SELECT id, title FROM events WHERE college_id = 1 LIMIT 1")->fetch(PDO::FETCH_OBJ);
+if (!$activeEvent) {
+    $pdo->prepare("INSERT INTO events (title, type, date, location, created_by, college_id) VALUES ('Notification Test Event', 'Tech', datetime('now', '+7 days'), 'Auditorium', ?, 1)")->execute([$adminId]);
+    $activeEvent = (object)['id' => $pdo->lastInsertId(), 'title' => 'Notification Test Event'];
+}
+$pdo->prepare("DELETE FROM notifications WHERE user_id = ? AND type = 'event_reminder'")->execute([$studentId]);
+$pdo->prepare("DELETE FROM event_registrations WHERE event_id = ? AND user_id = ?")->execute([$activeEvent->id, $studentId]);
+$rsvpRes = e2e_http("$baseUrl/events/register", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'event_id' => $activeEvent->id
+], $studentCookies);
+
+$attendeeNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'event_reminder' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($attendeeNotif && $attendeeNotif->link === '/events', "Event registration created attendee confirmation notification");
+
+// D. Job posted notification to students
+$newJobTitle = "Staff SRE Test " . time();
+$jobCreateRes = e2e_http("$baseUrl/jobs/create", 'POST', [
+    'csrf_token' => $alumniCsrf,
+    'title' => $newJobTitle,
+    'company' => 'CloudTech Labs',
+    'location' => 'Bengaluru',
+    'type' => 'Full-time',
+    'industry' => 'Cloud',
+    'salary_range' => '₹25L - ₹35L',
+    'description' => 'Test SRE job',
+    'requirements' => 'Linux, Docker'
+], $alumniCookies);
+
+$jobAlertNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $studentId AND type = 'job_alert' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($jobAlertNotif && strpos($jobAlertNotif->message, $newJobTitle) !== false && $jobAlertNotif->link === '/jobs', "Job creation triggered job alert notification to student with /jobs link");
+
+// E. Moderation report notification to college admin
+$testPostId = $pdo->query("SELECT id FROM posts WHERE college_id = 1 LIMIT 1")->fetchColumn();
+if (!$testPostId) {
+    $pdo->prepare("INSERT INTO posts (user_id, college_id, content) VALUES (?, 1, 'Post to report')")->execute([$alumniId]);
+    $testPostId = $pdo->lastInsertId();
+}
+$repRes = e2e_http("$baseUrl/community/report", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'reported_item_type' => 'post',
+    'reported_item_id' => $testPostId,
+    'reason' => 'Test guideline violation notification trigger'
+], $studentCookies);
+
+$modNotif = $pdo->query("SELECT * FROM notifications WHERE user_id = $adminId AND type = 'moderation' ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_OBJ);
+e2e_assert($modNotif && $modNotif->link === '/admin/moderation' && (int)$modNotif->college_id === 1, "Content report submission triggered notification to college admin with /admin/moderation link");
+
+// --------------------------------------------------------------------------
+// 12. FILE UPLOAD LIMITS & EXECUTION SECURITY
+// --------------------------------------------------------------------------
+set_test_role('File Upload Limits');
+echo "\n--- 12. Testing File Upload Validation & Security Controls ---\n";
+
+$tmpDir = sys_get_temp_dir();
+
+// A. Oversize file (>5MB) rejected
+$oversizeFile = $tmpDir . '/oversize_test.pdf';
+file_put_contents($oversizeFile, str_repeat('A', 6 * 1024 * 1024)); // 6MB
+$res = e2e_http("$baseUrl/profile/update", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'full_name' => 'Aarav Student'
+], $studentCookies, ['resume' => $oversizeFile]);
+@unlink($oversizeFile);
+e2e_assert($res['code'] === 422, "Resume upload >5MB rejected with HTTP 422");
+
+// B. Wrong MIME with right extension (text/php pretending to be .pdf) rejected
+$fakePdfFile = $tmpDir . '/fake_test.pdf';
+file_put_contents($fakePdfFile, "<?php phpinfo(); ?>");
+$res = e2e_http("$baseUrl/profile/update", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'full_name' => 'Aarav Student'
+], $studentCookies, ['resume' => $fakePdfFile]);
+@unlink($fakePdfFile);
+e2e_assert($res['code'] === 422, "Wrong MIME type file pretending to be .pdf rejected with HTTP 422");
+
+// C. Double extension safe handling (x.php.pdf)
+$doubleExtFile = $tmpDir . '/safe_resume.php.pdf';
+$pdfContent = "%PDF-1.4\n%âãÏÓ\n1 0 obj\n<<\n/Title (Test)\n>>\nendobj\ntrailer\n<<\n/Root 1 0 R\n>>\n%%EOF";
+file_put_contents($doubleExtFile, $pdfContent);
+$res = e2e_http("$baseUrl/profile/update", 'POST', [
+    'csrf_token' => $studentCsrf,
+    'full_name' => 'Aarav Student'
+], $studentCookies, ['resume' => $doubleExtFile]);
+@unlink($doubleExtFile);
+
+$storedResume = $pdo->query("SELECT resume_file FROM users WHERE id = $studentId")->fetchColumn();
+$isRandomized = preg_match('#^/uploads/resumes/resume_[a-f0-9]{32}\.pdf$#', (string)$storedResume);
+$noPhpExt = (strpos((string)$storedResume, '.php') === false);
+e2e_assert($isRandomized && $noPhpExt, "Double extension sanitized to randomized hex filename without .php extension");
+
+// D. Upload directory execution protection
+$publicUploadsHtaccess = file_exists($projectDir . '/public/uploads/.htaccess');
+$assetsUploadsHtaccess = file_exists($projectDir . '/public/assets/uploads/.htaccess');
+e2e_assert($publicUploadsHtaccess && $assetsUploadsHtaccess, "Script execution blocked via .htaccess in public/uploads/ and public/assets/uploads/");
+
+// --------------------------------------------------------------------------
+// 13. COMPREHENSIVE AUTHENTICATED CSRF COVERAGE & RATE-LIMITING
 // --------------------------------------------------------------------------
 set_test_role('Security / CSRF / Rate-Limit');
-echo "\n--- 7. Testing Form Validation, CSRF Blanket Coverage & Rate Limiting ---\n";
+echo "\n--- 13. Testing Authenticated CSRF Blanket Coverage & Rate Limiting ---\n";
 
 // A. Validation keeps input and reports error
 $badLogin = e2e_http("$baseUrl/login", 'POST', [
@@ -831,25 +1240,70 @@ e2e_assert(
     "Bad login submission returns validation error structure"
 );
 
-// B. CSRF Enforcement on All POST Routes
+// B. CSRF Enforcement across all POST routes while properly authenticated
 @unlink($projectDir . '/storage/rate_limits.json');
 $pdo->exec("DELETE FROM login_attempts");
 preg_match_all("/Router::post\(\s*'([^']+)'/", file_get_contents($projectDir . '/routes/web.php'), $matches);
 $postRoutes = array_unique($matches[1]);
-$allCsrfBlocked = true;
+
+$publicRoutes = ['/login', '/signup', '/verify', '/forgot-password', '/reset-password'];
+$superRoutes = ['/super-admin/institutions/create', '/super-admin/institutions/status', '/super-admin/settings/update'];
+$adminRoutes = ['/events-admin/create', '/events-admin/checkin', '/events-admin/edit', '/events-admin/delete', '/events-admin/upload-gallery', '/admin/moderation/resolve', '/admin/moderation/dismiss', '/admin/settings/update'];
+
+$allCsrfMissingBlocked = true;
+$allCsrfWrongBlocked = true;
 $testedCsrfCount = 0;
 
 foreach ($postRoutes as $pRoute) {
-    // Send POST with NO CSRF token and no cookies
-    $res = e2e_http("$baseUrl$pRoute", 'POST', ['test' => 1]);
+    if ($pRoute === '/payment/callback') {
+        // Special case: Payment webhook uses HMAC SHA256 signature verification rather than CSRF cookie
+        $resMissing = e2e_http("$baseUrl$pRoute", 'POST', ['txn_id' => '123'], $studentCookies);
+        $resWrong = e2e_http("$baseUrl$pRoute", 'POST', ['txn_id' => '123', 'sig' => 'invalid_sig'], $studentCookies);
+        $testedCsrfCount++;
+        if ($resMissing['code'] !== 403) {
+            $allCsrfMissingBlocked = false;
+            echo "    [CSRF MISSING LEAK] Route $pRoute returned HTTP {$resMissing['code']}\n";
+        }
+        if ($resWrong['code'] !== 403) {
+            $allCsrfWrongBlocked = false;
+            echo "    [CSRF WRONG LEAK] Route $pRoute returned HTTP {$resWrong['code']}\n";
+        }
+        continue;
+    }
+
+    // Determine appropriate authenticated session for this route
+    if (in_array($pRoute, $publicRoutes)) {
+        $testCookies = [];
+    } elseif (in_array($pRoute, $superRoutes)) {
+        $testCookies = $superCookies;
+    } elseif (in_array($pRoute, $adminRoutes)) {
+        $testCookies = $adminCookies;
+    } else {
+        $testCookies = $studentCookies;
+    }
+
+    // Test 1: Missing CSRF token
+    $resMissing = e2e_http("$baseUrl$pRoute", 'POST', ['test' => 1], $testCookies);
+    // Test 2: Wrong CSRF token
+    $resWrong = e2e_http("$baseUrl$pRoute", 'POST', ['test' => 1, 'csrf_token' => 'tampered_invalid_token'], $testCookies);
+
     $testedCsrfCount++;
-    // Must return 403 Forbidden or redirect to login (if AuthMiddleware checks cookie first)
-    if ($res['code'] !== 403 && $res['code'] !== 302) {
-        $allCsrfBlocked = false;
-        echo "    [CSRF LEAK] Route $pRoute returned HTTP {$res['code']} instead of 403/302!\n";
+
+    $isMissingBlocked = ($resMissing['code'] === 403 && (stripos($resMissing['body'], 'CSRF') !== false || stripos($resMissing['body'], 'forbidden') !== false));
+    $isWrongBlocked = ($resWrong['code'] === 403 && (stripos($resWrong['body'], 'CSRF') !== false || stripos($resWrong['body'], 'forbidden') !== false));
+
+    if (!$isMissingBlocked) {
+        $allCsrfMissingBlocked = false;
+        echo "    [CSRF MISSING LEAK] Route $pRoute returned HTTP {$resMissing['code']} (Body: " . substr(strip_tags($resMissing['body']), 0, 50) . ")\n";
+    }
+    if (!$isWrongBlocked) {
+        $allCsrfWrongBlocked = false;
+        echo "    [CSRF WRONG LEAK] Route $pRoute returned HTTP {$resWrong['code']} (Body: " . substr(strip_tags($resWrong['body']), 0, 50) . ")\n";
     }
 }
-e2e_assert($allCsrfBlocked && $testedCsrfCount > 15, "CSRF verification enforced across all $testedCsrfCount POST routes in web.php (all returned 403 or auth redirect)");
+
+e2e_assert($allCsrfMissingBlocked && $testedCsrfCount > 30, "Missing CSRF token blocked with HTTP 403 across all $testedCsrfCount POST routes while authenticated");
+e2e_assert($allCsrfWrongBlocked && $testedCsrfCount > 30, "Invalid/tampered CSRF token blocked with HTTP 403 across all $testedCsrfCount POST routes while authenticated");
 
 // C. Rate Limiting: 6th Failed Login in window returns HTTP 429
 $attackEmail = "attacker_" . time() . "@test.com";
@@ -892,9 +1346,10 @@ echo "========================================================\n";
 
 echo "\n--- Summary By Role / Area ---\n";
 foreach ($roleStats as $r => $s) {
-    echo sprintf("  %-30s : %2d Passed / %2d Total (%d Failed)\n", $r, $s['passed'], $s['total'], $s['failed']);
+    echo sprintf("  %-35s : %2d Passed / %2d Total (%d Failed)\n", $r, $s['passed'], $s['total'], $s['failed']);
 }
 
 if ($failedTests > 0) {
     exit(1);
 }
+

@@ -3,4 +3,6 @@
 /storage/logs/*
 !/storage/logs/.gitkeep
 /database/database.sqlite
+/database/test.sqlite
 /storage/rate_limits.json
+/node_modules/

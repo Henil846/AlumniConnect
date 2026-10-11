@@ -71,11 +71,28 @@ class ProfileController {
         
         $resumeFile = null;
         if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
+            if ($_FILES['resume']['size'] > 5 * 1024 * 1024) {
+                http_response_code(422);
+                die("Resume exceeds maximum allowed size of 5MB");
+            }
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['resume']['tmp_name']);
+            finfo_close($finfo);
+            $allowedMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!in_array($mime, $allowedMimes)) {
+                http_response_code(422);
+                die("Invalid file type: expected PDF or Word document");
+            }
+            $ext = strtolower(pathinfo($_FILES['resume']['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['pdf', 'doc', 'docx'])) {
+                http_response_code(422);
+                die("Invalid resume file extension");
+            }
             $uploadDir = __DIR__ . '/../../public/uploads/resumes/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-            $filename = time() . '_' . basename($_FILES['resume']['name']);
+            $filename = 'resume_' . bin2hex(random_bytes(16)) . '.' . $ext;
             $targetPath = $uploadDir . $filename;
             if (move_uploaded_file($_FILES['resume']['tmp_name'], $targetPath)) {
                 $resumeFile = '/uploads/resumes/' . $filename;
@@ -120,6 +137,14 @@ class ProfileController {
             header("HTTP/1.0 404 Not Found");
             echo "User not found.";
             exit;
+        }
+
+        // Enforce cross-tenant isolation: cannot view user from another college (unless super_admin)
+        $myCollegeId = \App\Core\Auth::user()->college_id ?? null;
+        $myRole = \App\Core\Auth::user()->role ?? null;
+        if ($myRole !== 'super_admin' && $user->college_id != $myCollegeId) {
+            http_response_code(403);
+            die("Forbidden: Cross-tenant profile access denied");
         }
 
         return View::render('profile-view', [

@@ -1,25 +1,25 @@
 # Alumni Connect — Interactive Element & Route Audit Inventory
 
-**Generated:** 2026-10-11 15:48:18
+**Generated:** 2026-10-11 16:48:22
 **Runtime:** PHP 8.0.30
 
 ## Summary Metrics
 
-- **Total Elements Audited:** 2098
-- **Functional Elements (Passing):** 2098
+- **Total Elements Audited:** 1388
+- **Functional Elements (Passing):** 1388
 - **Defects / Gaps Detected:** 0
 - **Hardcoded View Strings:** 0
-- **Unlinked Defined Routes:** 33
+- **Unlinked Defined Routes:** 42
 
 ## Breakdown by Element Type and Role
 
 | Role | Links | Forms | Buttons | Fetch / XHR Endpoints | Total Audited Elements |
 |---|---|---|---|---|---|
-| **student** | 471 | 106 | 272 | 20 | **869** |
-| **alumni** | 408 | 137 | 304 | 19 | **868** |
-| **college_admin** | 65 | 19 | 33 | 5 | **122** |
-| **super_admin** | 99 | 103 | 73 | 0 | **275** |
-| **Total (All Roles)** | **1043** | **365** | **682** | **44** | **2134** |
+| **student** | 322 | 69 | 185 | 20 | **596** |
+| **alumni** | 306 | 67 | 180 | 19 | **572** |
+| **college_admin** | 54 | 18 | 32 | 5 | **109** |
+| **super_admin** | 60 | 25 | 34 | 0 | **119** |
+| **Total (All Roles)** | **742** | **179** | **431** | **44** | **1396** |
 
 ## Defect Inventory (Pending Fixes)
 
@@ -36,6 +36,7 @@
 - `GET /reset-password`
 - `GET /profile/{id}`
 - `GET /manage-referrals`
+- `GET /events-admin/certificate`
 - `GET /gallery`
 - `GET /messages/stream`
 - `GET /payment/checkout`
@@ -51,6 +52,7 @@
 - `POST /jobs/create`
 - `POST /jobs/delete`
 - `POST /jobs/edit`
+- `POST /events/cancel`
 - `POST /events-admin/create`
 - `POST /events-admin/edit`
 - `POST /events-admin/delete`
@@ -58,10 +60,17 @@
 - `POST /community/delete`
 - `POST /community/edit`
 - `POST /community/poll-vote`
+- `POST /community/report`
+- `POST /community/comment/delete`
 - `POST /messages/send`
+- `POST /messages/delete`
 - `POST /marketplace/delete`
 - `POST /marketplace/edit`
 - `POST /payment/callback`
+- `POST /business-directory/edit`
+- `POST /business-directory/delete`
+- `POST /startup-hub/edit`
+- `POST /startup-hub/delete`
 - `POST /ads/disable`
 - `POST /admin/users/role`
 
@@ -100,12 +109,6 @@
 | student | /dashboard | Button: Request Referral (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -189,41 +192,7 @@
 | student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /directory | Button: 1 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: 2 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /directory | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | student | /mentorship | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /mentorship | Link: Home (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -244,15 +213,6 @@
 | student | /mentorship | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /mentorship | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /mentorship | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /mentorship | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /mentorship | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -263,15 +223,6 @@
 | student | /mentorship | Button: Engineering (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /mentorship | Button: Marketing (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /mentorship | Button: Full Directory (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /mentorship | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | student | /referral-request | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -332,16 +283,6 @@
 | student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /jobs | Button: 1 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -366,17 +307,6 @@
 | student | /events | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /events | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | student | /events | Form: [unnamed] (action=&quot;/events&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/cancel&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /events | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -385,19 +315,8 @@
 | student | /events | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /events | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /events | Button: Upcoming (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /events | Button: Registered (24) (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
+| student | /events | Button: Registered (0) (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /events | Button: Search (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: Cancel RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /events | Button: Get Started (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -423,15 +342,6 @@
 | student | /community | Form: [unnamed] (action=&quot;/community/post&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /community | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /community | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -440,15 +350,6 @@
 | student | /community | Button: Poll (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: Event (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: Post (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: [Icon Button] (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: [Icon Button] (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /community | Button: Become a Mentor (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -468,37 +369,9 @@
 | student | /messages | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /messages | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /messages | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Rahul Sharma STUDENT (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: PHP Tester User STUDENT (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: User Three ALUMNI (href=&quot;/messages?user_id=6&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: User Three ALUMNI (href=&quot;/messages?user_id=7&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Henil Patel STUDENT (href=&quot;/messages?user_id=19&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Student User STUDENT (href=&quot;/messages?user_id=32&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=33&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Student User STUDENT (href=&quot;/messages?user_id=35&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=36&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=37&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=39&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=41&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=43&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=45&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=47&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=49&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=51&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=53&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=61&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Verify Test ALUMNI (href=&quot;/messages?user_id=65&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Browser Test ALUMNI (href=&quot;/messages?user_id=66&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=68&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=69&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=73&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Pooja Iyer ALUMNI (href=&quot;/messages?user_id=80&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Dean K. Sharma COLLEGE_ADMIN (href=&quot;/messages?user_id=81&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Antigravity SuperAdmin SUPER_ADMIN (href=&quot;/messages?user_id=82&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=86&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=88&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=90&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /messages | Link: Test STUDENT (href=&quot;/messages?user_id=94&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| student | /messages | Link: Pooja Iyer ALUMNI (href=&quot;/messages?user_id=2&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| student | /messages | Link: Dean K. Sharma COLLEGE_ADMIN (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| student | /messages | Link: Antigravity SuperAdmin SUPER_ADMIN (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /messages | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /messages | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /messages | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -526,23 +399,6 @@
 | student | /marketplace | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /marketplace | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /marketplace | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /marketplace | Link: Contact (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /marketplace | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /marketplace | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /marketplace | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -578,15 +434,11 @@
 | student | /donations | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | student | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /donations | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /donations | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /donations | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
@@ -605,9 +457,7 @@
 | student | /business-directory | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /business-directory | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /business-directory | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=80&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| student | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=2&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /business-directory | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /business-directory | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /business-directory | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -638,9 +488,7 @@
 | student | /startup-hub | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /startup-hub | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /startup-hub | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=80&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| student | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=2&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /startup-hub | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /startup-hub | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /startup-hub | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -701,100 +549,10 @@
 | student | /notifications | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /notifications | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /notifications | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Someone cancelled the mentorship sess... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 1 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 2 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has declined your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 1 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 2 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has declined your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Someone cancelled the mentorship sess... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 1 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 2 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has declined your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Someone cancelled the mentorship sess... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has declined your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Someone cancelled the mentorship sess... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 1 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Test Notification 2 (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Thank you! Your donation of ₹500.00... (href=&quot;/donations&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your mentor has accepted your mentors... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: An alumni has approved your referral ... (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your report for item (post) has been ... (href=&quot;/community&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: You have successfully registered for ... (href=&quot;/events&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Your application for 'Senior UI Desig... (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| student | /notifications | Link: Welcome to Alumni Connect! Complete y... (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /notifications | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | student | /notifications | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /notifications | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-all-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /notifications | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /notifications | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
@@ -802,10 +560,6 @@
 | student | /notifications | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /notifications | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /notifications | Button: Mark All as Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /notifications | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | student | /rewards | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -828,15 +582,11 @@
 | student | /rewards | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | student | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| student | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | student | /rewards | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /rewards | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | student | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| student | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| student | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | student | /rewards | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
@@ -948,19 +698,9 @@
 | alumni | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Accept (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Details (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Accept (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Details (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: Request Referral (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: View Profile (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /dashboard | Button: Request Mentorship (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1044,41 +784,7 @@
 | alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: Connect (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /directory | Button: 1 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: 2 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /directory | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /directory | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | alumni | /mentorship | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /mentorship | Link: Home (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -1099,15 +805,6 @@
 | alumni | /mentorship | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /mentorship | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /mentorship | Form: [unnamed] (action=&quot;/mentorship/book&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /mentorship | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /mentorship | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /mentorship | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1118,15 +815,6 @@
 | alumni | /mentorship | Button: Engineering (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /mentorship | Button: Marketing (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /mentorship | Button: Full Directory (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /mentorship | Button: Book Session (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /mentorship | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | alumni | /referral-request | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -1187,16 +875,6 @@
 | alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /jobs | Button: 1 (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /jobs | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1223,17 +901,6 @@
 | alumni | /events | Form: [unnamed] (action=&quot;/events&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /events | Form: [unnamed] (action=&quot;/events/register&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /events | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /events | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /events | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1242,17 +909,6 @@
 | alumni | /events | Button: Upcoming (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /events | Button: Registered (0) (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /events | Button: Search (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /events | Button: RSVP (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /events | Button: Get Started (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1278,15 +934,6 @@
 | alumni | /community | Form: [unnamed] (action=&quot;/community/post&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /community | Form: [unnamed] (action=&quot;/community/like&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /community | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /community | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1295,15 +942,6 @@
 | alumni | /community | Button: Poll (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: Event (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: Post (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /community | Button: 1 (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: [Icon Button] (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: [Icon Button] (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /community | Button: Become a Mentor (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
@@ -1323,37 +961,9 @@
 | alumni | /messages | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /messages | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /messages | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Rahul Sharma STUDENT (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: PHP Tester User STUDENT (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: User Three ALUMNI (href=&quot;/messages?user_id=6&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: User Three ALUMNI (href=&quot;/messages?user_id=7&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Henil Patel STUDENT (href=&quot;/messages?user_id=19&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Student User STUDENT (href=&quot;/messages?user_id=32&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=33&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Student User STUDENT (href=&quot;/messages?user_id=35&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=36&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=37&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=39&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=41&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A User ALUMNI (href=&quot;/messages?user_id=43&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=45&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=47&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=49&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=51&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=53&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=61&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Verify Test ALUMNI (href=&quot;/messages?user_id=65&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Browser Test ALUMNI (href=&quot;/messages?user_id=66&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Alumni User ALUMNI (href=&quot;/messages?user_id=68&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=69&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=73&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Aarav Patel STUDENT (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Dean K. Sharma COLLEGE_ADMIN (href=&quot;/messages?user_id=81&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Antigravity SuperAdmin SUPER_ADMIN (href=&quot;/messages?user_id=82&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=86&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=88&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: College A ALUMNI (href=&quot;/messages?user_id=90&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /messages | Link: Test STUDENT (href=&quot;/messages?user_id=94&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| alumni | /messages | Link: Aarav Patel STUDENT (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| alumni | /messages | Link: Dean K. Sharma COLLEGE_ADMIN (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| alumni | /messages | Link: Antigravity SuperAdmin SUPER_ADMIN (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /messages | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /messages | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /messages | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -1381,23 +991,6 @@
 | alumni | /marketplace | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /marketplace | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /marketplace | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=79&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=3&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /marketplace | Link: Contact (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /marketplace | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /marketplace | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /marketplace | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -1433,15 +1026,11 @@
 | alumni | /donations | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | alumni | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /donations | Form: [unnamed] (action=&quot;/donations/donate&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /donations | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /donations | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /donations | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /donations | Button: Donate Now (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /donations | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
@@ -1460,9 +1049,7 @@
 | alumni | /business-directory | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /business-directory | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /business-directory | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=80&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| alumni | /business-directory | Link: Contact Owner (href=&quot;/messages?user_id=2&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /business-directory | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /business-directory | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /business-directory | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -1493,9 +1080,7 @@
 | alumni | /startup-hub | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /startup-hub | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /startup-hub | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=80&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=1&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| alumni | /startup-hub | Link: Contact Founder (href=&quot;/messages?user_id=2&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /startup-hub | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /startup-hub | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /startup-hub | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -1556,87 +1141,10 @@
 | alumni | /notifications | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /notifications | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /notifications | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Direct... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Direct... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Direct... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Direct... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: New message from Someone: &quot;E2E Messag... (href=&quot;/messages&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone booked a mentorship session w... (href=&quot;/mentorship&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Someone requested a referral from you. (href=&quot;/referral-request&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| alumni | /notifications | Link: Welcome back, Pooja! You have 3 new a... (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /notifications | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | alumni | /notifications | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /notifications | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
 | alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-all-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /notifications | Form: [unnamed] (action=&quot;/notifications/mark-read&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /notifications | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /notifications | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
@@ -1644,44 +1152,6 @@
 | alumni | /notifications | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /notifications | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /notifications | Button: Mark All as Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /notifications | Button: Mark Read (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /notifications | Script fetch: /notifications/mark-all-read | Endpoint registered in routes/web.php | PASS (PASS (Endpoint registered)) |
 | alumni | /rewards | Link: Alumni Connect Modern Collegiate (href=&quot;/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -1705,13 +1175,11 @@
 | alumni | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| alumni | /rewards | Form: [unnamed] (action=&quot;/rewards/award&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | alumni | /rewards | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /rewards | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | alumni | /rewards | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| alumni | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | alumni | /rewards | Button: Claim (Test) (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
@@ -1790,13 +1258,11 @@
 | college_admin | /admin/dashboard | Form: [unnamed] (action=&quot;/admin/users/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | college_admin | /admin/dashboard | Form: [unnamed] (action=&quot;/admin/users/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | college_admin | /admin/dashboard | Form: [unnamed] (action=&quot;/admin/users/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| college_admin | /admin/dashboard | Form: [unnamed] (action=&quot;/admin/users/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | college_admin | /admin/dashboard | Button: Support Growth (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | college_admin | /admin/dashboard | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | college_admin | /admin/dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | college_admin | /admin/dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | college_admin | /admin/dashboard | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
-| college_admin | /admin/dashboard | Button: Suspend (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | college_admin | /admin/dashboard | Button: Suspend (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | college_admin | /admin/dashboard | Button: Suspend (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | college_admin | /admin/dashboard | Button: Suspend (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
@@ -1867,17 +1333,6 @@
 | college_admin | /events-admin | Link: Settings (href=&quot;/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | college_admin | /events-admin | Link: Help Center (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | college_admin | /events-admin | Link: [Icon/Image Link] (href=&quot;/profile&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=4&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=6&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=8&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=10&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=12&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=14&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=16&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=18&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=20&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=22&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| college_admin | /events-admin | Link: Certificate (href=&quot;/events-admin/certificate?reg_id=24&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | college_admin | /events-admin | Link: View all notifications (href=&quot;/notifications&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | college_admin | /events-admin | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | college_admin | /events-admin | Form: [unnamed] (action=&quot;/search&quot; method=&quot;GET&quot;) | Active route in web.php with CSRF token | PASS (Valid (GET, CSRF N/A)) |
@@ -1899,10 +1354,10 @@
 | super_admin | /super-admin/dashboard | Link: Revenue (href=&quot;/super-admin/revenue&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/dashboard | Link: Settings (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/dashboard | Link: Support (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/dashboard | Link: Total Students 13 Active across network (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/dashboard | Link: Alumni 53 Registered members (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/dashboard | Link: Active Jobs 45 Opportunities open (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/dashboard | Link: Total Revenue $5,600.00 Processed loc... (href=&quot;/super-admin/revenue&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| super_admin | /super-admin/dashboard | Link: Total Students 2 Active across network (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| super_admin | /super-admin/dashboard | Link: Alumni 2 Registered members (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| super_admin | /super-admin/dashboard | Link: Active Jobs 3 Opportunities open (href=&quot;/jobs&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
+| super_admin | /super-admin/dashboard | Link: Total Revenue $50,000.00 Processed lo... (href=&quot;/super-admin/revenue&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/dashboard | Link: View All Institutions (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/dashboard | Link: View (href=&quot;/super-admin/institutions&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/dashboard | Link: View (href=&quot;/events-admin&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
@@ -1962,45 +1417,6 @@
 | super_admin | /super-admin/institutions | Link: Support (href=&quot;/help&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
-| super_admin | /super-admin/institutions | Link: Configure → (href=&quot;/super-admin/settings&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/institutions | Link: System Status (href=&quot;/super-admin/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/institutions | Link: Data Privacy (href=&quot;/privacy&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |
 | super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/logout&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
@@ -2010,128 +1426,11 @@
 | super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/tier&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
-| super_admin | /super-admin/institutions | Form: [unnamed] (action=&quot;/super-admin/institutions/status&quot; method=&quot;POST&quot;) | Active route in web.php with CSRF token | PASS (Valid (POST, CSRF present)) |
 | super_admin | /super-admin/institutions | Button: Logout (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | super_admin | /super-admin/institutions | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | super_admin | /super-admin/institutions | Button: [Icon Button] (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | super_admin | /super-admin/institutions | Button: + Onboard Institution (type=&quot;button&quot;) | Functional click handler or form submission | PASS (PASS (Active handler)) |
 | super_admin | /super-admin/institutions | Button: Save &amp; Create (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
-| super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | super_admin | /super-admin/institutions | Button: ● Active (type=&quot;submit&quot;) | Functional click handler or form submission | PASS (PASS (Form submit)) |
 | super_admin | /super-admin/revenue | Link: AlumniConnect Platform Administration (href=&quot;/super-admin/dashboard&quot;) | Reachable clean page (HTTP 200 or 302) | PASS (HTTP 200) |

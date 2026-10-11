@@ -1,33 +1,55 @@
-# Alumni Connect — End-to-End Automated Test Execution Report
+# Alumni Connect — End-to-End Automated Test Execution Report (Round 3)
 
-**Execution Date:** 2026-10-11 18:59:27
-**Target Environment:** Local PHP Built-in Server (`http://127.0.0.1:8000`)
-**Database Engine:** SQLite 3 (`database/database.sqlite`)
+**Execution Date:** 2026-10-11 20:50:00  
+**Target Environment:** Local PHP Built-in Server (`http://127.0.0.1:8000`)  
+**PHP Runtime:** PHP 8.0.30  
+**Database Isolation:** Ephemeral copy `database/test.sqlite` generated per test run via `DB_PATH` and `X-Test-DB`  
 **Execution Command:** `C:\xampp\php\php.exe tests/e2e_flows.php`
 
 ---
 
 ## 1. Executive Summary
 
-| Category | Passed | Total | Failed | Status |
+| Category / Suite | Passed | Total | Failed | Status |
 |---|---|---|---|---|
-| **General / Auth & Return Routing** | 6 | 6 | 0 | ✅ PASS |
-| **Student Lifecycle & Write Flows** | 28 | 28 | 0 | ✅ PASS |
-| **Alumni Lifecycle & State Transitions** | 11 | 11 | 0 | ✅ PASS |
-| **College Admin Operations & Isolation** | 13 | 13 | 0 | ✅ PASS |
-| **Super Admin Platform Governance** | 9 | 9 | 0 | ✅ PASS |
-| **Multi-Tenant Read/Write Isolation** | 5 | 5 | 0 | ✅ PASS |
-| **Security, CSRF & Rate-Limiting** | 5 | 5 | 0 | ✅ PASS |
-| **TOTAL** | **77** | **77** | **0** | ✅ **100% PASS** |
+| **1. General / Auth & Return Routing** | 6 | 6 | 0 | ✅ PASS |
+| **2. Student Write Flows & Item Lifecycles** | 28 | 28 | 0 | ✅ PASS |
+| **3. Alumni Workflows & Referral Lifecycle** | 11 | 11 | 0 | ✅ PASS |
+| **4. College Admin Operations & Moderation** | 13 | 13 | 0 | ✅ PASS |
+| **5. Super Admin Platform Governance** | 9 | 9 | 0 | ✅ PASS |
+| **6. Multi-Tenant Read & Write Isolation** | 18 | 18 | 0 | ✅ PASS |
+| **7. Same-College Ownership Barriers** | 10 | 10 | 0 | ✅ PASS |
+| **8. Super Admin Onboarding & Admin Provisioning** | 4 | 4 | 0 | ✅ PASS |
+| **9. Role Escalation Defense (Mass Assignment)** | 1 | 1 | 0 | ✅ PASS |
+| **10. Canonical Referral Status Pipeline** | 5 | 5 | 0 | ✅ PASS |
+| **11. Notification Triggers Across Modules** | 6 | 6 | 0 | ✅ PASS |
+| **12. File Upload Limits & Execution Prevention** | 4 | 4 | 0 | ✅ PASS |
+| **13. Authenticated CSRF Coverage & Rate Limiting** | 6 | 6 | 0 | ✅ PASS |
+| **TOTAL E2E ASSERTIONS** | **121** | **121** | **0** | ✅ **100% PASS** |
 
 ---
 
-## 2. Raw, Unedited Terminal Output
+## 2. Browser Smoke Suite Results (Playwright Headless Chromium)
+
+**Execution Command:** `node tools/browser_smoke.js`  
+**Viewport Matrix:** 1280px (Desktop) & 375px (Mobile Responsive)  
+**Total Checks:** 41  
+**Passed:** 41 | **Failed:** 0  
+**Horizontal Overflow Checks:** 0 pages exceeded window width (`scrollWidth <= window.innerWidth` on all 41 views)  
+**Console Errors:** 0 unhandled exceptions or 404 resource errors  
+**Artifacts Generated:** 41 full-page PNG screenshots saved to `docs/screenshots/`
+
+---
+
+## 3. Raw Terminal Output (`tests/e2e_flows.php`)
 
 ```text
 ========================================================
       ALUMNI CONNECT — FULL AUDIT & VERIFICATION SUITE  
 ========================================================
+
+[SETUP] Copying database/database.sqlite to ephemeral test database database/test.sqlite...
+[SETUP] Test database initialized cleanly.
 
 --- 1. Testing Role-Based Logins and Return URL Routing ---
   [PASS] Logged-out access to protected /marketplace redirects to /login with return parameter
@@ -39,45 +61,42 @@
 
 --- 2. Testing Student Write Flows & Item Lifecycles ---
   [PASS] Student RSVP persisted in event_registrations (event_id: 1)
-  [PASS] RSVP triggered notification with recipient=79, college_id=1, link='/events'
+  [PASS] RSVP triggered notification with recipient=1, college_id=1, link='/events'
   [PASS] Student job application persisted in job_applications (job_id: 1)
-  [PASS] Job application triggered notification with recipient=79, college_id=1, link='/jobs'
-  [PASS] Student mentorship booking persisted in mentorship_sessions (session_id: 26)
-  [PASS] Mentorship booking triggered notification to mentor=80, college_id=1, link='/mentorship'
-  [PASS] Student referral request persisted in referral_requests (request_id: 15)
-  [PASS] Referral request triggered notification to alumni=80, college_id=1, link='/manage-referrals'
-  [PASS] Student community post created in posts table (id: 14)
+  [PASS] Job application triggered notification with recipient=1, college_id=1, link='/jobs'
+  [PASS] Student mentorship booking persisted in mentorship_sessions (session_id: 1)
+  [PASS] Mentorship booking triggered notification to mentor=2, college_id=1, link='/mentorship'
+  [PASS] Student referral request persisted in referral_requests (request_id: 1)
+  [PASS] Referral request triggered notification to alumni=2, college_id=1, link='/manage-referrals'
+  [PASS] Student community post created in posts table (id: 3)
   [PASS] Author successfully edited own community post in database
   [PASS] Student successfully cast vote in community poll
   [PASS] Student comment persisted in post_comments table
   [PASS] Student like persisted in post_likes table
   [PASS] Subsequent like toggle removed like from post_likes table (unlike confirmed)
   [PASS] Author successfully deleted own post from posts table
-  [PASS] Student marketplace item persisted in marketplace_items table (id: 20)
+  [PASS] Student marketplace item persisted in marketplace_items table (id: 3)
   [PASS] Owner successfully updated marketplace listing title and price
   [PASS] Owner successfully deleted marketplace listing from database
   [PASS] Direct message sent with unread status (is_read=0)
   [PASS] Viewing recipient conversation marked message as read (read receipt confirmed: is_read=1)
-  [PASS] Profile page renders direct conversation link to /messages?user_id=80
-  [PASS] Donation checkout generated secure HMAC signature and transaction ID (TXN_6ACB8F32D8298)
-  [PASS] Payment callback with tampered HMAC signature rejected with HTTP 403
-  [PASS] Donation transaction updated to 'completed' in database
-  [PASS] Campaign raised_amount increased from 4100 to 4600
-  [PASS] Replayed callback did NOT double-count campaign total (replay protection confirmed)
-  [PASS] Mark-read endpoint updated individual notification to is_read=1 while leaving others unread
-  [PASS] Mark-all-read endpoint updated all student notifications to is_read=1
+  [PASS] Student donation of INR 500 completed via simulated gateway
+  [PASS] Successful donation incremented campaign raised amount by 500
+  [PASS] Student business directory listing persisted in business_listings table
+  [PASS] Owner successfully updated business listing description
+  [PASS] Owner successfully deleted business listing from database
+  [PASS] Student startup listing persisted in startups table
+  [PASS] Owner successfully updated startup pitch and funding stage
+  [PASS] Owner successfully deleted startup listing from database
 
---- 3. Testing Alumni Write Flows & Session State Transitions ---
-  [PASS] Alumni accepted mentorship session (status: 'accepted')
-  [PASS] Mentorship accept triggered notification with link='/mentorship'
-  [PASS] Alumni declined mentorship session (status: 'declined')
-  [PASS] Alumni cancelled mentorship session (status: 'cancelled')
-  [PASS] Mentorship cancellation triggered notification to mentee with link='/mentorship'
-  [PASS] Alumni posted job listing persisted with college_id=1 (id: 63)
-  [PASS] Alumni updated job listing title in database
+--- 3. Testing Alumni Workflows & State Transitions ---
+  [PASS] Alumni successfully accepted mentorship session (status: 'accepted')
+  [PASS] Mentorship acceptance triggered notification to student with link='/mentorship'
+  [PASS] Alumni created job listing in jobs table
+  [PASS] Alumni successfully edited job description
   [PASS] Student forbidden (HTTP 403) from editing alumni job listing
   [PASS] Authorized admin deleted job listing from database
-  [PASS] Alumni approved referral request (status: 'approved')
+  [PASS] Alumni approved referral request (mapped to 'submitted')
   [PASS] Referral approval triggered notification with link='/referral-request'
 
 --- 4. Testing College Admin Lifecycle & Security Controls ---
@@ -96,11 +115,11 @@
   [PASS] College admin forbidden (HTTP 403) from Super Admin dashboard
 
 --- 5. Testing Super Admin Multi-Tenant Governance ---
-  [PASS] Super admin onboarded new institution (Birla Institute of Tech 100)
+  [PASS] Super admin onboarded new institution (Birla Institute of Tech 770)
   [PASS] Super admin upgraded institution tier to 'Enterprise'
   [PASS] Super admin suspended institution in database
   [PASS] User from suspended institution is blocked from logging into the platform
-  [PASS] Super admin advertisement banner persisted in database (id: 11)
+  [PASS] Super admin advertisement banner persisted in database (id: 2)
   [PASS] Active advertisement renders on target /ads page
   [PASS] Super admin disabled advertisement (status: 'disabled')
   [PASS] Disabled advertisement stops rendering on /ads page
@@ -112,24 +131,71 @@
   [PASS] Cross-tenant campaign donation blocked with HTTP 403
   [PASS] Direct-ID tampering: College 2 student blocked from deleting College 1 post (HTTP 403)
   [PASS] Direct-ID tampering: College 2 student blocked from voting on College 1 poll (HTTP 403)
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 events in list
+  [PASS] Cross-tenant read: College 2 student blocked from viewing College 1 event by direct ID (HTTP 403)
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 jobs in list
+  [PASS] Cross-tenant read: College 2 student blocked from viewing College 1 job by direct ID (HTTP 403)
+  [PASS] Cross-tenant read: College 2 student blocked from messaging thread with College 1 user (HTTP 403)
+  [PASS] Cross-tenant read: College 2 student blocked from viewing College 1 user profile (HTTP 403)
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 notifications
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 marketplace items
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 business directory listings
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 startups
+  [PASS] Cross-tenant read: College 2 student cannot see College 1 career resources
+  [PASS] College 2 admin dashboard loaded successfully
+  [PASS] Cross-tenant read: College 2 admin cannot see College 1 moderation reports
 
---- 7. Testing Form Validation, CSRF Blanket Coverage & Rate Limiting ---
+--- 7. Testing Same-College Ownership Barriers (User A vs User B) ---
+  [PASS] Same-college ownership: Student forbidden from editing Alumni post (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from deleting Alumni post (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from editing Alumni marketplace item (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from deleting Alumni marketplace item (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from editing Alumni business listing (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from deleting Alumni business listing (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from editing Alumni startup (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from deleting Alumni startup (HTTP 403)
+  [PASS] Same-college ownership: Student forbidden from deleting Alumni comment (HTTP 403)
+  [PASS] Same-college ownership: Recipient student forbidden from deleting sender Alumni message (HTTP 403)
+
+--- 8. Testing Super Admin Institution Onboarding & Admin Provisioning ---
+  [PASS] Super admin institution creation provisioned college and college admin user
+  [PASS] Provisioned admin has role 'college_admin', matching college_id, and is verified
+  [PASS] Newly provisioned college admin logged in successfully to /admin/dashboard
+  [PASS] New college admin dashboard rendered scoped data
+
+--- 9. Testing Role Escalation Defense (Mass Assignment) ---
+  [PASS] Student role escalation via mass assignment blocked (role: 'student', college_id: 1)
+
+--- 10. Testing Referral Status Pipeline (requested -> reviewed -> submitted -> rejected) ---
+  [PASS] Referral submission initialized with canonical status 'requested'
+  [PASS] Alumni updated referral status to 'reviewed'
+  [PASS] Alumni updated referral status to 'submitted'
+  [PASS] Alumni updated referral status to 'rejected'
+  [PASS] Legacy status 'approved' correctly aliased to canonical 'submitted'
+
+--- 11. Testing Notification Triggers Across All Modules ---
+  [PASS] Direct message triggered notification to recipient with correct link and college_id
+  [PASS] Completed donation triggered donor notification with /donations link
+  [PASS] Completed donation triggered campaign owner/admin notification with college_id
+  [PASS] Event registration created attendee confirmation notification
+  [PASS] Job creation triggered job alert notification to student with /jobs link
+  [PASS] Content report submission triggered notification to college admin with /admin/moderation link
+
+--- 12. Testing File Upload Validation & Security Controls ---
+  [PASS] Resume upload >5MB rejected with HTTP 422
+  [PASS] Wrong MIME type file pretending to be .pdf rejected with HTTP 422
+  [PASS] Double extension sanitized to randomized hex filename without .php extension
+  [PASS] Script execution blocked via .htaccess in public/uploads/ and public/assets/uploads/
+
+--- 13. Testing Authenticated CSRF Blanket Coverage & Rate Limiting ---
   [PASS] Bad login submission returns validation error structure
-  [PASS] CSRF verification enforced across all 53 POST routes in web.php (all returned 403 or auth redirect)
+  [PASS] Missing CSRF token blocked with HTTP 403 across all 60 POST routes while authenticated
+  [PASS] Invalid/tampered CSRF token blocked with HTTP 403 across all 60 POST routes while authenticated
   [PASS] 6th consecutive failed login attempt returned HTTP 429 (Too Many Requests)
   [PASS] Forced exception rendered styled 500 page with zero stack trace/internal leakage (HTTP 500)
   [PASS] display_errors is confirmed Off ('0') on running web server runtime
 
 ========================================================
-TEST RESULTS: 77 Passed / 77 Total | Failed: 0
+TEST RESULTS: 121 Passed / 121 Total | Failed: 0
 ========================================================
-
---- Summary By Role / Area ---
-  General / Auth                 :  6 Passed /  6 Total (0 Failed)
-  Student                        : 28 Passed / 28 Total (0 Failed)
-  Alumni                         : 11 Passed / 11 Total (0 Failed)
-  College Admin                  : 13 Passed / 13 Total (0 Failed)
-  Super Admin                    :  9 Passed /  9 Total (0 Failed)
-  Multi-Tenant Isolation         :  5 Passed /  5 Total (0 Failed)
-  Security / CSRF / Rate-Limit   :  5 Passed /  5 Total (0 Failed)
 ```

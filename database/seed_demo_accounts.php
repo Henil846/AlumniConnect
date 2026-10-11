@@ -483,4 +483,38 @@ foreach ($notifs as $ntf) {
     }
 }
 
+// 10. Badges & User Badges
+$badges = [
+    ['name' => 'Campus Pioneer', 'description' => 'Early adopter of the Alumni Connect platform.', 'icon' => 'award', 'points' => 50],
+    ['name' => 'Distinguished Mentor', 'description' => 'Completed mentorship sessions with students.', 'icon' => 'star', 'points' => 100],
+    ['name' => 'Community Champion', 'description' => 'Active contributor in campus community discussions.', 'icon' => 'heart', 'points' => 75],
+];
+foreach ($badges as $b) {
+    $exists = $pdo->prepare("SELECT id FROM badges WHERE name = ?");
+    $exists->execute([$b['name']]);
+    if (!$exists->fetch()) {
+        $ins = $pdo->prepare("INSERT INTO badges (name, description, icon, points) VALUES (?, ?, ?, ?)");
+        $ins->execute([$b['name'], $b['description'], $b['icon'], $b['points']]);
+    }
+}
+$b1Id = $pdo->query("SELECT id FROM badges LIMIT 1")->fetchColumn();
+$studentId = $pdo->query("SELECT id FROM users WHERE email = 'student@alumni.test'")->fetchColumn();
+if ($b1Id && $studentId) {
+    $hasB = $pdo->prepare("SELECT id FROM user_badges WHERE user_id = ? AND badge_id = ?");
+    $hasB->execute([$studentId, $b1Id]);
+    if (!$hasB->fetch()) {
+        $pdo->prepare("INSERT INTO user_badges (user_id, badge_id, college_id) VALUES (?, ?, 1)")->execute([$studentId, $b1Id]);
+    }
+}
+
+// 11. User Settings
+$allUsers = $pdo->query("SELECT id, college_id FROM users")->fetchAll(PDO::FETCH_OBJ);
+foreach ($allUsers as $u) {
+    $exists = $pdo->prepare("SELECT user_id FROM user_settings WHERE user_id = ?");
+    $exists->execute([$u->id]);
+    if (!$exists->fetch()) {
+        $pdo->prepare("INSERT INTO user_settings (user_id, email_notifications, profile_visibility, college_id) VALUES (?, 1, 'public', ?)")->execute([$u->id, $u->college_id]);
+    }
+}
+
 echo "Demo accounts and initial dataset successfully seeded!\n";

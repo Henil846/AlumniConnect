@@ -45,13 +45,17 @@ class PaymentController {
         $status = $_POST['status'] ?? 'failed';
         $sig = $_POST['sig'] ?? null;
 
-        if ($txnId && $sig) {
-            $secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');
-            $expectedSig = hash_hmac('sha256', $txnId, $secret);
-            if (!hash_equals($expectedSig, $sig)) {
-                http_response_code(403);
-                die("Invalid callback signature");
-            }
+        if (!$txnId || !$sig) {
+            http_response_code(403);
+            die("Transaction ID or Signature missing");
+        }
+
+        $secret = \App\Core\Env::get('APP_SECRET', 'fallback_secret_key');
+        $expectedSig = hash_hmac('sha256', $txnId, $secret);
+        if (!hash_equals($expectedSig, $sig)) {
+            http_response_code(403);
+            die("Invalid callback signature");
+        }
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("SELECT * FROM donations WHERE transaction_id = ?");
             $stmt->execute([$txnId]);
@@ -81,19 +85,22 @@ class PaymentController {
                     $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'donation', ?, ?, '/donations')");
                     $notifStmt->execute([$donation->user_id, "Thank you! Your donation of ₹" . number_format($donation->amount, 2) . " to '$campTitle' was successful.", $collegeId]);
 
-                    // Notification for Campaign Creator
-                    if ($camp && $camp->created_by && $camp->created_by != $donation->user_id) {
+                    // Notification for Campaign Creator / College Admin
+                    $recipientId = ($camp && !empty($camp->created_by)) ? $camp->created_by : null;
+                    if (!$recipientId) {
+                        $recipientId = $pdo->query("SELECT id FROM users WHERE role = 'college_admin' AND college_id = " . intval($collegeId) . " LIMIT 1")->fetchColumn();
+                    }
+                    if ($recipientId && $recipientId != $donation->user_id) {
                         $donorName = $pdo->query("SELECT full_name FROM users WHERE id = " . intval($donation->user_id))->fetchColumn() ?: 'An anonymous donor';
-                        $notifStmt->execute([$camp->created_by, "New donation of ₹" . number_format($donation->amount, 2) . " received from $donorName for '$campTitle'.", $collegeId]);
+                        $notifStmt->execute([$recipientId, "New donation of ₹" . number_format($donation->amount, 2) . " received from $donorName for '$campTitle'.", $collegeId]);
                     }
 
-                    header("Location: /donations?success=1");
-                    exit;
-                } else {
-                    $pdo->prepare("UPDATE donations SET status = 'failed' WHERE transaction_id = ?")->execute([$txnId]);
-                    header("Location: /donations?error=Payment+Failed");
-                    exit;
-                }
+                header("Location: /donations?success=1");
+                exit;
+            } else {
+                $pdo->prepare("UPDATE donations SET status = 'failed' WHERE transaction_id = ?")->execute([$txnId]);
+                header("Location: /donations?error=Payment+Failed");
+                exit;
             }
         }
         

@@ -7,15 +7,34 @@ use PDOException;
 class Database {
     private static $pdo = null;
 
+    public static function resetConnection() {
+        self::$pdo = null;
+    }
+
     public static function getConnection() {
         if (self::$pdo === null) {
             $connection = Env::get('DB_CONNECTION', 'sqlite');
-            $database = Env::get('DB_DATABASE', __DIR__ . '/../../database/database.sqlite');
+            
+            // Allow test database override via HTTP header (dev/testing mode only) or DB_PATH env
+            $testDb = null;
+            if (Env::get('APP_ENV', 'development') !== 'production') {
+                if (!empty($_SERVER['HTTP_X_TEST_DB'])) {
+                    $headerDb = trim($_SERVER['HTTP_X_TEST_DB']);
+                    // Prevent path traversal outside project
+                    if (strpos($headerDb, '..') === false && (strpos($headerDb, 'test') !== false || substr($headerDb, -7) === '.sqlite')) {
+                        $testDb = $headerDb;
+                    }
+                } elseif (getenv('DB_PATH')) {
+                    $testDb = getenv('DB_PATH');
+                }
+            }
+
+            $database = $testDb ?: Env::get('DB_DATABASE', __DIR__ . '/../../database/database.sqlite');
             
             try {
                 if ($connection === 'sqlite') {
                     // Make path absolute if it's relative
-                    if (strpos($database, '/') !== 0 && strpos($database, ':\\') !== 1) {
+                    if (strpos($database, '/') !== 0 && strpos($database, ':\\') !== 1 && strpos($database, ':/') !== 1) {
                         $database = __DIR__ . '/../../' . $database;
                     }
                     // Ensure directory exists

@@ -17,6 +17,10 @@ class Env {
     }
 
     public static function get($key, $default = null) {
+        $val = getenv($key);
+        if ($val !== false) return $val;
+        if (isset($_ENV[$key])) return $_ENV[$key];
+
         if (!self::$loaded) {
             self::load(__DIR__ . '/../../.env');
         }

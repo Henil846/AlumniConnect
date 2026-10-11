@@ -50,6 +50,11 @@ class JobsController {
             $stmt = $pdo->prepare("SELECT * FROM jobs WHERE id = ? AND college_id = ?");
             $stmt->execute([$selectedJobId, $collegeId]);
             $selectedJob = $stmt->fetch(\PDO::FETCH_OBJ);
+
+            if (!empty($_GET['job_id']) && !$selectedJob) {
+                http_response_code(403);
+                die("Forbidden: Cross-tenant job access denied");
+            }
         }
 
         return View::render('jobs', [
@@ -65,7 +70,8 @@ class JobsController {
 
     public function apply() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            die("CSRF Token Verification Failed");
+            http_response_code(403);
+            die("CSRF validation failed.");
         }
         
         $jobId = $_POST['job_id'];
@@ -96,7 +102,8 @@ class JobsController {
 
     public function create() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            die("CSRF Token Verification Failed");
+            http_response_code(403);
+            die("CSRF validation failed.");
         }
         $userId = \App\Core\Auth::id() ?? null;
         $role = \App\Core\Auth::user()->role ?? null;
@@ -118,6 +125,15 @@ class JobsController {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("INSERT INTO jobs (title, company, location, type, industry, salary_range, description, requirements, college_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')");
             $stmt->execute([$title, $company, $location, $type, $industry, $salaryRange, $description, $requirements, $collegeId]);
+
+            // Notify students in the college of the new job posting
+            $studentsStmt = $pdo->prepare("SELECT id FROM users WHERE college_id = ? AND role = 'student' LIMIT 5");
+            $studentsStmt->execute([$collegeId]);
+            $students = $studentsStmt->fetchAll(\PDO::FETCH_COLUMN);
+            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'job_alert', ?, ?, '/jobs')");
+            foreach ($students as $stuId) {
+                $notifStmt->execute([$stuId, "New job opportunity posted: '$title' at $company.", $collegeId]);
+            }
         }
         header("Location: /jobs?created=1");
         exit;
@@ -125,7 +141,8 @@ class JobsController {
 
     public function delete() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
-            die("CSRF Token Verification Failed");
+            http_response_code(403);
+            die("CSRF validation failed.");
         }
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");

@@ -1,42 +1,39 @@
 # Alumni Connect — Database Schema & Tenant Isolation Audit Report
 
-**Generated:** 2026-10-11 15:10:35
+**Generated:** 2026-10-11 16:23:18
 **Database File:** `database/database.sqlite`
 
 ## 1. Table Inventory & Tenant Scoping Status
 
 | Table Name | Row Count | Has `college_id`? | Tenant Scoping Status | Columns |
 |---|---|---|---|---|
-| `advertisements` | 8 | ✅ Yes | **Tenant-Scoped** | `id, sponsor_name, image_url, link_url, status, created_at, college_id` |
-| `badges` | 4 | ❌ No | **Review Needed** | `id, name, description, icon` |
-| `businesses` | 3 | ✅ Yes | **Tenant-Scoped** | `id, user_id, name, description, website, category, created_at, college_id` |
-| `campaigns` | 4 | ✅ Yes | **Tenant-Scoped** | `id, title, description, goal_amount, raised_amount, created_by, created_at, college_id` |
-| `career_resources` | 3 | ✅ Yes | **Tenant-Scoped** | `id, title, link, resource_type, created_at, college_id` |
-| `colleges` | 36 | ❌ No | **Intentionally Global** | `id, name, city, state, created_at, status, plan, slug` |
-| `donations` | 9 | ✅ Yes | **Tenant-Scoped** | `id, user_id, campaign_id, amount, status, transaction_id, created_at, college_id` |
+| `advertisements` | 1 | ✅ Yes | **Tenant-Scoped** | `id, sponsor_name, image_url, link_url, status, college_id, created_at` |
+| `businesses` | 1 | ✅ Yes | **Tenant-Scoped** | `id, user_id, name, description, website, category, college_id, created_at` |
+| `campaigns` | 2 | ✅ Yes | **Tenant-Scoped** | `id, title, description, goal_amount, raised_amount, created_by, college_id, created_at` |
+| `career_resources` | 1 | ✅ Yes | **Tenant-Scoped** | `id, title, link, resource_type, college_id, created_at` |
+| `colleges` | 2 | ❌ No | **Intentionally Global** | `id, name, city, state, status, plan, slug, created_at` |
+| `donations` | 1 | ✅ Yes | **Tenant-Scoped** | `id, user_id, campaign_id, amount, status, transaction_id, college_id, created_at` |
 | `email_verifications` | 0 | ❌ No | **Review Needed** | `id, user_id, otp, expires_at` |
-| `event_gallery` | 0 | ✅ Yes | **Tenant-Scoped** | `id, event_id, file_path, created_at, college_id` |
-| `event_registrations` | 14 | ✅ Yes | **Tenant-Scoped** | `id, event_id, user_id, college_id, status, qr_code, created_at` |
-| `events` | 13 | ✅ Yes | **Tenant-Scoped** | `id, title, type, date, location, image_url, description, speakers, created_at, capacity, college_id` |
-| `job_applications` | 14 | ✅ Yes | **Tenant-Scoped** | `id, job_id, user_id, college_id, status, created_at` |
-| `jobs` | 44 | ✅ Yes | **Tenant-Scoped** | `id, title, company, location, industry, type, salary_range, description, requirements, created_at, college_id, status` |
-| `login_attempts` | 9 | ❌ No | **Review Needed** | `id, email, ip_address, attempt_time` |
-| `marketplace_items` | 17 | ✅ Yes | **Tenant-Scoped** | `id, user_id, title, description, price, item_condition, category, status, created_at, college_id` |
-| `mentorship_sessions` | 18 | ✅ Yes | **Tenant-Scoped** | `id, mentor_id, mentee_id, status, created_at, college_id` |
-| `messages` | 7 | ✅ Yes | **Tenant-Scoped** | `id, sender_id, receiver_id, content, is_read, created_at, college_id` |
-| `notifications` | 89 | ✅ Yes | **Tenant-Scoped** | `id, user_id, type, message, is_read, created_at, college_id` |
-| `page_views` | 0 | ✅ Yes | **Tenant-Scoped** | `id, page_url, user_id, viewed_at, college_id` |
-| `password_resets` | 0 | ❌ No | **Review Needed** | `id, email, token, expires_at, created_at, used` |
-| `post_comments` | 7 | ✅ Yes | **Tenant-Scoped** | `id, post_id, user_id, content, created_at, college_id` |
-| `post_likes` | 8 | ✅ Yes | **Tenant-Scoped** | `user_id, post_id, college_id` |
-| `posts` | 11 | ✅ Yes | **Tenant-Scoped** | `id, user_id, content, image_url, college_id, created_at` |
-| `referral_requests` | 9 | ✅ Yes | **Tenant-Scoped** | `id, alumni_id, student_id, status, created_at, college_id` |
-| `reports` | 8 | ✅ Yes | **Tenant-Scoped** | `id, reporter_id, reported_item_type, reported_item_id, reason, status, created_at, college_id` |
-| `startups` | 3 | ✅ Yes | **Tenant-Scoped** | `id, user_id, name, elevator_pitch, funding_stage, website, created_at, college_id` |
-| `user_badges` | 2 | ✅ Yes | **Tenant-Scoped** | `id, user_id, badge_id, awarded_at, college_id` |
-| `user_sessions` | 79 | ❌ No | **Review Needed** | `id, user_id, refresh_token, expires_at, created_at` |
-| `user_settings` | 4 | ❌ No | **Review Needed** | `user_id, email_notifications, profile_visibility, updated_at` |
-| `users` | 73 | ✅ Yes | **Tenant-Scoped** | `id, full_name, email, password, role, college_id, is_verified, created_at, about_me, department, industry, location, linkedin, github, website, skills, education, projects, certifications, resume_file, status` |
+| `event_gallery` | 0 | ✅ Yes | **Tenant-Scoped** | `id, event_id, file_path, college_id, created_at` |
+| `event_registrations` | 0 | ✅ Yes | **Tenant-Scoped** | `id, event_id, user_id, college_id, status, qr_code, created_at` |
+| `events` | 3 | ✅ Yes | **Tenant-Scoped** | `id, title, type, date, location, image_url, description, speakers, capacity, created_by, college_id, created_at` |
+| `job_applications` | 0 | ✅ Yes | **Tenant-Scoped** | `id, job_id, user_id, college_id, status, created_at` |
+| `jobs` | 3 | ✅ Yes | **Tenant-Scoped** | `id, title, company, location, industry, type, salary_range, description, requirements, college_id, status, created_at` |
+| `login_attempts` | 0 | ❌ No | **Review Needed** | `id, email, ip_address, attempt_time` |
+| `marketplace_items` | 1 | ✅ Yes | **Tenant-Scoped** | `id, user_id, title, description, price, item_condition, category, status, college_id, created_at` |
+| `mentorship_sessions` | 0 | ✅ Yes | **Tenant-Scoped** | `id, mentor_id, mentee_id, status, college_id, created_at` |
+| `messages` | 0 | ✅ Yes | **Tenant-Scoped** | `id, sender_id, receiver_id, content, is_read, college_id, created_at` |
+| `notifications` | 3 | ✅ Yes | **Tenant-Scoped** | `id, user_id, type, message, is_read, link, college_id, created_at` |
+| `page_views` | 0 | ✅ Yes | **Tenant-Scoped** | `id, page_url, user_id, college_id, viewed_at` |
+| `password_resets` | 0 | ❌ No | **Review Needed** | `id, email, token, expires_at, used, created_at` |
+| `post_comments` | 0 | ✅ Yes | **Tenant-Scoped** | `id, post_id, user_id, content, college_id, created_at` |
+| `post_likes` | 0 | ✅ Yes | **Tenant-Scoped** | `user_id, post_id, college_id` |
+| `posts` | 2 | ✅ Yes | **Tenant-Scoped** | `id, user_id, content, image_url, college_id, created_at` |
+| `referral_requests` | 0 | ✅ Yes | **Tenant-Scoped** | `id, alumni_id, student_id, status, college_id, created_at` |
+| `reports` | 1 | ✅ Yes | **Tenant-Scoped** | `id, reporter_id, reported_item_type, reported_item_id, reason, status, college_id, created_at` |
+| `startups` | 1 | ✅ Yes | **Tenant-Scoped** | `id, user_id, name, elevator_pitch, funding_stage, website, college_id, created_at` |
+| `user_sessions` | 0 | ❌ No | **Review Needed** | `id, user_id, refresh_token, expires_at, created_at` |
+| `users` | 7 | ✅ Yes | **Tenant-Scoped** | `id, full_name, email, password, role, college_id, is_verified, about_me, department, industry, location, linkedin, github, website, skills, education, projects, certifications, resume_file, status, created_at` |
 
 ## 2. Intentional Global & Security Tables Rationale
 

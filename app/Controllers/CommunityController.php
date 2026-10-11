@@ -43,19 +43,27 @@ class CommunityController {
         $content = $_POST['content'] ?? '';
         
         $imageUrl = null;
-        if (!empty($_FILES['image']['name'])) {
+        if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+                http_response_code(422);
+                die("Image exceeds maximum allowed size of 5MB");
+            }
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime = finfo_file($finfo, $_FILES['image']['tmp_name']);
-            if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif'])) {
-                $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-                $filename = 'post_' . time() . '_' . rand(100,999) . '.' . $ext;
-                $target = __DIR__ . '/../../../public/assets/uploads/' . $filename;
+            finfo_close($finfo);
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']) && in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $filename = 'post_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+                $target = __DIR__ . '/../../public/assets/uploads/' . $filename;
                 if (!is_dir(dirname($target))) {
                     mkdir(dirname($target), 0777, true);
                 }
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
                     $imageUrl = '/assets/uploads/' . $filename;
                 }
+            } else {
+                http_response_code(422);
+                die("Invalid image file type");
             }
         }
 
@@ -187,6 +195,66 @@ class CommunityController {
             die("Forbidden: Cannot vote on cross-college poll");
         }
         header("Location: /community?voted=1");
+        exit;
+    }
+
+    public function deleteComment() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $commentId = (int)($_POST['comment_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $role = \App\Core\Auth::user()->role ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT c.*, p.college_id as post_college_id FROM post_comments c JOIN posts p ON c.post_id = p.id WHERE c.id = ?");
+        $stmt->execute([$commentId]);
+        $comment = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$comment) {
+            http_response_code(404);
+            die("Comment not found");
+        }
+        if ($comment->post_college_id != $collegeId || ($comment->user_id != $userId && $role !== 'admin' && $role !== 'college_admin')) {
+            http_response_code(403);
+            die("Forbidden: Cannot delete comment");
+        }
+        $pdo->prepare("DELETE FROM post_comments WHERE id = ?")->execute([$commentId]);
+        header("Location: /community?comment_deleted=1");
+        exit;
+    }
+
+    public function report() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        
+        $itemType = trim($_POST['reported_item_type'] ?? 'post');
+        $itemId = (int)($_POST['reported_item_id'] ?? 0);
+        $reason = trim($_POST['reason'] ?? 'Violation of community guidelines');
+        $reportedUserId = (int)($_POST['reported_user_id'] ?? 0);
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("INSERT INTO reports (reporter_id, reported_item_type, reported_item_id, reason, status, college_id) VALUES (?, ?, ?, ?, 'pending', ?)");
+        $stmt->execute([$userId, $itemType, $itemId, $reason, $collegeId]);
+
+        // Trigger notification to the college admin
+        $adminStmt = $pdo->prepare("SELECT id FROM users WHERE college_id = ? AND role = 'college_admin' LIMIT 1");
+        $adminStmt->execute([$collegeId]);
+        $adminId = $adminStmt->fetchColumn();
+        if ($adminId) {
+            $reporterName = \App\Core\Auth::user()->full_name ?? 'A user';
+            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'moderation', ?, ?, '/admin/moderation')");
+            $notifStmt->execute([$adminId, "New content report submitted by $reporterName.", $collegeId]);
+        }
+
+        header("Location: /community?reported=1");
         exit;
     }
 }

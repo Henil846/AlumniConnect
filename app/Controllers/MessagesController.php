@@ -21,6 +21,11 @@ class MessagesController {
             $stmt->execute([$selectedUserId, $collegeId]);
             $selectedUser = $stmt->fetch(\PDO::FETCH_OBJ);
 
+            if (!empty($_GET['user_id']) && !$selectedUser) {
+                http_response_code(403);
+                die("Forbidden: Cross-tenant message access denied");
+            }
+
             if ($selectedUser) {
                 $stmt = $pdo->prepare("
                     SELECT * FROM messages 
@@ -75,8 +80,8 @@ class MessagesController {
             // Notification trigger for recipient
             $senderName = \App\Core\Auth::user()->full_name ?? 'Someone';
             $preview = mb_substr($content, 0, 50);
-            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'message', ?, ?, '/messages')");
-            $notifStmt->execute([$receiverId, "New message from $senderName: \"$preview\"", $collegeId]);
+            $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'message', ?, ?, ?)");
+            $notifStmt->execute([$receiverId, "New message from $senderName: \"$preview\"", $collegeId, '/messages?user_id=' . $senderId]);
         }
         
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
@@ -139,5 +144,36 @@ class MessagesController {
                 break;
             }
         }
+    }
+
+    public function deleteMessage() {
+        if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
+            die("CSRF validation failed.");
+        }
+        $userId = \App\Core\Auth::id() ?? null;
+        if (!$userId) die("Unauthorized");
+        $messageId = (int)($_POST['message_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ?");
+        $stmt->execute([$messageId]);
+        $msg = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$msg) {
+            http_response_code(404);
+            die("Message not found");
+        }
+        if ($msg->college_id != $collegeId || $msg->sender_id != $userId) {
+            http_response_code(403);
+            die("Forbidden: Cannot delete message sent by another user");
+        }
+        $pdo->prepare("DELETE FROM messages WHERE id = ?")->execute([$messageId]);
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            echo json_encode(['success' => true]);
+            exit;
+        }
+        header("Location: /messages?deleted=1");
+        exit;
     }
 }

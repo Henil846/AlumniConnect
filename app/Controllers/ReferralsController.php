@@ -24,39 +24,30 @@ class ReferralsController {
 
     public function submit() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
             die('CSRF validation failed.');
         }
 
         $alumniId = $_POST['alumni_id'] ?? null;
         if ($alumniId) {
             $pdo = Database::getConnection();
-            try {
-                $pdo->exec("CREATE TABLE IF NOT EXISTS referral_requests (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    alumni_id INT NOT NULL,
-                    student_id INT NOT NULL,
-                    status VARCHAR(50) DEFAULT 'pending',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )");
-                
-                $stmt = $pdo->prepare("INSERT INTO referral_requests (alumni_id, student_id, college_id) VALUES (?, ?, ?)");
-                $studentId = \App\Core\Auth::id() ?? null;
-                $collegeId = \App\Core\Auth::user()->college_id ?? null;
-                if ($studentId) {
-                    $check = $pdo->prepare("SELECT id FROM users WHERE id = ? AND college_id = ?");
-                    $check->execute([$alumniId, $collegeId]);
-                    if (!$check->fetch()) {
-                        http_response_code(403);
-                        die("Unauthorized to request referral from this user");
-                    }
-                    $stmt->execute([$alumniId, $studentId, $collegeId]);
-                    
-                    // Generate Notification for Alumni
-                    $studentName = \App\Core\Auth::user()->full_name ?? 'Someone';
-                    $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'referral', ?, ?, '/referral-request')");
-                    $notifStmt->execute([$alumniId, "$studentName requested a referral from you.", $collegeId]);
+            $stmt = $pdo->prepare("INSERT INTO referral_requests (alumni_id, student_id, status, college_id) VALUES (?, ?, 'requested', ?)");
+            $studentId = \App\Core\Auth::id() ?? null;
+            $collegeId = \App\Core\Auth::user()->college_id ?? null;
+            if ($studentId) {
+                $check = $pdo->prepare("SELECT id FROM users WHERE id = ? AND college_id = ?");
+                $check->execute([$alumniId, $collegeId]);
+                if (!$check->fetch()) {
+                    http_response_code(403);
+                    die("Unauthorized to request referral from this user");
                 }
-            } catch (\PDOException $e) {}
+                $stmt->execute([$alumniId, $studentId, $collegeId]);
+                
+                // Generate Notification for Alumni
+                $studentName = \App\Core\Auth::user()->full_name ?? 'Someone';
+                $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'referral', ?, ?, '/referral-request')");
+                $notifStmt->execute([$alumniId, "$studentName requested a referral from you.", $collegeId]);
+            }
         }
         
         header('Location: /referral-request?submitted=1');
@@ -65,6 +56,7 @@ class ReferralsController {
 
     public function updateStatus() {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            http_response_code(403);
             die('CSRF validation failed.');
         }
 
@@ -72,7 +64,13 @@ class ReferralsController {
         $status = $_POST['status'] ?? null;
         $alumniId = \App\Core\Auth::id() ?? null;
         
-        if ($requestId && in_array($status, ['approved', 'rejected'])) {
+        // Map legacy 'approved' to canonical 'submitted'
+        if ($status === 'approved') {
+            $status = 'submitted';
+        }
+        
+        $validStatuses = ['requested', 'reviewed', 'submitted', 'rejected'];
+        if ($requestId && in_array($status, $validStatuses)) {
             $pdo = Database::getConnection();
             
             // Verify ownership
@@ -87,7 +85,7 @@ class ReferralsController {
                 $alumniName = \App\Core\Auth::user()->full_name ?? 'An alumni';
                 $collegeId = \App\Core\Auth::user()->college_id ?? null;
                 $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'referral_update', ?, ?, '/referral-request')");
-                $notifStmt->execute([$studentId, "$alumniName has $status your referral request.", $collegeId]);
+                $notifStmt->execute([$studentId, "$alumniName has updated your referral request to '$status'.", $collegeId]);
             } else {
                 http_response_code(403);
                 die("Unauthorized to update this request");

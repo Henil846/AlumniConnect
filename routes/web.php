@@ -251,6 +251,16 @@ Router::post('/community/poll-vote', function() {
     return (new CommunityController())->pollVote();
 });
 
+Router::post('/community/report', function() {
+    AuthMiddleware::handle();
+    return (new CommunityController())->report();
+});
+
+Router::post('/community/comment/delete', function() {
+    AuthMiddleware::handle();
+    return (new CommunityController())->deleteComment();
+});
+
 Router::get('/messages', function() {
     AuthMiddleware::handle();
     return (new MessagesController())->index();
@@ -259,6 +269,11 @@ Router::get('/messages', function() {
 Router::post('/messages/send', function() {
     AuthMiddleware::handle();
     return (new MessagesController())->send();
+});
+
+Router::post('/messages/delete', function() {
+    AuthMiddleware::handle();
+    return (new MessagesController())->deleteMessage();
 });
 
 Router::get('/messages/stream', function() {
@@ -316,6 +331,16 @@ Router::post('/business-directory/create', function() {
     return (new BusinessController())->create();
 });
 
+Router::post('/business-directory/edit', function() {
+    AuthMiddleware::handle();
+    return (new BusinessController())->edit();
+});
+
+Router::post('/business-directory/delete', function() {
+    AuthMiddleware::handle();
+    return (new BusinessController())->delete();
+});
+
 Router::get('/startup-hub', function() {
     AuthMiddleware::handle();
     return (new StartupHubController())->index();
@@ -324,6 +349,16 @@ Router::get('/startup-hub', function() {
 Router::post('/startup-hub/create', function() {
     AuthMiddleware::handle();
     return (new StartupHubController())->create();
+});
+
+Router::post('/startup-hub/edit', function() {
+    AuthMiddleware::handle();
+    return (new StartupHubController())->edit();
+});
+
+Router::post('/startup-hub/delete', function() {
+    AuthMiddleware::handle();
+    return (new StartupHubController())->delete();
 });
 
 Router::get('/career-center', function() {
