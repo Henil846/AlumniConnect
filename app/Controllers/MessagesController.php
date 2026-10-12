@@ -76,6 +76,7 @@ class MessagesController {
             }
             $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, college_id) VALUES (?, ?, ?, ?)");
             $stmt->execute([$senderId, $receiverId, $content, $collegeId]);
+            $insertedId = (int)$pdo->lastInsertId();
 
             // Notification trigger for recipient
             $senderName = \App\Core\Auth::user()->full_name ?? 'Someone';
@@ -85,7 +86,17 @@ class MessagesController {
         }
         
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            echo json_encode(['success' => true]);
+            echo json_encode([
+                'success' => true,
+                'message' => [
+                    'id' => $insertedId ?? 0,
+                    'sender_id' => $senderId,
+                    'receiver_id' => (int)$receiverId,
+                    'content' => $content,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'is_read' => 0
+                ]
+            ]);
             exit;
         }
 
@@ -99,51 +110,62 @@ class MessagesController {
         
         $otherId = $_GET['user_id'] ?? null;
         if (!$otherId) die("Missing user_id parameter");
+
+        $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $check = $pdo->prepare("SELECT id FROM users WHERE id = ? AND college_id = ?");
+        $check->execute([$otherId, $collegeId]);
+        if (!$check->fetch()) {
+            http_response_code(403);
+            die("Forbidden: Cross-tenant message access denied");
+        }
         
         header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
+        header('Cache-Control: no-cache, no-transform');
         header('Connection: keep-alive');
+        header('X-Accel-Buffering: no');
 
-        // Simple polling approach for SSE
-        $pdo = Database::getConnection();
-        
-        // Fetch last message ID
-        $stmt = $pdo->prepare("
-            SELECT MAX(id) FROM messages 
-            WHERE (sender_id = ? AND receiver_id = ?) 
-               OR (sender_id = ? AND receiver_id = ?)
-        ");
-        $stmt->execute([$userId, $otherId, $otherId, $userId]);
-        $lastId = $stmt->fetchColumn() ?: 0;
+        // Instruct client to reconnect after 2.5s for live updates without blocking the server
+        echo "retry: 2500\n\n";
 
-        while (true) {
+        $lastId = (int)($_GET['last_id'] ?? ($_SERVER['HTTP_LAST_EVENT_ID'] ?? 0));
+        if ($lastId <= 0) {
             $stmt = $pdo->prepare("
-                SELECT * FROM messages 
-                WHERE id > ? AND (
-                    (sender_id = ? AND receiver_id = ?) OR 
-                    (sender_id = ? AND receiver_id = ?)
-                )
-                ORDER BY id ASC
+                SELECT MAX(id) FROM messages 
+                WHERE ((sender_id = ? AND receiver_id = ?) 
+                   OR (sender_id = ? AND receiver_id = ?))
+                   AND college_id = ?
             ");
-            $stmt->execute([$lastId, $userId, $otherId, $otherId, $userId]);
-            $newMessages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            if ($newMessages) {
-                foreach ($newMessages as $msg) {
-                    echo "data: " . json_encode($msg) . "\n\n";
-                    $lastId = max($lastId, $msg['id']);
-                }
-                ob_flush();
-                flush();
-            }
-
-            sleep(2); // Wait 2s before polling again
-
-            // Check connection is still alive
-            if (connection_aborted()) {
-                break;
-            }
+            $stmt->execute([$userId, $otherId, $otherId, $userId, $collegeId]);
+            $lastId = (int)($stmt->fetchColumn() ?: 0);
         }
+
+        $stmt = $pdo->prepare("
+            SELECT * FROM messages 
+            WHERE id > ? AND (
+                (sender_id = ? AND receiver_id = ?) OR 
+                (sender_id = ? AND receiver_id = ?)
+            )
+            AND college_id = ?
+            ORDER BY id ASC
+        ");
+        $stmt->execute([$lastId, $userId, $otherId, $otherId, $userId, $collegeId]);
+        $newMessages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (!empty($newMessages)) {
+            foreach ($newMessages as $msg) {
+                echo "id: " . $msg['id'] . "\n";
+                echo "data: " . json_encode($msg) . "\n\n";
+            }
+        } else {
+            echo ": ping\n\n";
+        }
+
+        if (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+        flush();
+        exit;
     }
 
     public function deleteMessage() {

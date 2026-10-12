@@ -177,10 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
       
       if (data.success) {
+        sessionStorage.setItem('userEmail', emailInput.value.trim());
         showToast(data.message, 'success');
         setTimeout(() => {
           window.location.href = data.redirect;
-        }, 1500);
+        }, 500);
       } else {
         if (data.errors) {
           if (data.errors.fullName) fullNameError.textContent = data.errors.fullName;

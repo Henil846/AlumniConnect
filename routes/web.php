@@ -46,7 +46,8 @@ Router::get('/reset-password', [AuthController::class, 'showResetPassword']);
 Router::post('/reset-password', [AuthController::class, 'processResetPassword']);
 
 Router::get('/dev/mailbox', function() {
-    if (\App\Core\Env::get('APP_ENV', 'production') === 'production') {
+    $env = \App\Core\Env::get('APP_ENV', 'production');
+    if (!in_array($env, ['local', 'testing', 'development'])) {
         http_response_code(404);
         echo "404 Not Found";
         return;
@@ -137,6 +138,11 @@ Router::post('/mentorship/cancel', function() {
 });
 
 Router::get('/referral-request', function() {
+    AuthMiddleware::handle();
+    return (new ReferralsController())->index();
+});
+
+Router::get('/referrals', function() {
     AuthMiddleware::handle();
     return (new ReferralsController())->index();
 });
@@ -443,6 +449,11 @@ Router::get('/admin/dashboard', function() {
     return (new AdminController())->dashboard();
 });
 
+Router::get('/admin/users', function() {
+    AuthMiddleware::handle();
+    return (new AdminController())->users();
+});
+
 Router::get('/admin/moderation', function() {
     AuthMiddleware::handle();
     return (new AdminController())->moderation();
@@ -530,6 +541,34 @@ Router::post('/super-admin/users/decline', function() {
 Router::get('/super-admin/revenue', function() {
     AuthMiddleware::handle();
     return (new SuperAdminController())->revenue();
+});
+Router::get('/super-admin/colleges', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->colleges();
+});
+Router::get('/super-admin/users', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->users();
+});
+Router::post('/super-admin/users/status', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->updateUserStatus();
+});
+Router::get('/super-admin/ads', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->ads();
+});
+Router::post('/super-admin/ads/create', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->createAd();
+});
+Router::post('/super-admin/ads/status', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->updateAdStatus();
+});
+Router::get('/super-admin/security', function() {
+    AuthMiddleware::handle();
+    return (new SuperAdminController())->security();
 });
 Router::get('/super-admin/settings', function() {
     AuthMiddleware::handle();

@@ -529,7 +529,13 @@
         <!-- Event -->
         <div class="event-card-modern">
             <div class="event-img-wrap">
-            <img src="<?= htmlspecialchars($event->image_url) ?>" alt="ev" style="object-fit:cover;" />
+            <?php if (!empty($event->image_url)): ?>
+                <img src="<?= htmlspecialchars($event->image_url) ?>" alt="Event banner" style="object-fit:cover;" />
+            <?php else: ?>
+                <div style="width:100%; height:140px; background:linear-gradient(135deg, #1e293b 0%, #3b82f6 100%); display:flex; align-items:center; justify-content:center;">
+                    <span style="font-size:2rem;">📅</span>
+                </div>
+            <?php endif; ?>
             <div class="event-date-pill">
                 <div class="mth"><?= strtoupper($eventDate->format('M')) ?></div>
                 <div class="day"><?= $eventDate->format('d') ?></div>
@@ -545,8 +551,8 @@
             
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:16px;">
                 <div class="avatar-stack">
-                <img src="/assets/img/mentor_marcus.png" alt="a" />
-                <img src="/assets/img/mentor_elena.png" alt="a" />
+                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl('Attendee 1', null)) ?>" alt="a" />
+                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl('Attendee 2', null)) ?>" alt="a" />
                 <div style="width:28px; height:28px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; margin-left:-8px;">+<?= count($registeredEventIds) ?></div>
                 </div>
                 <?php if ($isRegistered): ?>
@@ -559,7 +565,7 @@
                     <form method="POST" action="/events/register" style="margin:0;">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
                         <input type="hidden" name="event_id" value="<?= $event->id ?>">
-                        <button type="submit" class="btn-primary" style="background:#000; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">RSVP</button>
+                        <button type="submit" class="btn-primary btn-rsvp" style="background:#000; border-radius:var(--radius-full); padding:8px 20px; font-size:0.85rem;">RSVP</button>
                     </form>
                 <?php endif; ?>
             </div>

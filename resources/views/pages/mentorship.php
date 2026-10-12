@@ -158,6 +158,28 @@
 <p>Connect with seasoned alumni who are ready to share their professional journey and help you navigate your career path.</p>
 </div>
 
+<?php if (!empty($incomingRequests)): ?>
+<div class="incoming-requests-card" style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; margin-bottom:32px; box-shadow:var(--shadow-sm);">
+    <h3 style="font-size:1.15rem; font-weight:800; margin-bottom:16px; color:var(--color-primary);">Pending Mentorship Requests (<?= count($incomingRequests) ?>)</h3>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <?php foreach ($incomingRequests as $req): ?>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:var(--color-bg); border-radius:var(--radius-md);">
+            <div>
+                <strong style="color:var(--color-text);"><?= htmlspecialchars($req->mentee_name) ?></strong>
+                <p style="font-size:0.8rem; color:var(--color-text-muted); margin:2px 0 0;">Requested session • Status: Pending</p>
+            </div>
+            <form action="/mentorship/update-status" method="POST" style="margin:0;">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                <input type="hidden" name="session_id" value="<?= $req->id ?>">
+                <input type="hidden" name="status" value="accepted">
+                <button type="submit" class="btn-accept-mentorship" style="background:var(--color-primary); color:#fff; border:none; padding:8px 18px; border-radius:var(--radius-full); font-size:0.85rem; font-weight:700; cursor:pointer;">Accept Mentorship</button>
+            </form>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="mentor-filters">
 <button class="filter-pill <?= empty($_GET['industry']) ? 'active' : '' ?>" onclick="window.location.href='/mentorship'">All Mentors</button>
 <button class="filter-pill <?= ($_GET['industry'] ?? '') === 'Product Design' ? 'active' : '' ?>" onclick="window.location.href='?industry=Product+Design'">Product Design</button>
@@ -175,7 +197,7 @@
     <div class="mentor-card">
         <div class="mentor-cover">
         <span class="mentor-badge">ALUMNI '<?= date('y', strtotime($mentor->created_at)) ?></span>
-        <img src="/assets/img/mentor_elena.png" alt="<?= htmlspecialchars($mentor->full_name) ?>" />
+        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($mentor->full_name ?? 'Mentor', $mentor->avatar ?? null)) ?>" alt="<?= htmlspecialchars($mentor->full_name) ?>" />
         </div>
         <div class="mentor-body" style="cursor:pointer;" onclick="if(event.target.tagName !== 'BUTTON') window.location.href='/profile/<?= $mentor->id ?>'">
         <div class="mentor-header">

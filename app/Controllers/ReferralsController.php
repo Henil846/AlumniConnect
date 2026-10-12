@@ -13,6 +13,11 @@ class ReferralsController {
             $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = 'alumni'");
             $stmt->execute([$alumniId]);
             $alumni = $stmt->fetch(\PDO::FETCH_OBJ);
+        } else {
+            $collegeId = \App\Core\Auth::user()->college_id ?? 1;
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE role = 'alumni' AND college_id = ? ORDER BY id ASC LIMIT 1");
+            $stmt->execute([$collegeId]);
+            $alumni = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
         return View::render('referral-request', [

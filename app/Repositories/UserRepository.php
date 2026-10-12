@@ -62,37 +62,63 @@ class UserRepository {
     }
 
     public function createPasswordReset($email, $token) {
-        $this->pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, datetime('now', '+1 hour'))")->execute([$email, $token]);
+        $hashedToken = hash('sha256', $token);
+        $this->pdo->prepare("DELETE FROM password_resets WHERE email = ?")->execute([$email]);
+        $this->pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, datetime('now', '+15 minutes'))")->execute([$email, $hashedToken]);
     }
 
     public function getValidPasswordReset($token) {
+        $hashedToken = hash('sha256', $token);
         $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND used = 0 AND expires_at > datetime('now')");
-        $stmt->execute([$token]);
+        $stmt->execute([$hashedToken]);
         return $stmt->fetch();
     }
 
     public function usePasswordReset($token, $newPasswordHash) {
+        $hashedToken = hash('sha256', $token);
         $reset = $this->getValidPasswordReset($token);
         if ($reset) {
             $this->pdo->prepare("UPDATE users SET password = ? WHERE email = ?")->execute([$newPasswordHash, $reset['email']]);
-            $this->pdo->prepare("UPDATE password_resets SET used = 1 WHERE token = ?")->execute([$token]);
+            $this->pdo->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$hashedToken]);
             return true;
         }
         return false;
     }
 
     public function logLoginAttempt($email, $ip) {
-        $this->pdo->prepare("INSERT INTO login_attempts (email, ip_address) VALUES (?, ?)")->execute([$email, $ip]);
+        $this->logAttempt('login', $email, $ip);
     }
 
     public function checkRateLimit($email, $ip) {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM login_attempts WHERE (email = ? OR ip_address = ?) AND attempt_time > datetime('now', '-15 minutes')");
-        $stmt->execute([$email, $ip]);
-        $row = $stmt->fetch();
-        return $row['count'] >= 5; // Lockout after 5 failed attempts
+        return $this->isRateLimited('login', $email, $ip, 5);
     }
 
     public function clearLoginAttempts($email) {
-        $this->pdo->prepare("DELETE FROM login_attempts WHERE email = ?")->execute([$email]);
+        $this->pdo->prepare("DELETE FROM login_attempts WHERE email = ? OR email LIKE ?")->execute([$email, "login:$email"]);
+    }
+
+    public function logAttempt($action, $identifier, $ip) {
+        try {
+            $this->pdo->prepare("INSERT INTO login_attempts (email, ip_address, action) VALUES (?, ?, ?)")->execute([$identifier ?: $ip, $ip, $action]);
+        } catch (\Throwable $e) {
+            $this->pdo->prepare("INSERT INTO login_attempts (email, ip_address) VALUES (?, ?)")->execute([$action . ':' . ($identifier ?: $ip), $ip]);
+        }
+    }
+
+    public function isRateLimited($action, $identifier, $ip, $maxAttempts = 5) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM login_attempts WHERE action = ? AND (email = ? OR ip_address = ?) AND attempt_time > datetime('now', '-15 minutes')");
+            $stmt->execute([$action, $identifier ?: $ip, $ip]);
+            $row = $stmt->fetch();
+            if ($row && $row['count'] >= $maxAttempts) {
+                return true;
+            }
+        } catch (\Throwable $e) {}
+
+        $key = $action . ':' . ($identifier ?: $ip);
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM login_attempts WHERE (email = ? OR (ip_address = ? AND email LIKE ?)) AND attempt_time > datetime('now', '-15 minutes')");
+        $stmt->execute([$key, $ip, $action . ':%']);
+        $row = $stmt->fetch();
+        return $row && ($row['count'] >= $maxAttempts);
     }
 }

@@ -119,7 +119,7 @@ class SuperAdminController {
         if (empty($adminEmail)) {
             $adminEmail = 'admin@' . $slug . '.edu';
         }
-        $hashed = password_hash($adminPassword, PASSWORD_DEFAULT);
+        $hashed = password_hash($adminPassword, PASSWORD_BCRYPT, ['cost' => 12]);
         $uStmt = $pdo->prepare("INSERT INTO users (email, password, full_name, role, college_id, status, is_verified) VALUES (?, ?, ?, 'college_admin', ?, 'active', 1)");
         $uStmt->execute([$adminEmail, $hashed, $adminName ?: ($name . ' Admin'), $collegeId]);
 
@@ -231,6 +231,116 @@ class SuperAdminController {
             'transactions' => $transactions,
             'totalRevenue' => $totalRevenue,
             'totalDonors' => $totalDonors,
+        ], 'super-admin');
+    }
+
+    public function colleges() {
+        return $this->institutions();
+    }
+
+    public function users() {
+        $this->checkAccess();
+        $pdo = Database::getConnection();
+        $search = trim($_GET['q'] ?? '');
+        if ($search !== '') {
+            $stmt = $pdo->prepare("SELECT u.*, c.name as college_name FROM users u LEFT JOIN colleges c ON u.college_id = c.id WHERE u.full_name LIKE ? OR u.email LIKE ? OR u.role LIKE ? ORDER BY u.created_at DESC");
+            $term = "%$search%";
+            $stmt->execute([$term, $term, $term]);
+            $users = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        } else {
+            $users = $pdo->query("SELECT u.*, c.name as college_name FROM users u LEFT JOIN colleges c ON u.college_id = c.id ORDER BY u.created_at DESC LIMIT 50")->fetchAll(\PDO::FETCH_OBJ);
+        }
+        $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        $activeUsers = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status = 'active' OR status IS NULL")->fetchColumn();
+        $suspendedUsers = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status = 'suspended' OR status = 'inactive'")->fetchColumn();
+
+        return View::render('super-admin/users', [
+            'title' => 'User Management — Alumni Connect',
+            'activePage' => 'super-admin-users',
+            'users' => $users,
+            'search' => $search,
+            'totalUsers' => $totalUsers,
+            'activeUsers' => $activeUsers,
+            'suspendedUsers' => $suspendedUsers,
+        ], 'super-admin');
+    }
+
+    public function updateUserStatus() {
+        $this->checkAccess();
+        $this->validateCsrf();
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $status = in_array($_POST['status'] ?? '', ['active', 'suspended', 'inactive']) ? $_POST['status'] : 'active';
+        if ($userId > 0) {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
+            $stmt->execute([$status, $userId]);
+        }
+        header("Location: /super-admin/users?updated=1");
+        exit;
+    }
+
+    public function ads() {
+        $this->checkAccess();
+        $pdo = Database::getConnection();
+        $ads = $pdo->query("SELECT a.*, c.name as college_name FROM advertisements a LEFT JOIN colleges c ON a.college_id = c.id ORDER BY a.created_at DESC")->fetchAll(\PDO::FETCH_OBJ);
+        $totalAds = count($ads);
+        $activeAds = (int)$pdo->query("SELECT COUNT(*) FROM advertisements WHERE status = 'active'")->fetchColumn();
+        $colleges = $pdo->query("SELECT id, name FROM colleges ORDER BY name ASC")->fetchAll(\PDO::FETCH_OBJ);
+
+        return View::render('super-admin/ads', [
+            'title' => 'Ads & Sponsorships — Alumni Connect',
+            'activePage' => 'super-admin-ads',
+            'ads' => $ads,
+            'totalAds' => $totalAds,
+            'activeAds' => $activeAds,
+            'colleges' => $colleges,
+        ], 'super-admin');
+    }
+
+    public function createAd() {
+        $this->checkAccess();
+        $this->validateCsrf();
+        $sponsor = trim($_POST['sponsor_name'] ?? '');
+        $link = trim($_POST['link_url'] ?? 'https://example.com');
+        $image = trim($_POST['image_url'] ?? '/assets/img/ad-banner.png');
+        $collegeId = !empty($_POST['college_id']) ? (int)$_POST['college_id'] : null;
+
+        if ($sponsor) {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("INSERT INTO advertisements (sponsor_name, link_url, image_url, status, college_id) VALUES (?, ?, ?, 'active', ?)");
+            $stmt->execute([$sponsor, $link, $image, $collegeId]);
+        }
+        header("Location: /super-admin/ads?created=1");
+        exit;
+    }
+
+    public function updateAdStatus() {
+        $this->checkAccess();
+        $this->validateCsrf();
+        $adId = (int)($_POST['ad_id'] ?? 0);
+        $status = in_array($_POST['status'] ?? '', ['active', 'disabled', 'inactive']) ? $_POST['status'] : 'active';
+        if ($adId > 0) {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("UPDATE advertisements SET status = ? WHERE id = ?");
+            $stmt->execute([$status, $adId]);
+        }
+        header("Location: /super-admin/ads?updated=1");
+        exit;
+    }
+
+    public function security() {
+        $this->checkAccess();
+        $pdo = Database::getConnection();
+        $attempts = $pdo->query("SELECT * FROM login_attempts ORDER BY attempt_time DESC LIMIT 25")->fetchAll(\PDO::FETCH_OBJ);
+        $totalAttempts = (int)$pdo->query("SELECT COUNT(*) FROM login_attempts")->fetchColumn();
+        $failedAttempts = (int)$pdo->query("SELECT COUNT(*) FROM login_attempts WHERE action = 'failed' OR action = 'login'")->fetchColumn();
+
+        return View::render('super-admin/security', [
+            'title' => 'Security & Audit Logs — Alumni Connect',
+            'activePage' => 'super-admin-security',
+            'attempts' => $attempts,
+            'totalAttempts' => $totalAttempts,
+            'failedAttempts' => $failedAttempts,
         ], 'super-admin');
     }
 

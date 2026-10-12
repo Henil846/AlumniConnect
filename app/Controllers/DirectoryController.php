@@ -38,7 +38,7 @@ class DirectoryController {
         $countSql .= " ORDER BY created_at DESC";
         
         // Pagination logic
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $page = max(1, intval($_GET['page'] ?? 1));
         $perPage = 20;
         $offset = ($page - 1) * $perPage;
         

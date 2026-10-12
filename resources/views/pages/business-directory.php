@@ -550,7 +550,7 @@
                             <p style="font-size:0.9rem; color:var(--color-text-muted); margin-bottom:16px; flex:1;"><?= nl2br(htmlspecialchars($biz->description)) ?></p>
                             
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
-                                <img src="/assets/img/signup_side_img.png" alt="" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
+                                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($biz->owner_name ?? 'Owner', null)) ?>" alt="" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
                                 <span style="font-size:0.85rem; font-weight:600; color:#334155;">Owned by <?= htmlspecialchars($biz->owner_name) ?></span>
                             </div>
                             

@@ -497,7 +497,8 @@
             <h1 class="page-title">Events Admin Console</h1>
             <p class="page-subtitle mb-0">Organize and track alumni engagements from a single dashboard.</p>
         </div>
-        <div style="display:flex; gap:12px;">
+        <div style="display:flex; gap:12px; align-items:center;">
+            <button type="button" class="btn-primary btn-create-event-open" onclick="document.getElementById('create-event-modal').style.display='flex'" style="padding:10px 20px; font-weight:700; border-radius:12px; background:#0f172a; color:#fff; border:none; cursor:pointer;">+ Create Event</button>
             <form method="GET" action="/events-admin" style="display:flex; align-items:center; gap:8px;">
                 <select name="event_id" class="form-input" onchange="this.form.submit()" style="background:#f8fafc; border:1px solid var(--color-border); padding:10px 16px; border-radius:12px; min-width:250px;">
                     <?php foreach($events as $event): ?>
@@ -508,6 +509,44 @@
                 </select>
             </form>
         </div>
+        </div>
+
+        <div id="create-event-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:#fff; border-radius:16px; width:100%; max-width:540px; padding:32px; position:relative; max-height:90vh; overflow-y:auto;">
+                <button type="button" onclick="document.getElementById('create-event-modal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
+                <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:16px;">Create Campus Event</h3>
+                <form method="POST" action="/events-admin/create" id="create-event-form" style="display:flex; flex-direction:column; gap:14px;">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Event Title</label>
+                        <input type="text" name="title" required placeholder="e.g. Founders & VC Mixer 2027" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;">
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <div style="flex:1;">
+                            <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Date & Time</label>
+                            <input type="text" name="date" required value="2027-02-15 17:00:00" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Event Type</label>
+                            <select name="type" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;">
+                                <option value="Networking">Networking</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Webinar">Webinar</option>
+                                <option value="Reunion">Reunion</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Location / Venue</label>
+                        <input type="text" name="location" required value="Innovation Hub Hall C" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Description</label>
+                        <textarea name="description" rows="3" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;" placeholder="Event summary...">Exclusive mixer connecting campus alumni founders with early-stage investors.</textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-submit-event" style="padding:12px; font-weight:700; border-radius:8px; background:#0f172a; color:#fff; border:none; cursor:pointer; margin-top:8px;">Publish Campus Event</button>
+                </form>
+            </div>
         </div>
 
         <?php if (isset($_GET['success'])): ?>
@@ -596,7 +635,7 @@
             <?php foreach($registrations as $reg): ?>
             <div class="table-item-row" style="display:flex; padding:16px 24px; border-bottom:1px solid var(--color-border); align-items:center;">
                 <div style="flex:3; display:flex; gap:12px; align-items:center;">
-                <img src="/assets/img/mentor_marcus.png" alt="av" style="width:44px; height:44px; border-radius:50%; object-fit:cover;" />
+                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($reg->full_name ?? 'Attendee', null)) ?>" alt="av" style="width:44px; height:44px; border-radius:50%; object-fit:cover;" />
                 <div>
                     <h4 class="font-bold text-md mb-1"><?= htmlspecialchars($reg->full_name) ?></h4>
                     <p class="text-xs text-muted mb-0"><?= htmlspecialchars($reg->email) ?></p>

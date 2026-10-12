@@ -26,17 +26,42 @@ if (App\Core\Env::get('APP_ENV', 'development') === 'production') {
     exit(1);
 }
 
+if (!in_array('--force', $argv)) {
+    fwrite(STDERR, "ERROR: Safety guard prevented execution. The '--force' flag is required to reset demo data.\n");
+    fwrite(STDERR, "Usage: php tools/reset_demo_data.php --force\n");
+    exit(1);
+}
+
 echo "========================================================\n";
 echo "       ALUMNI CONNECT — RESET DEMO DATABASE            \n";
 echo "========================================================\n\n";
 
 $dbPath = $projectDir . '/database/database.sqlite';
-$backupPath = $projectDir . '/database/database.sqlite.bak';
+$backupDir = $projectDir . '/database/backups';
+if (!is_dir($backupDir)) {
+    @mkdir($backupDir, 0777, true);
+}
+$timestamp = date('Ymd_His');
+$timestampedBackup = $backupDir . "/database_{$timestamp}.sqlite.bak";
+$legacyBackup = $projectDir . '/database/database.sqlite.bak';
 
-// 1. Create safety backup if database exists
+$countsBefore = [];
 if (file_exists($dbPath)) {
-    copy($dbPath, $backupPath);
-    echo "[1/4] Created safety backup at database/database.sqlite.bak\n";
+    try {
+        $prePdo = new PDO("sqlite:" . $dbPath);
+        $tables = $prePdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($tables as $t) {
+            $countsBefore[$t] = (int)$prePdo->query("SELECT COUNT(*) FROM \"$t\"")->fetchColumn();
+        }
+        unset($prePdo);
+    } catch (\Throwable $e) {}
+
+    // 1. Create timestamped safety backup (never overwrite)
+    copy($dbPath, $timestampedBackup);
+    copy($dbPath, $legacyBackup);
+    echo "[1/4] Created timestamped safety backup at database/backups/database_{$timestamp}.sqlite.bak (never overwritten)\n";
+} else {
+    echo "[1/4] No existing database found to backup.\n";
 }
 
 // 2. Remove old sqlite file to guarantee clean state
@@ -45,8 +70,8 @@ App\Core\Database::resetConnection();
 @unlink($dbPath . '-wal');
 @unlink($dbPath . '-shm');
 echo "[2/4] Removed existing database file.\n";
-
-// Initialize base tables
+// 3. Initialize base tables
+echo "[3/4] Rebuilding clean database schema and base tables...\n";
 $pdo = new PDO("sqlite:" . $dbPath);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -306,6 +331,7 @@ $ddlStatements = [
   "id" INTEGER PRIMARY KEY AUTOINCREMENT,
   "email" varchar(255) NOT NULL,
   "ip_address" varchar(45) NOT NULL,
+  "action" varchar(50) DEFAULT "login",
   "attempt_time" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 )',
 
@@ -367,4 +393,28 @@ foreach ($ddlStatements as $stmt) {
 echo "[4/4] Seeding canonical demo accounts and multi-campus dataset...\n";
 require $projectDir . '/database/seed_demo_accounts.php';
 
+$countsAfter = [];
+try {
+    $postPdo = new PDO("sqlite:" . $dbPath);
+    $tables = $postPdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($tables as $t) {
+        $countsAfter[$t] = (int)$postPdo->query("SELECT COUNT(*) FROM \"$t\"")->fetchColumn();
+    }
+    unset($postPdo);
+} catch (\Throwable $e) {}
+
+$allTables = array_unique(array_merge(array_keys($countsBefore), array_keys($countsAfter)));
+sort($allTables);
+
+echo "\n------------------------------------------------------------\n";
+printf("%-25s | %-12s | %-12s\n", "Table", "Before Reset", "After Reset");
+echo "------------------------------------------------------------\n";
+foreach ($allTables as $t) {
+    $before = $countsBefore[$t] ?? 0;
+    $after = $countsAfter[$t] ?? 0;
+    printf("%-25s | %-12d | %-12d\n", $t, $before, $after);
+}
+echo "------------------------------------------------------------\n";
+
 echo "\nSUCCESS: Demo database cleanly rebuilt at database/database.sqlite!\n";
+

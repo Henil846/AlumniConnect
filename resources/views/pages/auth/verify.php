@@ -12,7 +12,7 @@
 
   <!-- HEADER -->
   <header class="auth-header" id="verifyHeader">
-    <a href="index.html" class="logo" id="verifyLogo">
+    <a href="/" class="logo" id="verifyLogo">
       <div class="logo-icon" style="background:var(--color-primary);">
         <svg viewBox="0 0 24 24" stroke-width="2.2" fill="none" stroke="white"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
       </div>
@@ -56,6 +56,7 @@
 
       <!-- OTP Inputs -->
       <form id="otpForm" novalidate>
+        <input type="hidden" name="csrf_token" id="csrfTokenInput" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
         <div class="otp-row" id="otpRow" role="group" aria-label="6-digit verification code">
           <input class="otp-input" id="otp0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
           <input class="otp-input" id="otp1" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
@@ -77,7 +78,7 @@
         <p class="expire-text">Code expires in <strong id="timerDisplay">02:00</strong></p>
         <p class="resend-text">
           Didn't receive the email?
-          <button type="button" class="resend-link" id="resendBtn">Resend code</button>
+          <button type="button" class="resend-link" id="resendBtn" onclick="alert('Verification code resent.')">Resend code</button>
         </p>
       </div>
 

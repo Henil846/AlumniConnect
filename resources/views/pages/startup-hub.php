@@ -548,7 +548,7 @@
                             <p style="font-size:0.9rem; color:#475569; margin-bottom:20px; flex:1; line-height:1.5;"><?= nl2br(htmlspecialchars($startup->elevator_pitch)) ?></p>
                             
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
-                                <img src="/assets/img/signup_side_img.png" alt="" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($startup->founder_name ?? 'Founder', null)) ?>" alt="" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                                 <span style="font-size:0.85rem; font-weight:600; color:#334155;">Founder: <?= htmlspecialchars($startup->founder_name) ?></span>
                             </div>
                             

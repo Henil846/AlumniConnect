@@ -28,7 +28,7 @@ class JobsController {
         $sql .= " ORDER BY created_at DESC";
         $countSql .= " ORDER BY created_at DESC";
         // Pagination logic
-        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $page = max(1, intval($_GET['page'] ?? 1));
         $perPage = 20;
         $offset = ($page - 1) * $perPage;
         
@@ -107,7 +107,7 @@ class JobsController {
         }
         $userId = \App\Core\Auth::id() ?? null;
         $role = \App\Core\Auth::user()->role ?? null;
-        if (!$userId || ($role !== 'alumni' && $role !== 'admin' && $role !== 'college_admin')) {
+        if (!$userId || ($role !== 'alumni' && $role !== 'admin' && $role !== 'college_admin' && $role !== 'super_admin')) {
             http_response_code(403);
             die("Unauthorized to post a job");
         }

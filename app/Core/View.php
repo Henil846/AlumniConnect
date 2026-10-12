@@ -2,6 +2,15 @@
 namespace App\Core;
 
 class View {
+    public static function avatarUrl($name = 'User', $avatar = null) {
+        if (!empty($avatar) && strpos($avatar, 'mentor_') === false && strpos($avatar, 'side_img') === false) {
+            return $avatar;
+        }
+        $initials = strtoupper(substr(trim($name ?: 'U'), 0, 2));
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1a2340" rx="32"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Inter,sans-serif" font-size="22" font-weight="700">' . htmlspecialchars($initials) . '</text></svg>';
+        return 'data:image/svg+xml;utf8,' . rawurlencode($svg);
+    }
+
     public static function render($view, $data = [], $layout = 'app') {
         extract($data);
         

@@ -24,11 +24,18 @@ class MentorshipController {
         $stmt->execute($params);
         $mentors = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
+        $incomingRequests = [];
+        if (\App\Core\Auth::user() && \App\Core\Auth::user()->role === 'alumni') {
+            $reqStmt = $pdo->prepare("SELECT ms.*, u.full_name as mentee_name FROM mentorship_sessions ms JOIN users u ON ms.mentee_id = u.id WHERE ms.mentor_id = ? AND ms.status = 'pending'");
+            $reqStmt->execute([\App\Core\Auth::id()]);
+            $incomingRequests = $reqStmt->fetchAll(\PDO::FETCH_OBJ);
+        }
+
         return View::render('mentorship', [
             'title' => 'Mentorship — Alumni Connect',
             'activePage' => 'mentorship',
             'mentors' => $mentors,
-            
+            'incomingRequests' => $incomingRequests,
         ], 'app');
     }
 

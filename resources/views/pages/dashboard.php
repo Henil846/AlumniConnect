@@ -349,7 +349,7 @@
 <!-- GREETING ROW -->
 <div class="dashboard-greeting">
 <div class="greeting-user">
-    <img src="/assets/img/mentor_elena.png" alt="<?= htmlspecialchars($user->full_name) ?>" class="greeting-avatar" />
+    <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($user->full_name ?? 'User', $user->avatar ?? null)) ?>" alt="<?= htmlspecialchars($user->full_name) ?>" class="greeting-avatar" />
     <div class="greeting-text">
     <h1>Good Morning, <?= htmlspecialchars(explode(' ', $user->full_name)[0]) ?>.</h1>
     <p>Ready to take the next step in your career journey today?</p>
@@ -429,7 +429,7 @@
         <?php foreach ($mentorshipRequests as $req): ?>
         <div class="request-item">
             <div class="request-info">
-            <img src="/assets/img/default-avatar.png" alt="Mentee" class="request-avatar" />
+            <img src="<?= \App\Core\View::avatarUrl($req->full_name) ?>" alt="<?= htmlspecialchars($req->full_name) ?>" class="request-avatar" />
             <div class="request-details">
                 <h4><?= htmlspecialchars($req->full_name) ?></h4>
                 <p><?= htmlspecialchars($req->industry ?? 'Student') ?></p>
@@ -490,7 +490,7 @@
         <?php foreach ($topMentors as $mentor): ?>
         <div class="mentor-card-mini">
         <div style="position:relative; display:inline-block; margin-bottom:8px;">
-            <img src="/assets/img/default-avatar.png" alt="<?= htmlspecialchars($mentor->full_name) ?>" style="display:block;" />
+            <img src="<?= \App\Core\View::avatarUrl($mentor->full_name, $mentor->avatar ?? null) ?>" alt="<?= htmlspecialchars($mentor->full_name) ?>" style="display:block;" />
             <span style="position:absolute; top:-4px; right:-4px; background:#dcfce7; color:#15803d; font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:10px; white-space:nowrap;">Available</span>
         </div>
         <h4><?= htmlspecialchars($mentor->full_name) ?></h4>

@@ -22,7 +22,25 @@ class EventsController {
             $params[] = '%' . $_GET['search'] . '%';
         }
 
-        $sql .= " ORDER BY date ASC";
+        // Count total for pagination
+        $countSql = "SELECT COUNT(*) as total FROM events WHERE college_id = ?";
+        if (!empty($_GET['type']) && is_array($_GET['type'])) {
+            $placeholders = str_repeat('?,', count($_GET['type']) - 1) . '?';
+            $countSql .= " AND type IN ($placeholders)";
+        }
+        if (!empty($_GET['search'])) {
+            $countSql .= " AND title LIKE ?";
+        }
+        $countStmt = $pdo->prepare($countSql);
+        $countStmt->execute($params);
+        $totalEvents = (int)($countStmt->fetch(\PDO::FETCH_OBJ)->total ?? 0);
+
+        $page = max(1, intval($_GET['page'] ?? 1));
+        $perPage = 6;
+        $offset = ($page - 1) * $perPage;
+        $totalPages = max(1, ceil($totalEvents / $perPage));
+
+        $sql .= " ORDER BY date ASC LIMIT $perPage OFFSET $offset";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $events = $stmt->fetchAll(\PDO::FETCH_OBJ);
@@ -57,7 +75,8 @@ class EventsController {
             'events' => $events,
             'selectedEvent' => $selectedEvent,
             'registeredEventIds' => $registeredEventIds,
-            
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
         ], 'app');
     }
 

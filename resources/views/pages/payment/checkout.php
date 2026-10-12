@@ -15,12 +15,14 @@
     
     <div style="display:flex; gap:16px; justify-content:center;">
         <form method="POST" action="/payment/callback">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
             <input type="hidden" name="txn_id" value="<?= htmlspecialchars($donation->transaction_id) ?>">
             <input type="hidden" name="sig" value="<?= htmlspecialchars($sig) ?>">
             <input type="hidden" name="status" value="success">
             <button class="btn-primary" style="background:#16a34a; border:none; padding:12px 24px; border-radius:8px; color:#fff; font-weight:700; cursor:pointer;">Simulate Success</button>
         </form>
         <form method="POST" action="/payment/callback">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
             <input type="hidden" name="txn_id" value="<?= htmlspecialchars($donation->transaction_id) ?>">
             <input type="hidden" name="sig" value="<?= htmlspecialchars($sig) ?>">
             <input type="hidden" name="status" value="failed">

@@ -27,9 +27,14 @@ class AdsController {
             http_response_code(403);
             die("CSRF validation failed.");
         }
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'super_admin' && $role !== 'admin' && $role !== 'college_admin') {
+            http_response_code(403);
+            die("Forbidden: Only administrators can create advertisements.");
+        }
         $sponsor = trim($_POST['sponsor_name'] ?? '');
         $link = trim($_POST['link_url'] ?? '');
-        $image = trim($_POST['image_url'] ?? '/assets/img/login_side_img.png');
+        $image = trim($_POST['image_url'] ?? '/assets/img/campus_cover.png');
         $collegeId = \App\Core\Auth::user()->college_id ?? null;
 
         if ($sponsor && $link) {
@@ -46,6 +51,11 @@ class AdsController {
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
             http_response_code(403);
             die("CSRF validation failed.");
+        }
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'super_admin' && $role !== 'admin' && $role !== 'college_admin') {
+            http_response_code(403);
+            die("Forbidden: Only administrators can manage advertisements.");
         }
         $id = (int)($_POST['id'] ?? 0);
         $status = ($_POST['status'] ?? 'disabled') === 'active' ? 'active' : 'disabled';

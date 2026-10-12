@@ -668,14 +668,21 @@ input { font-family: inherit; }
 }
 
 @media (max-width: 768px) {
+  .hamburger-menu { display: inline-flex !important; }
   .sidebar {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 999999 !important;
     position: fixed;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: none !important;
     height: 100vh;
   }
-  .sidebar.open {
-    transform: translateX(0);
+  .sidebar.open, .sidebar.active {
+    transform: translateX(0) !important;
+    display: flex !important;
+    visibility: visible !important;
   }
   .top-header { padding: 0 16px; }
   .content-scrollable { padding: 16px; }
@@ -702,6 +709,10 @@ input { font-family: inherit; }
           <a href="/admin/dashboard" class="nav-item <?= ($activePage ?? '') === 'admin-dashboard' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             Admin Dashboard
+          </a>
+          <a href="/admin/users" class="nav-item <?= ($activePage ?? '') === 'admin-users' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Admin Users
           </a>
           <a href="/admin/moderation" class="nav-item <?= ($activePage ?? '') === 'admin-moderation' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -756,13 +767,37 @@ input { font-family: inherit; }
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
             Messages
           </a>
-          <a href="/referral-request" class="nav-item <?= ($activePage ?? '') === 'referrals' ? 'active' : '' ?>">
+          <a href="/referrals" class="nav-item <?= ($activePage ?? '') === 'referrals' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
             Referrals
           </a>
           <a href="/marketplace" class="nav-item <?= ($activePage ?? '') === 'marketplace' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             Marketplace
+          </a>
+          <a href="/business-directory" class="nav-item <?= ($activePage ?? '') === 'business-directory' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Business Directory
+          </a>
+          <a href="/startup-hub" class="nav-item <?= ($activePage ?? '') === 'startup-hub' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Startup Hub
+          </a>
+          <a href="/career-center" class="nav-item <?= ($activePage ?? '') === 'career-center' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Career Center
+          </a>
+          <a href="/rewards" class="nav-item <?= ($activePage ?? '') === 'rewards' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            Rewards
+          </a>
+          <a href="/notifications" class="nav-item <?= ($activePage ?? '') === 'notifications' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Notifications
+          </a>
+          <a href="/ads" class="nav-item <?= ($activePage ?? '') === 'ads' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            Sponsored Ads
           </a>
           <a href="/donations" class="nav-item <?= ($activePage ?? '') === 'donations' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -795,7 +830,7 @@ input { font-family: inherit; }
       
       <!-- TOP HEADER -->
       <header class="top-header">
-        <button type="button" class="hamburger-menu" onclick="document.querySelector('.sidebar').classList.toggle('active')" style="display:none; background:none; border:none; margin-right:15px; cursor:pointer;">
+        <button type="button" class="hamburger-menu" onclick="document.querySelector('.sidebar').classList.toggle('active'); document.querySelector('.sidebar').classList.toggle('open');" style="display:none; background:none; border:none; margin-right:15px; cursor:pointer;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="24" height="24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <form action="/search" method="GET" class="header-search">
@@ -810,7 +845,7 @@ input { font-family: inherit; }
           <button type="button" class="header-icon-btn" onclick="window.location.href='/messages'" title="Messages">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </button>
-          <a href="/profile"><img src="<?= htmlspecialchars((\App\Core\Auth::user() && !empty(\App\Core\Auth::user()->avatar)) ? \App\Core\Auth::user()->avatar : '/assets/img/mentor_elena.png') ?>" alt="Profile" class="header-profile" /></a>
+          <a href="/profile"><img src="<?= htmlspecialchars(\App\Core\View::avatarUrl(\App\Core\Auth::user()->full_name ?? 'User', \App\Core\Auth::user()->avatar ?? null)) ?>" alt="Profile" class="header-profile" /></a>
         </div>
       </header>
 

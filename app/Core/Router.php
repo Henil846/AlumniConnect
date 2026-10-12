@@ -19,7 +19,9 @@ class Router {
         ini_set('display_errors', '0');
         set_exception_handler(function(\Throwable $e) {
             http_response_code(500);
-            error_log($e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            if (strpos($e->getMessage(), 'Forced test exception') === false) {
+                error_log($e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            }
             
             if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
                 header('Content-Type: application/json');
@@ -40,10 +42,12 @@ class Router {
         });
 
         // Add Global Security Headers
-        header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com");
+        header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:;");
         header("X-Frame-Options: DENY");
         header("X-Content-Type-Options: nosniff");
         header("Referrer-Policy: strict-origin-when-cross-origin");
+        header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+        header("X-XSS-Protection: 1; mode=block");
 
         // Exact match
         if (isset(self::$routes[$method][$uri])) {

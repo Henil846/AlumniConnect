@@ -367,7 +367,7 @@ textarea.form-textarea {
     <div class="app-card">
     <div class="app-card-body profile-photo-card">
         <div class="profile-photo-wrap">
-        <img src="/assets/img/signup_side_img.png" alt="<?= htmlspecialchars($user->full_name) ?>" class="profile-photo" style="object-position:top;" />
+        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($user->full_name ?? 'User', $user->avatar ?? null)) ?>" alt="<?= htmlspecialchars($user->full_name) ?>" class="profile-photo" style="object-position:top;" />
         <button type="button" class="photo-edit-btn" onclick="alert('Profile photo update: Select a new image from settings.')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
         </button>

@@ -157,14 +157,15 @@
                 </div>
               </td>
               <td>
-                <form action="/super-admin/institutions/tier" method="POST" style="margin:0; display:inline-flex;">
+                <form action="/super-admin/institutions/tier" method="POST" class="tier-update-form" style="margin:0; display:inline-flex; align-items:center; gap:6px;">
                   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
                   <input type="hidden" name="id" value="<?= $inst->id ?>">
-                  <select name="plan" onchange="this.form.submit()" style="padding:4px 8px; border-radius:6px; font-weight:700; font-size:0.75rem; border:1px solid #cbd5e1; background:#f8fafc;">
+                  <select name="plan" class="tier-select" style="padding:4px 8px; border-radius:6px; font-weight:700; font-size:0.75rem; border:1px solid #cbd5e1; background:#f8fafc;">
                     <option value="Starter" <?= ($inst->plan ?? 'Starter') === 'Starter' ? 'selected' : '' ?>>Starter</option>
                     <option value="Growth" <?= ($inst->plan ?? '') === 'Growth' ? 'selected' : '' ?>>Growth</option>
                     <option value="Enterprise" <?= ($inst->plan ?? '') === 'Enterprise' ? 'selected' : '' ?>>Enterprise</option>
                   </select>
+                  <button type="submit" class="btn-tier-upgrade" style="padding:4px 8px; font-size:0.75rem; font-weight:700; background:#0f172a; color:#fff; border:none; border-radius:6px; cursor:pointer;">Update</button>
                 </form>
               </td>
               <td>

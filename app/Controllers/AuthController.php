@@ -28,15 +28,25 @@ class AuthController {
             return;
         }
 
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $email = $_POST['email'] ?? '';
+        if ($this->userRepo->isRateLimited('signup', $email, $ip, 5)) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many registration attempts. Please try again later.']);
+            return;
+        }
+
         $errors = AuthValidator::validateSignup($_POST);
         
         if (!empty($errors)) {
+            $this->userRepo->logAttempt('signup', $email, $ip);
             echo json_encode(['success' => false, 'errors' => $errors]);
             return;
         }
 
         $existingUser = $this->userRepo->findByEmail($_POST['email']);
         if ($existingUser) {
+            $this->userRepo->logAttempt('signup', $email, $ip);
             echo json_encode(['success' => false, 'message' => 'Email already registered.']);
             return;
         }
@@ -44,9 +54,9 @@ class AuthController {
         $user = new User([
             'full_name' => $_POST['fullName'],
             'email' => $_POST['email'],
-            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+            'password' => password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]),
             'role' => $_POST['role'],
-            'college_id' => 1, // Defaulting to 1 for now or get from request
+            'college_id' => !empty($_POST['college_id']) ? intval($_POST['college_id']) : 1,
             'is_verified' => 0
         ]);
 
@@ -128,6 +138,12 @@ class AuthController {
 
         $this->userRepo->clearLoginAttempts($email);
 
+        // Regenerate session id on login to prevent session fixation
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        session_regenerate_id(true);
+
         $token = JwtService::encode([
             'id' => $user->id,
             'role' => $user->role,
@@ -138,9 +154,24 @@ class AuthController {
         $refreshToken = bin2hex(random_bytes(32));
         $this->userRepo->createSession($user->id, $refreshToken);
 
-        // Set cookies
-        setcookie('auth_token', $token, time() + (86400 * 7), '/', '', false, true);
-        setcookie('refresh_token', $refreshToken, time() + (86400 * 30), '/', '', false, true);
+        // Set cookies with HttpOnly, SameSite=Lax, and conditional Secure flag
+        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        setcookie('auth_token', $token, [
+            'expires' => time() + (86400 * 7),
+            'path' => '/',
+            'domain' => '',
+            'secure' => $isSecure,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+        setcookie('refresh_token', $refreshToken, [
+            'expires' => time() + (86400 * 30),
+            'path' => '/',
+            'domain' => '',
+            'secure' => $isSecure,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
 
         // Determine role-based landing page or safe return URL
         $redirect = '/dashboard';
@@ -197,7 +228,15 @@ class AuthController {
     }
 
     public function showVerify() {
-        return View::render('auth/verify', ['title' => 'Verify Email'], 'auth');
+        $csrf = $_COOKIE['csrf_token'] ?? bin2hex(random_bytes(32));
+        $_COOKIE['csrf_token'] = $csrf;
+        setcookie('csrf_token', $csrf, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+        return View::render('auth/verify', ['title' => 'Verify Email', 'csrf' => $csrf], 'auth');
     }
 
     public function processVerify() {
@@ -206,12 +245,21 @@ class AuthController {
             echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
             return;
         }
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $email = $_POST['email'] ?? '';
         $otp = $_POST['otp'] ?? '';
+
+        if ($this->userRepo->isRateLimited('verify', $email, $ip, 5)) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many verification attempts. Please try again later.']);
+            return;
+        }
+
         $user = $this->userRepo->findByEmail($email);
         if ($user && $this->userRepo->verifyEmail($user->id, $otp)) {
             echo json_encode(['success' => true, 'message' => 'Verified successfully!', 'redirect' => '/login']);
         } else {
+            $this->userRepo->logAttempt('verify', $email, $ip);
             echo json_encode(['success' => false, 'message' => 'Invalid or expired OTP.']);
         }
     }
@@ -226,7 +274,16 @@ class AuthController {
             echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
             return;
         }
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $email = $_POST['email'] ?? '';
+
+        if ($this->userRepo->isRateLimited('forgot_password', $email, $ip, 5)) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many password reset requests. Please try again later.']);
+            return;
+        }
+        $this->userRepo->logAttempt('forgot_password', $email, $ip);
+
         $user = $this->userRepo->findByEmail($email);
         if ($user) {
             $token = bin2hex(random_bytes(32));
@@ -247,15 +304,24 @@ class AuthController {
             echo json_encode(['success' => false, 'message' => 'CSRF validation failed.']);
             return;
         }
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $token = $_POST['token'] ?? '';
         $password = $_POST['password'] ?? '';
+
+        if ($this->userRepo->isRateLimited('reset_password', $token, $ip, 5)) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => 'Too many password reset attempts. Please try again later.']);
+            return;
+        }
+
         if (strlen($password) < 8) {
             echo json_encode(['success' => false, 'message' => 'Password too short.']);
             return;
         }
-        if ($this->userRepo->usePasswordReset($token, password_hash($password, PASSWORD_DEFAULT))) {
+        if ($this->userRepo->usePasswordReset($token, password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]))) {
             echo json_encode(['success' => true, 'message' => 'Password reset successfully.', 'redirect' => '/login']);
         } else {
+            $this->userRepo->logAttempt('reset_password', $token, $ip);
             echo json_encode(['success' => false, 'message' => 'Invalid or expired token.']);
         }
     }

@@ -2,10 +2,14 @@
 .env
 /storage/logs/*
 !/storage/logs/.gitkeep
-/database/database.sqlite
-/database/test.sqlite
+/database/*.sqlite
+/database/*.sqlite-wal
+/database/*.sqlite-shm
+/database/*.bak
+/database/backups/*
+!/database/backups/.gitkeep
 /storage/rate_limits.json
 /node_modules/
-/database/*.bak
 /public/uploads/resumes/*
 !/public/uploads/resumes/.gitkeep
+/tools/smoke_output.txt

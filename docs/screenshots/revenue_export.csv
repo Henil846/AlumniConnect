@@ -1,0 +1,10 @@
+ID,"Donor Name",Amount,Currency,"Campaign Title",College,"Transaction ID",Status,Date
+9,"Aarav Patel",50,USD,"Alumni Endowed Scholarship Fund 2026","Indian Institute of Technology Bombay",TXN_6ACD190596E03,completed,"2026-10-12 17:29:41"
+8,"Aarav Patel",5000,USD,"Campus DeepTech Prototyping Cleanroom","Indian Institute of Technology Bombay",TXN_6ACD159F9FBBE,completed,"2026-10-12 17:15:11"
+7,"Aarav Patel",500,USD,"Campus DeepTech Prototyping Cleanroom","Indian Institute of Technology Bombay",TXN_6ACD15913390B,failed,"2026-10-12 17:14:57"
+1,"Pooja Iyer",100000,USD,"Alumni Endowed Scholarship Fund 2026","Indian Institute of Technology Bombay",TXN_SEED_DON_001,completed,"2026-10-12 14:51:16"
+2,"Rahul Mehra",250000,USD,"Alumni Endowed Scholarship Fund 2026","Indian Institute of Technology Bombay",TXN_SEED_DON_002,completed,"2026-10-12 14:51:16"
+3,"Sameer Kulkarni",500000,USD,"Campus DeepTech Prototyping Cleanroom","Indian Institute of Technology Bombay",TXN_SEED_DON_003,completed,"2026-10-12 14:51:16"
+4,"Divya Krishnan",50000,USD,"Rural STEM Education & Outreach Initiative","Indian Institute of Technology Bombay",TXN_SEED_DON_004,completed,"2026-10-12 14:51:16"
+5,"Ananya Verma",75000,USD,"BITS Innovation Hub Seed Corpus","Birla Institute of Technology and Science, Pilani",TXN_SEED_DON_005,completed,"2026-10-12 14:51:16"
+6,"Harsh Vardhan",200000,USD,"BITS Innovation Hub Seed Corpus","Birla Institute of Technology and Science, Pilani",TXN_SEED_DON_006,completed,"2026-10-12 14:51:16"

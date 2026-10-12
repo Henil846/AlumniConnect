@@ -1,0 +1,446 @@
+[
+    {
+        "method": "GET",
+        "path": "\/signup"
+    },
+    {
+        "method": "POST",
+        "path": "\/signup"
+    },
+    {
+        "method": "GET",
+        "path": "\/login"
+    },
+    {
+        "method": "POST",
+        "path": "\/login"
+    },
+    {
+        "method": "POST",
+        "path": "\/logout"
+    },
+    {
+        "method": "POST",
+        "path": "\/logout-all"
+    },
+    {
+        "method": "GET",
+        "path": "\/verify"
+    },
+    {
+        "method": "POST",
+        "path": "\/verify"
+    },
+    {
+        "method": "GET",
+        "path": "\/forgot-password"
+    },
+    {
+        "method": "POST",
+        "path": "\/forgot-password"
+    },
+    {
+        "method": "GET",
+        "path": "\/reset-password"
+    },
+    {
+        "method": "POST",
+        "path": "\/reset-password"
+    },
+    {
+        "method": "GET",
+        "path": "\/dev\/mailbox"
+    },
+    {
+        "method": "GET",
+        "path": "\/dev\/selftest-error"
+    },
+    {
+        "method": "GET",
+        "path": "\/dev\/selftest-empty"
+    },
+    {
+        "method": "GET",
+        "path": "\/dev\/forced-exception"
+    },
+    {
+        "method": "GET",
+        "path": "\/dev\/display-errors-check"
+    },
+    {
+        "method": "GET",
+        "path": "\/dashboard"
+    },
+    {
+        "method": "GET",
+        "path": "\/profile"
+    },
+    {
+        "method": "POST",
+        "path": "\/profile\/update"
+    },
+    {
+        "method": "GET",
+        "path": "\/profile\/{id}"
+    },
+    {
+        "method": "GET",
+        "path": "\/directory"
+    },
+    {
+        "method": "GET",
+        "path": "\/mentorship"
+    },
+    {
+        "method": "POST",
+        "path": "\/mentorship\/book"
+    },
+    {
+        "method": "POST",
+        "path": "\/mentorship\/update-status"
+    },
+    {
+        "method": "POST",
+        "path": "\/mentorship\/cancel"
+    },
+    {
+        "method": "GET",
+        "path": "\/referral-request"
+    },
+    {
+        "method": "GET",
+        "path": "\/referrals"
+    },
+    {
+        "method": "GET",
+        "path": "\/manage-referrals"
+    },
+    {
+        "method": "POST",
+        "path": "\/referral-request\/submit"
+    },
+    {
+        "method": "POST",
+        "path": "\/referral-request\/update-status"
+    },
+    {
+        "method": "GET",
+        "path": "\/jobs"
+    },
+    {
+        "method": "POST",
+        "path": "\/jobs\/apply"
+    },
+    {
+        "method": "POST",
+        "path": "\/jobs\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/jobs\/delete"
+    },
+    {
+        "method": "POST",
+        "path": "\/jobs\/edit"
+    },
+    {
+        "method": "GET",
+        "path": "\/events"
+    },
+    {
+        "method": "POST",
+        "path": "\/events\/register"
+    },
+    {
+        "method": "POST",
+        "path": "\/events\/cancel"
+    },
+    {
+        "method": "GET",
+        "path": "\/events-admin"
+    },
+    {
+        "method": "POST",
+        "path": "\/events-admin\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/events-admin\/checkin"
+    },
+    {
+        "method": "POST",
+        "path": "\/events-admin\/edit"
+    },
+    {
+        "method": "POST",
+        "path": "\/events-admin\/delete"
+    },
+    {
+        "method": "GET",
+        "path": "\/events-admin\/certificate"
+    },
+    {
+        "method": "POST",
+        "path": "\/events-admin\/upload-gallery"
+    },
+    {
+        "method": "GET",
+        "path": "\/gallery"
+    },
+    {
+        "method": "GET",
+        "path": "\/community"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/post"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/like"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/comment"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/delete"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/edit"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/poll-vote"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/report"
+    },
+    {
+        "method": "POST",
+        "path": "\/community\/comment\/delete"
+    },
+    {
+        "method": "GET",
+        "path": "\/messages"
+    },
+    {
+        "method": "POST",
+        "path": "\/messages\/send"
+    },
+    {
+        "method": "POST",
+        "path": "\/messages\/delete"
+    },
+    {
+        "method": "GET",
+        "path": "\/messages\/stream"
+    },
+    {
+        "method": "GET",
+        "path": "\/marketplace"
+    },
+    {
+        "method": "POST",
+        "path": "\/marketplace\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/marketplace\/delete"
+    },
+    {
+        "method": "POST",
+        "path": "\/marketplace\/edit"
+    },
+    {
+        "method": "GET",
+        "path": "\/donations"
+    },
+    {
+        "method": "POST",
+        "path": "\/donations\/donate"
+    },
+    {
+        "method": "GET",
+        "path": "\/payment\/checkout"
+    },
+    {
+        "method": "POST",
+        "path": "\/payment\/callback"
+    },
+    {
+        "method": "GET",
+        "path": "\/business-directory"
+    },
+    {
+        "method": "POST",
+        "path": "\/business-directory\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/business-directory\/edit"
+    },
+    {
+        "method": "POST",
+        "path": "\/business-directory\/delete"
+    },
+    {
+        "method": "GET",
+        "path": "\/startup-hub"
+    },
+    {
+        "method": "POST",
+        "path": "\/startup-hub\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/startup-hub\/edit"
+    },
+    {
+        "method": "POST",
+        "path": "\/startup-hub\/delete"
+    },
+    {
+        "method": "GET",
+        "path": "\/career-center"
+    },
+    {
+        "method": "POST",
+        "path": "\/career-center\/create"
+    },
+    {
+        "method": "GET",
+        "path": "\/notifications"
+    },
+    {
+        "method": "POST",
+        "path": "\/notifications\/mark-read"
+    },
+    {
+        "method": "POST",
+        "path": "\/notifications\/mark-all-read"
+    },
+    {
+        "method": "GET",
+        "path": "\/rewards"
+    },
+    {
+        "method": "POST",
+        "path": "\/rewards\/award"
+    },
+    {
+        "method": "GET",
+        "path": "\/ads"
+    },
+    {
+        "method": "POST",
+        "path": "\/ads\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/ads\/disable"
+    },
+    {
+        "method": "GET",
+        "path": "\/help"
+    },
+    {
+        "method": "GET",
+        "path": "\/admin\/dashboard"
+    },
+    {
+        "method": "GET",
+        "path": "\/admin\/users"
+    },
+    {
+        "method": "GET",
+        "path": "\/admin\/moderation"
+    },
+    {
+        "method": "POST",
+        "path": "\/admin\/moderation\/resolve"
+    },
+    {
+        "method": "GET",
+        "path": "\/admin\/payments"
+    },
+    {
+        "method": "GET",
+        "path": "\/admin\/analytics"
+    },
+    {
+        "method": "POST",
+        "path": "\/admin\/users\/status"
+    },
+    {
+        "method": "POST",
+        "path": "\/admin\/users\/role"
+    },
+    {
+        "method": "GET",
+        "path": "\/settings"
+    },
+    {
+        "method": "POST",
+        "path": "\/settings\/update"
+    },
+    {
+        "method": "GET",
+        "path": "\/terms"
+    },
+    {
+        "method": "GET",
+        "path": "\/privacy"
+    },
+    {
+        "method": "GET",
+        "path": "\/search"
+    },
+    {
+        "method": "GET",
+        "path": "\/super-admin\/dashboard"
+    },
+    {
+        "method": "GET",
+        "path": "\/super-admin\/analytics"
+    },
+    {
+        "method": "GET",
+        "path": "\/super-admin\/institutions"
+    },
+    {
+        "method": "POST",
+        "path": "\/super-admin\/institutions\/create"
+    },
+    {
+        "method": "POST",
+        "path": "\/super-admin\/institutions\/status"
+    },
+    {
+        "method": "POST",
+        "path": "\/super-admin\/institutions\/tier"
+    },
+    {
+        "method": "POST",
+        "path": "\/super-admin\/users\/verify"
+    },
+    {
+        "method": "POST",
+        "path": "\/super-admin\/users\/decline"
+    },
+    {
+        "method": "GET",
+        "path": "\/super-admin\/revenue"
+    },
+    {
+        "method": "GET",
+        "path": "\/super-admin\/settings"
+    },
+    {
+        "method": "GET",
+        "path": "\/"
+    }
+]

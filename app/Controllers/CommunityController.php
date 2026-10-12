@@ -6,10 +6,15 @@ use App\Core\Database;
 
 class CommunityController {
     public function index() {
-        $pdo = Database::getConnection();
-        $userId = \App\Core\Auth::id() ?? null; // Adjust according to AuthMiddleware
+        $user = \App\Core\Auth::user();
+        if (!$user) {
+            header("Location: /login?return=/community");
+            exit;
+        }
 
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $pdo = Database::getConnection();
+        $userId = $user->id;
+        $collegeId = $user->college_id;
 
         $stmt = $pdo->prepare("
             SELECT p.*, u.full_name, u.role, u.college_id as user_college_id,
@@ -68,7 +73,7 @@ class CommunityController {
         }
 
         $pdo = Database::getConnection();
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
         $stmt = $pdo->prepare("INSERT INTO posts (user_id, content, image_url, college_id) VALUES (?, ?, ?, ?)");
         $stmt->execute([$userId, $content, $imageUrl, $collegeId]);
 
@@ -83,7 +88,7 @@ class CommunityController {
 
         $pdo = Database::getConnection();
         
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
         $check = $pdo->prepare("SELECT id FROM posts WHERE id = ? AND college_id = ?");
         $check->execute([$postId, $collegeId]);
         if (!$check->fetch()) {
@@ -112,7 +117,7 @@ class CommunityController {
         if ($content && $postId) {
             $pdo = Database::getConnection();
             
-            $collegeId = \App\Core\Auth::user()->college_id ?? null;
+            $collegeId = \App\Core\Auth::user()?->college_id ?? null;
             $check = $pdo->prepare("SELECT id FROM posts WHERE id = ? AND college_id = ?");
             $check->execute([$postId, $collegeId]);
             if (!$check->fetch()) {
@@ -132,8 +137,8 @@ class CommunityController {
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");
         $postId = (int)($_POST['post_id'] ?? 0);
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
-        $role = \App\Core\Auth::user()->role ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
+        $role = \App\Core\Auth::user()?->role ?? null;
         
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = ?");
@@ -159,7 +164,7 @@ class CommunityController {
         if (!$userId) die("Unauthorized");
         $postId = (int)($_POST['post_id'] ?? 0);
         $content = trim($_POST['content'] ?? '');
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
         
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = ?");
@@ -185,7 +190,7 @@ class CommunityController {
         if (!$userId) die("Unauthorized");
         $postId = (int)($_POST['post_id'] ?? 0);
         $option = trim($_POST['option'] ?? 'Option A');
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
 
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("SELECT id FROM posts WHERE id = ? AND college_id = ?");
@@ -206,8 +211,8 @@ class CommunityController {
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");
         $commentId = (int)($_POST['comment_id'] ?? 0);
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
-        $role = \App\Core\Auth::user()->role ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
+        $role = \App\Core\Auth::user()?->role ?? null;
 
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("SELECT c.*, p.college_id as post_college_id FROM post_comments c JOIN posts p ON c.post_id = p.id WHERE c.id = ?");
@@ -233,7 +238,7 @@ class CommunityController {
         }
         $userId = \App\Core\Auth::id() ?? null;
         if (!$userId) die("Unauthorized");
-        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $collegeId = \App\Core\Auth::user()?->college_id ?? null;
         
         $itemType = trim($_POST['reported_item_type'] ?? 'post');
         $itemId = (int)($_POST['reported_item_id'] ?? 0);
@@ -249,7 +254,7 @@ class CommunityController {
         $adminStmt->execute([$collegeId]);
         $adminId = $adminStmt->fetchColumn();
         if ($adminId) {
-            $reporterName = \App\Core\Auth::user()->full_name ?? 'A user';
+            $reporterName = \App\Core\Auth::user()?->full_name ?? 'A user';
             $notifStmt = $pdo->prepare("INSERT INTO notifications (user_id, type, message, college_id, link) VALUES (?, 'moderation', ?, ?, '/admin/moderation')");
             $notifStmt->execute([$adminId, "New content report submitted by $reporterName.", $collegeId]);
         }

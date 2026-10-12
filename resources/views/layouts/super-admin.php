@@ -981,8 +981,9 @@ body {
 
 @media(max-width: 768px) {
   #mobileMenuBtn { display: block !important; }
-  .admin-sidebar { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 10000; transition: left 0.3s ease; }
-  .admin-sidebar.mobile-open { left: 0; }
+  .admin-sidebar { position: fixed !important; left: -100% !important; top: 0 !important; bottom: 0 !important; width: 280px !important; z-index: 999999 !important; transition: none !important; }
+  .admin-sidebar.mobile-open, .admin-sidebar.open, .admin-sidebar.active { left: 0 !important; display: flex !important; visibility: visible !important; opacity: 1 !important; }
+  .admin-sidebar.mobile-open .admin-nav, .admin-sidebar.open .admin-nav, .admin-sidebar.active .admin-nav { display: flex !important; visibility: visible !important; flex-direction: column !important; }
 }
 </style>
 </head>
@@ -1009,6 +1010,18 @@ body {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             Institutions
           </a>
+          <a href="/super-admin/colleges" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-colleges' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Colleges
+          </a>
+          <a href="/super-admin/users" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-users' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Users
+          </a>
+          <a href="/super-admin/ads" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-ads' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            Advertisements
+          </a>
           <a href="/super-admin/analytics" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-analytics' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             Analytics
@@ -1016,6 +1029,10 @@ body {
           <a href="/super-admin/revenue" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-revenue' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Revenue
+          </a>
+          <a href="/super-admin/security" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-security' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Security
           </a>
           <a href="/super-admin/settings" class="admin-nav-item <?= ($activePage ?? '') === 'super-admin-settings' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>

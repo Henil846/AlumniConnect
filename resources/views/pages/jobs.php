@@ -46,9 +46,58 @@
     <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:4px;">Discover Your Path</h2>
     <p class="text-xs text-muted mb-0">Showing <?= count($jobs) ?> jobs tailored to your background</p>
     </div>
+    <div style="display:flex; gap:12px; align-items:center;">
+    <button type="button" class="btn-primary btn-post-job-open" onclick="document.getElementById('post-job-modal').style.display='flex'" style="padding:8px 16px; font-size:0.85rem; font-weight:700;">+ Post a Job</button>
     <div style="display:flex; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-white); overflow:hidden;">
     <button type="button" onclick="document.querySelectorAll('.job-card-full').forEach(c => c.style.padding='20px')" style="padding:8px; background:var(--color-bg); border:none; cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
     <button type="button" onclick="document.querySelectorAll('.job-card-full').forEach(c => c.style.padding='12px')" style="padding:8px; background:transparent; border:none; border-left:1px solid var(--color-border); cursor:pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+    </div>
+    </div>
+</div>
+
+<div id="post-job-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:12px; width:100%; max-width:540px; padding:28px; position:relative; max-height:90vh; overflow-y:auto;">
+        <button type="button" onclick="document.getElementById('post-job-modal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
+        <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:16px;">Post a New Job Opportunity</h3>
+        <form method="POST" action="/jobs/create" id="post-job-form" style="display:flex; flex-direction:column; gap:12px;">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+            <div>
+                <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Job Title</label>
+                <input type="text" name="title" required placeholder="e.g. Lead Systems Engineer" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;">
+            </div>
+            <div>
+                <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Company Name</label>
+                <input type="text" name="company" required placeholder="e.g. TechCorp Labs" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;">
+            </div>
+            <div style="display:flex; gap:12px;">
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Location</label>
+                    <input type="text" name="location" value="Bengaluru / Remote" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Type</label>
+                    <select name="type" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;">
+                        <option value="Full-time">Full-time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Salary Range</label>
+                <input type="text" name="salary_range" value="₹25 - ₹40 LPA" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;">
+            </div>
+            <div>
+                <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Role Description</label>
+                <textarea name="description" rows="3" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;" placeholder="Overview of responsibilities...">Lead core engineering modules and scaling pipelines.</textarea>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Requirements</label>
+                <textarea name="requirements" rows="2" style="width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:6px; font-size:0.9rem;" placeholder="Key qualifications...">Strong backend architecture, distributed systems.</textarea>
+            </div>
+            <button type="submit" class="btn-primary btn-submit-job" style="margin-top:8px; padding:12px; font-weight:700; cursor:pointer;">Publish Job Opportunity</button>
+        </form>
     </div>
 </div>
 
@@ -137,7 +186,7 @@
 <form method="POST" action="/jobs/apply" style="display:flex; gap:12px; position:sticky; bottom:0; padding-top:16px; background:var(--color-white); border-top:1px solid var(--color-border);">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
     <input type="hidden" name="job_id" value="<?= $selectedJob->id ?>">
-    <button type="submit" class="btn-primary" style="flex:1; padding:14px; font-size:1rem;">Apply Now</button>
+    <button type="submit" class="btn-primary btn-apply-job" style="flex:1; padding:14px; font-size:1rem; cursor:pointer;">Apply Now</button>
 </form>
 <?php endif; ?>
 

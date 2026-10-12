@@ -519,7 +519,7 @@ a { text-decoration: none; }
 
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
-    <a href="index.html" class="logo">
+    <a href="/" class="logo">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
       </div>
@@ -667,16 +667,16 @@ a { text-decoration: none; }
   <!-- FOOTER -->
   <footer class="footer" id="footer">
     <div class="footer-container">
-      <a href="index.html" class="logo footer-logo">
+      <a href="/" class="logo footer-logo">
         <div class="logo-icon">
           <svg viewBox="0 0 24 24" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
         </div>
         Alumni Connect
       </a>
       <div class="footer-links">
-        <a href="#" id="footerPrivacy">Privacy Policy</a>
-        <a href="#" id="footerTerms">Terms of Service</a>
-        <a href="#" id="footerContact">Contact</a>
+        <a href="/privacy" id="footerPrivacy">Privacy Policy</a>
+        <a href="/terms" id="footerTerms">Terms of Service</a>
+        <a href="mailto:support@alumni.test" id="footerContact">Contact</a>
       </div>
       <p class="footer-copy">© 2024 Alumni Connect Platform. Built for the Modern Professional.</p>
     </div>

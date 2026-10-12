@@ -1,6 +1,7 @@
 <span class="eyebrow">CAREER ACCELERATION</span>
 <h1 class="page-title">Request a Referral</h1>
 <p class="page-subtitle">Connect with our esteemed alumni at top global firms. A direct referral increases your chances of landing an interview by 4x.</p>
+<div style="margin-bottom:20px;"><a href="/manage-referrals" style="font-size:0.85rem; font-weight:700; color:var(--color-primary); text-decoration:none;">View &amp; Manage Referrals →</a></div>
 
 <div class="layout-2col">
     
@@ -43,7 +44,7 @@
         <h5 class="font-semibold text-md mb-1">Upload your PDF here</h5>
         <p class="text-xs text-muted">or click to browse from your device (Max 5MB)</p>
         </div>
-        <input type="file" name="resume" accept=".pdf,.doc,.docx" required style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="this.previousElementSibling.querySelector('h5').innerText = this.files[0].name">
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="this.previousElementSibling.querySelector('h5').innerText = this.files[0].name">
     </div>
 
     <div class="step-header">
@@ -87,8 +88,8 @@
         </div>
         <p class="text-xs text-muted mb-3" style="line-height:1.5;">Request sent to Alumni **David K.** on Oct 24, 2023. Average response time: 2 days.</p>
         <div class="avatar-stack">
-        <img src="/assets/img/mentor_marcus.png" alt="av" />
-        <img src="/assets/img/mentor_elena.png" alt="av" />
+        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl('Member A', null)) ?>" alt="av" />
+        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl('Member B', null)) ?>" alt="av" />
         <div style="width:32px; height:32px; border-radius:50%; background:var(--color-bg); border:2px solid var(--color-white); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700; margin-left:-10px; color:var(--color-text-muted);">+12</div>
         </div>
     </div>

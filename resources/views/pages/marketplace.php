@@ -503,7 +503,7 @@
         <h2 class="font-bold text-xl mb-1">Marketplace</h2>
         <p class="text-sm text-muted">Buy, sell, or trade items with fellow alumni.</p>
     </div>
-    <button onclick="document.getElementById('create-modal').style.display='flex'" class="btn btn-primary" style="background:#0f172a; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600;">Post an Item</button>
+    <button onclick="document.getElementById('create-modal').style.display='flex'" class="btn btn-primary btn-post-item" style="background:#0f172a; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600;">Post an Item</button>
 </div>
 
 <?php if (isset($_GET['posted'])): ?>
@@ -555,7 +555,7 @@
                                 <span style="font-size:0.75rem; color:var(--color-text-muted);"><?= date('M j, Y', strtotime($item->created_at)) ?></span>
                             </div>
                             <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--color-border); padding-top:16px;">
-                                <img src="/assets/img/signup_side_img.png" alt="" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
+                                <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($item->author_name ?? 'Seller', null)) ?>" alt="" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
                                 <span style="font-size:0.85rem; font-weight:600; color:#334155;"><?= htmlspecialchars($item->author_name) ?></span>
                                 <a href="/messages?user_id=<?= $item->user_id ?>" style="margin-left:auto; font-size:0.8rem; font-weight:700; color:#2563eb; text-decoration:none;">Contact</a>
                             </div>

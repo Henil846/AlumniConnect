@@ -6,7 +6,21 @@ use App\Core\Database;
 use Dompdf\Dompdf;
 
 class EventsAdminController {
+    private function checkAdmin() {
+        $role = \App\Core\Auth::user()->role ?? null;
+        if ($role !== 'admin' && $role !== 'college_admin' && $role !== 'super_admin') {
+            http_response_code(403);
+            try {
+                \App\Core\View::render('errors/403', ['title' => 'Access Forbidden — Alumni Connect', 'activePage' => ''], 'app');
+            } catch (\Throwable $t) {
+                echo "Unauthorized: Events Admin access required.";
+            }
+            exit;
+        }
+    }
+
     public function index() {
+        $this->checkAdmin();
         $pdo = Database::getConnection();
         
         $sql = "SELECT * FROM events ORDER BY date ASC";
@@ -48,6 +62,7 @@ class EventsAdminController {
     }
 
     public function checkin() {
+        $this->checkAdmin();
         $qr = trim($_POST['qr_code'] ?? '');
         if (!$qr) {
             header("Location: /events-admin?error=Empty+QR+Code");
@@ -110,7 +125,11 @@ class EventsAdminController {
             </div>
         ";
 
-        if (class_exists(Dompdf::class)) {
+        $isTesting = (\App\Core\Env::get('APP_ENV', 'production') === 'testing');
+        $engine = $isTesting ? ($_GET['engine'] ?? null) : null;
+        $useFallback = ($engine === 'fallback' || !class_exists(Dompdf::class));
+
+        if (!$useFallback && class_exists(Dompdf::class)) {
             $dompdf = new Dompdf();
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
@@ -119,29 +138,83 @@ class EventsAdminController {
             exit;
         }
 
-        // Pure-PHP zero-dependency valid PDF-1.4 stream fallback when vendor is not installed
+        // Pure-PHP zero-dependency structurally valid PDF-1.4 stream fallback
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="certificate_' . rawurlencode($data->full_name) . '.pdf"');
         $cleanName = addcslashes($data->full_name, '()\\');
         $cleanTitle = addcslashes($data->event_title, '()\\');
         $cleanDate = date('F j, Y', strtotime($data->event_date));
-        $stream = "BT /F1 18 Tf 50 500 Td (Certificate of Attendance) Tj ET\n"
-                . "BT /F1 14 Tf 50 460 Td (Presented to: " . $cleanName . ") Tj ET\n"
-                . "BT /F1 12 Tf 50 420 Td (For attending: " . $cleanTitle . ") Tj ET\n"
-                . "BT /F1 10 Tf 50 380 Td (Date: " . $cleanDate . ") Tj ET\n";
-        $len = strlen($stream);
-        $pdf = "%PDF-1.4\n"
-            . "1 0 obj<</Type /Catalog /Pages 2 0 R>>endobj\n"
-            . "2 0 obj<</Type /Pages /Kids [3 0 R] /Count 1>>endobj\n"
-            . "3 0 obj<</Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources <<>> /Contents 4 0 R>>endobj\n"
-            . "4 0 obj<</Length " . $len . ">>stream\n" . $stream . "endstream\nendobj\n"
-            . "xref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000216 00000 n \n"
-            . "trailer<</Size 5 /Root 1 0 R>>\nstartxref\n" . (270 + $len) . "\n%%EOF";
-        echo $pdf;
+
+        // Decorative borders and clear text layout
+        $stream = "0.2 0.4 0.8 rg\n"
+                . "2 w\n"
+                . "20 20 752 572 re S\n"
+                . "0.8 0.6 0.2 rg\n"
+                . "1 w\n"
+                . "25 25 742 562 re S\n"
+                . "0 0 0 rg\n"
+                . "BT\n"
+                . "/F1 28 Tf\n"
+                . "50 500 Td\n"
+                . "(Certificate of Attendance) Tj\n"
+                . "ET\n"
+                . "BT\n"
+                . "/F1 16 Tf\n"
+                . "50 440 Td\n"
+                . "(This certifies that) Tj\n"
+                . "ET\n"
+                . "BT\n"
+                . "/F1 24 Tf\n"
+                . "50 390 Td\n"
+                . "(" . $cleanName . ") Tj\n"
+                . "ET\n"
+                . "BT\n"
+                . "/F1 16 Tf\n"
+                . "50 340 Td\n"
+                . "(has successfully attended the collegiate event:) Tj\n"
+                . "ET\n"
+                . "BT\n"
+                . "/F1 20 Tf\n"
+                . "50 290 Td\n"
+                . "(" . $cleanTitle . ") Tj\n"
+                . "ET\n"
+                . "BT\n"
+                . "/F1 14 Tf\n"
+                . "50 230 Td\n"
+                . "(Date: " . $cleanDate . ") Tj\n"
+                . "ET\n";
+
+        $objects = [
+            1 => "<< /Type /Catalog /Pages 2 0 R >>",
+            2 => "<< /Type /Pages /Kids [4 0 R] /Count 1 >>",
+            3 => "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+            4 => "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 3 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>",
+            5 => "<< /Length " . strlen($stream) . " >>\nstream\n" . $stream . "endstream"
+        ];
+
+        $header = "%PDF-1.4\n%\xe2\xe3\xcf\xd3\n";
+        $body = '';
+        $xrefOffsets = [0 => 0];
+
+        foreach ($objects as $num => $obj) {
+            $xrefOffsets[$num] = strlen($header) + strlen($body);
+            $body .= "{$num} 0 obj\n{$obj}\nendobj\n";
+        }
+
+        $startXref = strlen($header) + strlen($body);
+        $xref = "xref\n0 " . (count($objects) + 1) . "\n";
+        $xref .= "0000000000 65535 f \n";
+        for ($i = 1; $i <= count($objects); $i++) {
+            $xref .= sprintf("%010d 00000 n \n", $xrefOffsets[$i]);
+        }
+
+        $trailer = "trailer\n<< /Size " . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n{$startXref}\n%%EOF\n";
+        echo $header . $body . $xref . $trailer;
         exit;
     }
 
     public function uploadGallery() {
+        $this->checkAdmin();
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
             http_response_code(403);
             die("CSRF validation failed.");
@@ -210,13 +283,9 @@ class EventsAdminController {
     }
 
     public function create() {
+        $this->checkAdmin();
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
             die("CSRF Token Verification Failed");
-        }
-        $role = \App\Core\Auth::user()->role ?? null;
-        if ($role !== 'admin' && $role !== 'college_admin' && $role !== 'super_admin') {
-            http_response_code(403);
-            die("Unauthorized to create events");
         }
         $title = trim($_POST['title'] ?? '');
         $description = trim($_POST['description'] ?? '');
@@ -228,20 +297,16 @@ class EventsAdminController {
         if ($title) {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("INSERT INTO events (title, description, date, location, type, college_id, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $date, $location, $type, $collegeId, '/assets/img/login_side_img.png']);
+            $stmt->execute([$title, $description, $date, $location, $type, $collegeId, '/assets/img/campus_cover.png']);
         }
         header("Location: /events-admin?created=1");
         exit;
     }
 
     public function edit() {
+        $this->checkAdmin();
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
             die("CSRF Token Verification Failed");
-        }
-        $role = \App\Core\Auth::user()->role ?? null;
-        if ($role !== 'admin' && $role !== 'college_admin') {
-            http_response_code(403);
-            die("Unauthorized");
         }
         $eventId = (int)($_POST['event_id'] ?? 0);
         $title = trim($_POST['title'] ?? '');
@@ -251,7 +316,7 @@ class EventsAdminController {
         $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
         $stmt->execute([$eventId]);
         $event = $stmt->fetch(\PDO::FETCH_OBJ);
-        if (!$event || $event->college_id != $collegeId) {
+        if (!$event || ($event->college_id != $collegeId && \App\Core\Auth::user()->role !== 'super_admin')) {
             http_response_code(403);
             die("Unauthorized: Event outside college");
         }
@@ -261,13 +326,9 @@ class EventsAdminController {
     }
 
     public function delete() {
+        $this->checkAdmin();
         if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
             die("CSRF Token Verification Failed");
-        }
-        $role = \App\Core\Auth::user()->role ?? null;
-        if ($role !== 'admin' && $role !== 'college_admin') {
-            http_response_code(403);
-            die("Unauthorized");
         }
         $eventId = (int)($_POST['event_id'] ?? 0);
         $collegeId = \App\Core\Auth::user()->college_id ?? null;
@@ -276,7 +337,7 @@ class EventsAdminController {
         $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
         $stmt->execute([$eventId]);
         $event = $stmt->fetch(\PDO::FETCH_OBJ);
-        if (!$event || $event->college_id != $collegeId) {
+        if (!$event || ($event->college_id != $collegeId && \App\Core\Auth::user()->role !== 'super_admin')) {
             http_response_code(403);
             die("Unauthorized: Event outside college");
         }

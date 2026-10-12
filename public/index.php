@@ -1,5 +1,12 @@
 <?php
+error_reporting(E_ALL);
 ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+$logDir = dirname(__DIR__) . '/storage/logs';
+if (!is_dir($logDir)) {
+    @mkdir($logDir, 0777, true);
+}
+ini_set('error_log', $logDir . '/php_error.log');
 
 // Basic Autoloader
 spl_autoload_register(function ($class) {
@@ -26,6 +33,10 @@ $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
 // Serve static files
 if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+    if (preg_match('#^/(uploads|assets/uploads)/.*\.(php|phtml|phar|sh|py|cgi|asp|jsp)$#i', $uri)) {
+        http_response_code(403);
+        die("Direct script execution in upload directory forbidden.");
+    }
     return false;
 }
 

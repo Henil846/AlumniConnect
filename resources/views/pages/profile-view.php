@@ -275,7 +275,7 @@
 
 <div class="profile-header-info">
     <div class="profile-header-main">
-    <img src="/assets/img/mentor_marcus.png" alt="<?= htmlspecialchars($user->full_name) ?>" class="profile-header-avatar" />
+    <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($user->full_name ?? 'Alumnus', $user->avatar ?? null)) ?>" alt="<?= htmlspecialchars($user->full_name) ?>" class="profile-header-avatar" />
     <div class="profile-header-text">
         <h1><?= htmlspecialchars($user->full_name) ?></h1>
         <p><?= htmlspecialchars(ucfirst($user->role)) ?></p>

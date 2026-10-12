@@ -4,7 +4,7 @@
  * 
  * Generates a realistic, deterministic multi-tenant dataset for local development:
  * - 4 Colleges (IIT Bombay, BITS Pilani, NIT Trichy, IIT Delhi)
- * - 44 Users across 4 roles (Super Admin, College Admins, Students, Alumni)
+ * - 46 Users across 4 roles (Super Admin, College Admins, Students, Alumni)
  *   All users share the deterministic password: Password123!
  * - 18 Jobs across multiple industries and salary tiers
  * - 12 Events (upcoming & past) with attendee registrations
@@ -97,7 +97,7 @@ foreach ($colleges as $c) {
 echo "  [✓] 4 Colleges verified/updated\n";
 
 // -------------------------------------------------------------
-// 2. USERS (44 deterministic accounts)
+// 2. USERS (46 deterministic accounts)
 // -------------------------------------------------------------
 $users = [
     // --- Super Admin ---
@@ -744,8 +744,10 @@ $c2AlumniId = $userMap['alumni2@alumni.test'];
 $c2AdminId = $userMap['admin2@alumni.test'];
 $c3StudentId = $userMap['kavya.ramakrishnan@nitt.test'];
 $c3AlumniId = $userMap['suresh.kannan@nittalum.test'];
+$c3AdminId = $userMap['admin3@alumni.test'] ?? null;
 $c4StudentId = $userMap['priya.choudhary@iitd.test'];
 $c4AlumniId = $userMap['anjali.bhargava@iitdalum.test'];
+$c4AdminId = $userMap['admin4@alumni.test'] ?? null;
 
 // -------------------------------------------------------------
 // 3. JOBS (18 listings across College 1 and College 2)
@@ -1746,6 +1748,157 @@ foreach ($allUsers as $u) {
             ->execute([$u->id, $u->college_id]);
     }
 }
-echo "  [✓] Badges and User Settings configured for all 44 users\n";
+echo "  [✓] Badges and User Settings configured for all " . count($users) . " users\n";
+
+// -------------------------------------------------------------
+// 17. EVENT GALLERY (20+ items across events)
+// -------------------------------------------------------------
+$galleryDir = __DIR__ . '/../storage/gallery';
+if (!is_dir($galleryDir)) {
+    @mkdir($galleryDir, 0755, true);
+}
+$baseImg = $galleryDir . '/gallery_4_1791110324.png';
+$sampleData = file_exists($baseImg) ? file_get_contents($baseImg) : base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+
+$eventIds = $pdo->query("SELECT id, college_id FROM events ORDER BY id ASC")->fetchAll(PDO::FETCH_OBJ);
+foreach ($eventIds as $ev) {
+    for ($g = 1; $g <= 2; $g++) {
+        $filename = "gallery_event_{$ev->id}_{$g}.png";
+        $filePath = $galleryDir . '/' . $filename;
+        if (!file_exists($filePath)) {
+            file_put_contents($filePath, $sampleData);
+        }
+        $chk = $pdo->prepare("SELECT id FROM event_gallery WHERE event_id = ? AND file_path = ?");
+        $chk->execute([$ev->id, $filename]);
+        if (!$chk->fetch()) {
+            $pdo->prepare("INSERT INTO event_gallery (event_id, file_path, college_id) VALUES (?, ?, ?)")
+                ->execute([$ev->id, $filename, $ev->college_id]);
+        }
+    }
+}
+echo "  [✓] Event Gallery verified/seeded (24 items across 12 events)\n";
+
+// -------------------------------------------------------------
+// 18. MESSAGES (27 messages across roles and colleges)
+// -------------------------------------------------------------
+$messagesData = [
+    // Conversation 1: Student <-> Alumni (College 1: Aarav Patel & Pooja Iyer)
+    [$c1StudentId, $c1AlumniId, "Hi Pooja! I saw your post regarding cloud engineering openings at Microsoft. Could you take a look at my resume?", 1, 1],
+    [$c1AlumniId, $c1StudentId, "Hey Aarav! Loved your distributed telemetry project. Send over the details and I'll review it today.", 1, 1],
+    [$c1StudentId, $c1AlumniId, "Thank you so much! Just uploaded the updated PDF with Kubernetes and Go benchmarks.", 1, 1],
+    [$c1AlumniId, $c1StudentId, "Reviewed! Impressive depth in consensus protocols. I'll submit your internal referral tomorrow.", 1, 1],
+    [$c1StudentId, $c1AlumniId, "That means the world to me. Really appreciate your guidance!", 0, 1],
+
+    // Conversation 2: Student <-> Admin (College 1: Aarav Patel & Dean Sharma)
+    [$c1StudentId, $c1AdminId, "Respected Dean Sharma, is student registration open for the upcoming Alumni Tech Summit?", 1, 1],
+    [$c1AdminId, $c1StudentId, "Yes Aarav, student passes are complimentary. Please register through the portal before Friday.", 1, 1],
+    [$c1StudentId, $c1AdminId, "Registered! Thank you sir.", 1, 1],
+    [$c1AdminId, $c1StudentId, "Best of luck. Be sure to attend the keynote by Pooja Iyer.", 0, 1],
+
+    // Conversation 3: Alumni <-> Admin (College 1: Pooja Iyer & Dean Sharma)
+    [$c1AlumniId, $c1AdminId, "Good morning Dean Sharma, excited to deliver the keynote next month.", 1, 1],
+    [$c1AdminId, $c1AlumniId, "Welcome back Pooja! The main auditorium is reserved for 250 attendees. Let us know if you need AV support.", 1, 1],
+    [$c1AlumniId, $c1AdminId, "Slides are prepared and tested. Looking forward to meeting the students.", 1, 1],
+
+    // Conversation 4: Student <-> Alumni (College 2: Rohan Mehta & Vivek Nambiar)
+    [$c2StudentId, $c2AlumniId, "Hello Vivek sir, I am preparing for cloud security and DevSecOps roles. Could you share some study recommendations?", 1, 2],
+    [$c2AlumniId, $c2StudentId, "Hi Rohan! Focus on AWS IAM least-privilege policies, Terraform state locking, and container scanning tools.", 1, 2],
+    [$c2StudentId, $c2AlumniId, "Noted! Would you be available for a 30-minute mock architectural review next week?", 1, 2],
+    [$c2AlumniId, $c2StudentId, "Certainly! Send a slot booking through the Mentorship Hub.", 0, 2],
+
+    // Conversation 5: Student <-> Alumni (College 3: Kavya Ramakrishnan & Suresh Kannan)
+    [$c3StudentId, $c3AlumniId, "Respected Suresh sir, what are the primary skills recruiters look for in semiconductor verification?", 1, 3],
+    [$c3AlumniId, $c3StudentId, "Hello Kavya, SystemVerilog, UVM testbench architectures, and assertions are essential.", 1, 3],
+    [$c3StudentId, $c3AlumniId, "Thank you! I am building an AXI bus verification suite for my final project.", 1, 3],
+    [$c3AlumniId, $c3StudentId, "That's an excellent portfolio piece. Feel free to share your repo when ready.", 0, 3],
+
+    // Conversation 6: Student <-> Alumni (College 4: Priya Choudhary & Anjali Bhargava)
+    [$c4StudentId, $c4AlumniId, "Hi Anjali, big fan of your work at Zomato! Any tips for transitioning from software to ML research?", 1, 4],
+    [$c4AlumniId, $c4StudentId, "Hi Priya! Master linear algebra, PyTorch training pipelines, and reading recent conference papers.", 1, 4],
+    [$c4StudentId, $c4AlumniId, "Working on transformer fine-tuning for low-resource languages right now.", 1, 4],
+    [$c4AlumniId, $c4StudentId, "Very relevant! Submit a referral request when you're ready to apply.", 0, 4],
+
+    // Conversation 7: Alumni <-> Alumni (Peer networking: Pooja Iyer & Rahul Mehra)
+    [$c1AlumniId, $userMap['rahul.mehra@alumni.test'], "Hey Rahul, are you attending the Tech Summit panel next month?", 1, 1],
+    [$userMap['rahul.mehra@alumni.test'], $c1AlumniId, "Yes Pooja! Moderating the startup scaling session at 2 PM.", 1, 1],
+    [$c1AlumniId, $userMap['rahul.mehra@alumni.test'], "Awesome, let's catch up over coffee before the opening remarks.", 0, 1]
+];
+
+foreach ($messagesData as $m) {
+    if (!$m[0] || !$m[1]) continue;
+    $chk = $pdo->prepare("SELECT id FROM messages WHERE sender_id = ? AND receiver_id = ? AND content = ?");
+    $chk->execute([$m[0], $m[1], $m[2]]);
+    if (!$chk->fetch()) {
+        $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, is_read, college_id) VALUES (?, ?, ?, ?, ?)")
+            ->execute([$m[0], $m[1], $m[2], $m[3], $m[4]]);
+    }
+}
+echo "  [✓] " . count($messagesData) . " Deterministic messages verified/seeded across 7 active threads\n";
+
+// -------------------------------------------------------------
+// 19. NOTIFICATIONS (36 notifications across all roles)
+// -------------------------------------------------------------
+$notificationsData = [
+    // Student Notifications (College 1)
+    [$c1StudentId, 'mentorship', 'Pooja Iyer accepted your mentorship session request.', 1, '/mentorship', 1],
+    [$c1StudentId, 'message', 'You have a new message from Pooja Iyer.', 0, "/messages?user_id={$c1AlumniId}", 1],
+    [$c1StudentId, 'referral', 'Your referral request for Microsoft has been marked as submitted.', 1, '/referrals', 1],
+    [$c1StudentId, 'event', 'Registration confirmed: Annual Alumni Tech Summit 2026.', 1, '/events', 1],
+    [$c1StudentId, 'job', 'New job alert: Cloud Infrastructure Engineer at Microsoft India matches your profile.', 0, '/jobs', 1],
+    [$c1StudentId, 'reward', 'Congratulations! You earned the Campus Pioneer badge (+50 points).', 1, '/rewards', 1],
+    [$c1StudentId, 'community', 'Pooja Iyer and 2 others liked your community post on IoT telemetry.', 1, '/community', 1],
+    [$c1StudentId, 'message', 'Dean K. Sharma replied to your query regarding summit passes.', 0, "/messages?user_id={$c1AdminId}", 1],
+
+    // Alumni Notifications (College 1)
+    [$c1AlumniId, 'referral', 'New referral request received from Aarav Patel for Microsoft.', 1, '/referrals', 1],
+    [$c1AlumniId, 'mentorship', 'New mentorship request received from Aarav Patel.', 1, '/mentorship', 1],
+    [$c1AlumniId, 'message', 'You have a new message from Aarav Patel.', 0, "/messages?user_id={$c1StudentId}", 1],
+    [$c1AlumniId, 'event', 'Speaker Invitation: Keynote address at Annual Alumni Tech Summit 2026.', 1, '/events', 1],
+    [$c1AlumniId, 'reward', 'You were awarded the Distinguished Mentor badge (+100 points).', 1, '/rewards', 1],
+    [$c1AlumniId, 'donation', 'Thank you for your generous contribution of ₹5,000 to the Endowment Fund.', 1, '/donations', 1],
+    [$c1AlumniId, 'community', 'Aarav Patel commented on your hiring announcement post.', 1, '/community', 1],
+    [$c1AlumniId, 'message', 'Rahul Mehra sent you a direct message.', 0, "/messages?user_id={$userMap['rahul.mehra@alumni.test']}", 1],
+
+    // College Admin Notifications (College 1)
+    [$c1AdminId, 'event', 'Aarav Patel registered for Annual Alumni Tech Summit 2026.', 1, '/events-admin', 1],
+    [$c1AdminId, 'donation', 'New donation received: ₹5,000 for Student Scholarship Endowment Fund.', 1, '/admin/donations', 1],
+    [$c1AdminId, 'moderation', 'Community feed report received: Post #4 flagged for review.', 0, '/admin/moderation', 1],
+    [$c1AdminId, 'user', 'New user registered: Tanvi Kulkarni joined IIT Bombay campus.', 1, '/admin/users', 1],
+    [$c1AdminId, 'message', 'You have a new inquiry from Aarav Patel.', 1, "/messages?user_id={$c1StudentId}", 1],
+    [$c1AdminId, 'analytics', 'Monthly alumni engagement report is now ready for download.', 0, '/admin/analytics', 1],
+
+    // Super Admin Notifications
+    [1, 'system', '4 colleges currently active across the platform.', 1, '/super-admin/institutions', 1],
+    [1, 'billing', 'Monthly platform SaaS subscription invoice generated for IIT Bombay (Enterprise).', 1, '/super-admin/revenue', 1],
+    [1, 'system', 'Platform security audit completed: 0 critical vulnerabilities.', 1, '/super-admin/settings', 1],
+    [1, 'institution', 'BITS Pilani campus upgraded to Growth plan.', 1, '/super-admin/institutions', 1],
+
+    // College 2 Notifications (BITS Pilani)
+    [$c2StudentId, 'mentorship', 'Vivek Nambiar responded to your DevSecOps mentorship inquiry.', 0, '/mentorship', 2],
+    [$c2StudentId, 'event', 'Showcase alert: BITS Pilani Global Founders Showcase 2026 starts in 20 days.', 1, '/events', 2],
+    [$c2AlumniId, 'referral', 'Referral request submitted on behalf of Rohan Mehta.', 1, '/referrals', 2],
+    [$c2AdminId, 'user', '12 new students enrolled in BITS Pilani network this month.', 1, '/admin/users', 2],
+
+    // College 3 Notifications (NIT Trichy)
+    [$c3StudentId, 'mentorship', 'Suresh Kannan shared VLSI verification resources.', 0, '/mentorship', 3],
+    [$c3AlumniId, 'event', 'NIT Trichy Golden Jubilee Alumni Meet scheduled for November.', 1, '/events', 3],
+    [$c3AdminId, 'donation', 'Alumni contribution of ₹25,000 received for Lab Equipment Fund.', 1, '/admin/donations', 3],
+
+    // College 4 Notifications (IIT Delhi)
+    [$c4StudentId, 'message', 'Anjali Bhargava shared ML research guidance with you.', 0, "/messages?user_id={$c4AlumniId}", 4],
+    [$c4AlumniId, 'mentorship', 'New student mentorship connection requested by Priya Choudhary.', 1, '/mentorship', 4],
+    [$c4AdminId, 'moderation', 'All moderation queue items resolved for the week.', 1, '/admin/moderation', 4]
+];
+
+foreach ($notificationsData as $n) {
+    if (!$n[0]) continue;
+    $chk = $pdo->prepare("SELECT id FROM notifications WHERE user_id = ? AND message = ?");
+    $chk->execute([$n[0], $n[2]]);
+    if (!$chk->fetch()) {
+        $pdo->prepare("INSERT INTO notifications (user_id, type, message, is_read, link, college_id) VALUES (?, ?, ?, ?, ?, ?)")
+            ->execute([$n[0], $n[1], $n[2], $n[3], $n[4], $n[5]]);
+    }
+}
+echo "  [✓] " . count($notificationsData) . " Deterministic notifications verified/seeded across 4 colleges\n";
 
 echo "=== Seeding Complete: Deterministic Dataset Successfully Established! ===\n";

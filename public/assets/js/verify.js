@@ -143,6 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const emailParam = urlParams.get('email');
         formData.append('email', emailParam || storedEmail || '');
 
+        const csrfInput = document.getElementById('csrfTokenInput');
+        if (csrfInput && csrfInput.value) {
+            formData.append('csrf_token', csrfInput.value);
+        } else {
+            const csrfMatch = document.cookie.match(/csrf_token=([^;]+)/);
+            if (csrfMatch) formData.append('csrf_token', csrfMatch[1]);
+        }
+
         const response = await fetch('/verify', {
             method: 'POST',
             body: formData,

@@ -22,8 +22,15 @@ class AuthMiddleware {
 
         // Ensure CSRF token exists
         if (!isset($_COOKIE['csrf_token'])) {
-            $csrf = bin2hex(random_bytes(32));
-            setcookie('csrf_token', $csrf, time() + (86400 * 7), '/', '', false, true);
+            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            setcookie('csrf_token', $csrf, [
+                'expires' => time() + (86400 * 7),
+                'path' => '/',
+                'domain' => '',
+                'secure' => $isSecure,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
             $_COOKIE['csrf_token'] = $csrf;
         }
 

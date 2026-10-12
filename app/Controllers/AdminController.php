@@ -62,6 +62,21 @@ class AdminController {
         ], 'app');
     }
 
+    public function users() {
+        $this->checkAdmin();
+        $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE college_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$collegeId]);
+        $users = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        return View::render('admin/users', [
+            'title' => 'Admin Users — Alumni Connect',
+            'activePage' => 'admin-users',
+            'users' => $users
+        ], 'app');
+    }
+
     public function moderation() {
         $this->checkAdmin();
         $pdo = Database::getConnection();

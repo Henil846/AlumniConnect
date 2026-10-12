@@ -502,7 +502,7 @@
                     <form action="/community/post" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
                         <div style="display:flex; gap:16px; align-items:center;">
-                            <img src="/assets/img/mentor_elena.png" alt="av" style="width:44px; height:44px; border-radius:50%; object-fit:cover;" />
+                            <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl(\App\Core\Auth::user()->full_name ?? 'User', \App\Core\Auth::user()->avatar ?? null)) ?>" alt="av" style="width:44px; height:44px; border-radius:50%; object-fit:cover;" />
                             <input type="text" name="content" required placeholder="Share an insight, milestone, or question with the alumni community..." style="flex:1; border:none; background:transparent; font-size:1rem; color:var(--color-text); outline:none;" />
                         </div>
                         
@@ -532,19 +532,19 @@
                     <span class="font-semibold text-sm text-muted" style="cursor:pointer;">Announcements</span>
                 </div>
 
-                <?php foreach ($posts as $post): ?>
+                <?php foreach (($posts ?? []) as $post): ?>
                 <!-- Feed Post -->
                 <div class="feed-post-card">
                     <div class="post-author-header">
-                        <img src="/assets/img/signup_side_img.png" style="object-position:top;" alt="av" />
+                        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($post->full_name ?? 'Alumni', $post->avatar ?? null)) ?>" style="object-position:top;" alt="av" />
                         <div style="flex:1;">
                             <div style="display:flex; align-items:center; gap:8px;">
-                                <h4 class="font-bold text-md mb-0"><?= htmlspecialchars($post->full_name) ?></h4>
-                                <?php if ($post->role === 'mentor'): ?>
+                                <h4 class="font-bold text-md mb-0"><?= htmlspecialchars($post->full_name ?? '') ?></h4>
+                                <?php if (($post->role ?? '') === 'mentor'): ?>
                                 <span class="badge" style="background:#dcfce7; color:#15803d; font-size:0.65rem; padding:2px 8px;">MENTOR</span>
                                 <?php endif; ?>
                             </div>
-                            <p class="text-xs text-muted mb-0"><?= htmlspecialchars(date('M j, Y g:i A', strtotime($post->created_at))) ?></p>
+                            <p class="text-xs text-muted mb-0"><?= htmlspecialchars(!empty($post->created_at) ? date('M j, Y g:i A', strtotime($post->created_at)) : '') ?></p>
                         </div>
                     </div>
 
@@ -562,18 +562,24 @@
                         <div style="display:flex; gap:24px;">
                             <form action="/community/like" method="POST" style="margin:0;">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
-                                <input type="hidden" name="post_id" value="<?= $post->id ?>">
-                                <button type="submit" style="background:none; border:none; color:<?= $post->liked_by_me ? '#059669' : 'inherit' ?>; display:flex; align-items:center; gap:6px; cursor:pointer; padding:0;">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="<?= $post->liked_by_me ? 'currentColor' : 'none' ?>" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 
-                                    <?= $post->likes_count ?>
+                                <input type="hidden" name="post_id" value="<?= $post->id ?? 0 ?>">
+                                <button type="submit" class="btn-like-post" style="background:none; border:none; color:<?= !empty($post->liked_by_me) ? '#059669' : 'inherit' ?>; display:flex; align-items:center; gap:6px; cursor:pointer; padding:0;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="<?= !empty($post->liked_by_me) ? 'currentColor' : 'none' ?>" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 
+                                    <?= htmlspecialchars((string)($post->likes_count ?? 0)) ?>
                                 </button>
                             </form>
                             <span style="display:flex; align-items:center; gap:6px; cursor:pointer;">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 
-                                <?= $post->comments_count ?>
+                                <?= htmlspecialchars((string)($post->comments_count ?? 0)) ?>
                             </span>
                         </div>
                     </div>
+                    <form action="/community/comment" method="POST" class="post-comment-form" style="display:flex; gap:8px; margin-top:14px;">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                        <input type="hidden" name="post_id" value="<?= $post->id ?? 0 ?>">
+                        <input type="text" name="content" placeholder="Write a comment..." style="flex:1; padding:8px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.85rem;" required>
+                        <button type="submit" class="btn-comment-submit" style="background:#0f172a; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:0.85rem; cursor:pointer;">Comment</button>
+                    </form>
                 </div>
                 <?php endforeach; ?>
 

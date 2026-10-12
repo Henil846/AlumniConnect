@@ -71,11 +71,11 @@
         <div class="form-group" style="margin-bottom: 16px;">
             <label class="form-label">Joining as</label>
             <div class="join-as-row">
-            <button type="button" class="join-as-btn active" id="joinStudent" data-type="student">
+            <button type="button" class="join-as-btn active" id="joinStudent" data-type="student" data-action="join-as">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                 Student
             </button>
-            <button type="button" class="join-as-btn" id="joinAlumni" data-type="alumni">
+            <button type="button" class="join-as-btn" id="joinAlumni" data-type="alumni" data-action="join-as">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 Alumni
             </button>
@@ -88,6 +88,7 @@
             <div class="input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="college" name="college" placeholder="Search your alma mater..." autocomplete="off" />
+            <input type="hidden" name="college_id" id="collegeIdInput" value="1" />
             </div>
             <!-- College suggestions dropdown -->
             <div class="college-dropdown" id="collegeDropdown" role="listbox" aria-label="College suggestions"></div>
@@ -99,7 +100,7 @@
             <div class="input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <input type="password" id="signupPassword" name="password" placeholder="Min. 8 characters" autocomplete="new-password" required />
-            <button type="button" class="input-toggle" id="signupTogglePwd" aria-label="Toggle password">
+            <button type="button" class="input-toggle" id="signupTogglePwd" data-action="toggle-password" aria-label="Toggle password">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
             </div>
@@ -119,7 +120,7 @@
         <div class="terms-row" style="margin-bottom: 24px;">
             <input type="checkbox" id="termsCheck" name="terms" />
             <label for="termsCheck">
-            I agree to the <a href="#" id="termsLink">Terms of Service</a> and <a href="#" id="privacyLink">Privacy Policy</a>.
+            I agree to the <a href="/terms" id="termsLink">Terms of Service</a> and <a href="/privacy" id="privacyLink">Privacy Policy</a>.
             </label>
         </div>
 

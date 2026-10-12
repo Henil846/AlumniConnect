@@ -406,7 +406,7 @@
     <div class="alumni-card">
     <div class="alumni-card-cover">
         <span class="class-badge">Class of '<?= date('y', strtotime($alum->created_at)) ?></span>
-        <img src="/assets/img/login_side_img.png" alt="Cover" style="object-position:center 30%;" />
+        <img src="/assets/img/campus_cover.png" alt="Cover" style="object-position:center 30%;" />
     </div>
     <div class="alumni-card-body">
         <div class="alumni-company-logo">

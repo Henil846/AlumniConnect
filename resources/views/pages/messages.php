@@ -385,7 +385,7 @@
             <?php foreach ($users as $u): ?>
             <a href="/messages?user_id=<?= $u->id ?>" class="chat-list-item <?= ($selectedUser && $selectedUser->id == $u->id) ? 'active' : '' ?>" style="text-decoration:none; color:inherit; display:flex;">
                 <div style="position:relative; margin-right: 12px;">
-                    <img src="/assets/img/signup_side_img.png" alt="av" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"/>
+                    <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($u->full_name ?? 'User', null)) ?>" alt="av" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"/>
                 </div>
                 <div class="meta" style="flex:1;">
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #1e293b;"><?= htmlspecialchars($u->full_name) ?></h4>
@@ -404,7 +404,7 @@
         <div style="padding:16px 24px; border-bottom:1px solid var(--color-border); background:var(--color-white); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:12px;">
                 <div style="position:relative;">
-                    <img src="/assets/img/signup_side_img.png" alt="av" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />
+                    <img id="selectedUserAvatar" src="<?= htmlspecialchars(\App\Core\View::avatarUrl($selectedUser->full_name ?? 'User', null)) ?>" alt="av" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />
                     <span style="width:10px; height:10px; border-radius:50%; background:#10b981; border:2px solid #fff; position:absolute; right:0; bottom:0;"></span>
                 </div>
                 <div>
@@ -418,9 +418,9 @@
         <div class="chat-messages-area" id="messages-container" style="flex: 1; overflow-y: auto; padding: 24px; background: #f8fafc;">
             <?php foreach ($messages as $msg): ?>
                 <?php $isMine = ($msg->sender_id == $currentUserId); ?>
-                <div style="display:flex; <?= $isMine ? 'justify-content:flex-end' : 'align-items:flex-end; gap:12px;' ?>; margin-bottom:16px;">
+                <div data-msg-id="<?= (int)$msg->id ?>" style="display:flex; <?= $isMine ? 'justify-content:flex-end' : 'align-items:flex-end; gap:12px;' ?>; margin-bottom:16px;">
                     <?php if (!$isMine): ?>
-                        <img src="/assets/img/signup_side_img.png" alt="E" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                        <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($selectedUser->full_name ?? 'User', null)) ?>" alt="E" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
                     <?php endif; ?>
                     
                     <div class="chat-bubble <?= $isMine ? 'outgoing' : 'incoming' ?>" style="max-width:70%; padding:10px 16px; border-radius:16px; <?= $isMine ? 'background:#0f172a; color:#fff; border-bottom-right-radius:4px;' : 'background:#fff; border:1px solid #e2e8f0; border-bottom-left-radius:4px;' ?>">
@@ -435,13 +435,13 @@
 
         <!-- Chat Input Bar -->
         <div class="chat-input-bar" style="padding: 16px 24px; border-top: 1px solid var(--color-border); background: var(--color-white); display: flex; align-items: center; gap: 16px;">
-            <form id="chat-form" style="display: flex; flex: 1; gap: 16px; align-items: center; margin: 0;">
+            <form id="chat-form" action="/messages/send" method="POST" style="display: flex; flex: 1; gap: 16px; align-items: center; margin: 0;">
                 <input type="hidden" name="receiver_id" id="receiver_id" value="<?= $selectedUser->id ?>">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
                 <div class="chat-input-box" style="flex: 1; display: flex; align-items: center; background: #f1f5f9; padding: 12px 16px; border-radius: 24px;">
                     <input type="text" name="content" id="chat-input" placeholder="Type a message..." style="flex: 1; border: none; background: transparent; outline: none; font-size: 0.95rem; color: #1e293b;" required autocomplete="off"/>
                 </div>
-                <button type="submit" style="width:44px; height:44px; border-radius:50%; background:#0f172a; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink: 0;">
+                <button type="submit" class="btn-send-message" style="width:44px; height:44px; border-radius:50%; background:#0f172a; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink: 0;">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 </button>
             </form>
@@ -451,46 +451,108 @@
             const container = document.getElementById('messages-container');
             container.scrollTop = container.scrollHeight;
 
-            // SSE listener
-            const selectedUserId = <?= $selectedUser->id ?>;
-            const currentUserId = <?= $currentUserId ?>;
-            const evtSource = new EventSource('/messages/stream?user_id=' + selectedUserId);
-            
-            evtSource.onmessage = function(event) {
-                const msg = JSON.parse(event.data);
-                
-                // Determine if message is mine
+            const selectedUserId = <?= (int)$selectedUser->id ?>;
+            const currentUserId = <?= (int)$currentUserId ?>;
+            const selectedUserAvatar = '<?= htmlspecialchars(\App\Core\View::avatarUrl($selectedUser->full_name ?? 'User', null)) ?>';
+
+            // Track rendered message IDs to prevent duplicates
+            const renderedMessageIds = new Set();
+            let maxMessageId = 0;
+            document.querySelectorAll('[data-msg-id]').forEach(el => {
+                const id = parseInt(el.getAttribute('data-msg-id'), 10);
+                if (id) {
+                    renderedMessageIds.add(id);
+                    if (id > maxMessageId) maxMessageId = id;
+                }
+            });
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML.replace(/\n/g, '<br>');
+            }
+
+            function appendMessage(msg) {
+                const msgId = parseInt(msg.id, 10);
+                if (msgId && renderedMessageIds.has(msgId)) {
+                    return;
+                }
+                if (msgId) {
+                    renderedMessageIds.add(msgId);
+                    if (msgId > maxMessageId) maxMessageId = msgId;
+                }
+
                 const isMine = (msg.sender_id == currentUserId);
-                
+                let timeStr = 'Just now';
+                if (msg.created_at) {
+                    const d = new Date(msg.created_at);
+                    if (!isNaN(d.getTime())) {
+                        timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                    }
+                }
+
                 let html = '';
                 if (isMine) {
                     html = `
-                        <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+                        <div data-msg-id="${msgId || ''}" style="display:flex; justify-content:flex-end; margin-bottom:16px;">
                             <div class="chat-bubble outgoing" style="max-width:70%; padding:10px 16px; border-radius:16px; background:#0f172a; color:#fff; border-bottom-right-radius:4px;">
-                                ${msg.content}
+                                ${escapeHtml(msg.content)}
                             </div>
+                        </div>
+                        <div style="text-align:right; font-size:0.7rem; color:var(--color-text-muted); margin-bottom: 8px;">
+                            ${timeStr}
                         </div>
                     `;
                 } else {
+                    const avatarSrc = (document.getElementById('selectedUserAvatar') && document.getElementById('selectedUserAvatar').src) || selectedUserAvatar;
                     html = `
-                        <div style="display:flex; align-items:flex-end; gap:12px; margin-bottom:16px;">
-                            <img src="/assets/img/signup_side_img.png" alt="E" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                        <div data-msg-id="${msgId || ''}" style="display:flex; align-items:flex-end; gap:12px; margin-bottom:16px;">
+                            <img src="${avatarSrc}" alt="av" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
                             <div class="chat-bubble incoming" style="max-width:70%; padding:10px 16px; border-radius:16px; background:#fff; border:1px solid #e2e8f0; border-bottom-left-radius:4px;">
-                                ${msg.content}
+                                ${escapeHtml(msg.content)}
                             </div>
+                        </div>
+                        <div style="margin-left:44px; font-size:0.7rem; color:var(--color-text-muted); margin-bottom: 8px;">
+                            ${timeStr}
                         </div>
                     `;
                 }
                 
                 container.insertAdjacentHTML('beforeend', html);
                 container.scrollTop = container.scrollHeight;
-            };
+            }
+
+            // SSE listener for real-time incoming messages
+            let evtSource = null;
+            function initSSE() {
+                if (evtSource) {
+                    try { evtSource.close(); } catch(e) {}
+                }
+                evtSource = new EventSource('/messages/stream?user_id=' + selectedUserId + '&last_id=' + maxMessageId);
+                
+                evtSource.onmessage = function(event) {
+                    try {
+                        const msg = JSON.parse(event.data);
+                        if (msg && msg.content) {
+                            appendMessage(msg);
+                        }
+                    } catch (e) {}
+                };
+            }
+            initSSE();
 
             // AJAX form submit
             document.getElementById('chat-form').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const formData = new FormData(this);
                 const input = document.getElementById('chat-input');
+                const content = input.value.trim();
+                if (!content) return;
+
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
+
+                const formData = new FormData(this);
                 
                 fetch('/messages/send', {
                     method: 'POST',
@@ -499,9 +561,17 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 }).then(r => r.json()).then(data => {
-                    if (data.success) {
+                    if (data && data.success) {
                         input.value = '';
+                        if (data.message) {
+                            appendMessage(data.message);
+                        }
                     }
+                }).catch(err => {
+                    console.error('Failed to send message:', err);
+                }).finally(() => {
+                    if (submitBtn) submitBtn.disabled = false;
+                    input.focus();
                 });
             });
         </script>

@@ -554,7 +554,7 @@
                 <ul style="list-style:none; padding:0; margin:0;">
                     <?php foreach ($recentDonations as $donation): ?>
                         <li style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                            <img src="/assets/img/signup_side_img.png" alt="" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+                            <img src="<?= htmlspecialchars(\App\Core\View::avatarUrl($donation->donor_name ?? 'Donor', null)) ?>" alt="" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
                             <div>
                                 <h4 style="font-size:0.9rem; font-weight:700; margin:0; color:#0f172a;"><?= htmlspecialchars($donation->donor_name) ?></h4>
                                 <div style="font-size:0.8rem; color:#059669; font-weight:600;">Donated <?= \App\Core\CurrencyHelper::formatINR($donation->amount) ?></div>

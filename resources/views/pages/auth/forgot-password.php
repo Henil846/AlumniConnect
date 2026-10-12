@@ -12,7 +12,7 @@
 
   <!-- HEADER -->
   <header class="forgot-header" id="forgotHeader">
-    <a href="index.html" class="logo" id="forgotLogo">
+    <a href="/" class="logo" id="forgotLogo">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" stroke-width="2.2" fill="none" stroke="currentColor"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
       </div>
@@ -47,7 +47,7 @@
           </button>
         </form>
 
-        <a href="login.html" class="back-link" id="backToLoginLink">
+        <a href="/login" class="back-link" id="backToLoginLink">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Back to Login
         </a>
@@ -65,11 +65,11 @@
         <p style="font-size:0.875rem;color:var(--color-text-muted);line-height:1.6;margin-bottom:28px;">
           We've sent a password reset link to <strong id="sentToEmail"></strong>. Check your spam folder if you don't see it within a few minutes.
         </p>
-        <a href="login.html" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:14px 28px;border-radius:9999px;" id="backToLoginSuccess">
+        <a href="/login" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:14px 28px;border-radius:9999px;" id="backToLoginSuccess">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Back to Login
         </a>
-        <button type="button" id="resendResetBtn" style="margin-top:16px;background:none;border:none;font-family:inherit;font-size:0.825rem;color:var(--color-text-muted);cursor:pointer;transition:color 0.2s;">
+        <button type="button" id="resendResetBtn" onclick="alert('Reset link resent.')" style="margin-top:16px;background:none;border:none;font-family:inherit;font-size:0.825rem;color:var(--color-text-muted);cursor:pointer;transition:color 0.2s;">
           Didn't receive it? <span style="color:var(--color-accent-dark);font-weight:600;">Resend email</span>
         </button>
       </div>
@@ -81,8 +81,8 @@
   <footer class="forgot-footer" id="forgotFooter">
     <p>© 2024 Alumni Connect Platform. Built for the Modern Professional.</p>
     <div class="forgot-footer-links">
-      <a href="#" id="footerPrivacy">Privacy Policy</a>
-      <a href="#" id="footerTerms">Terms of Service</a>
+      <a href="/privacy" id="footerPrivacy">Privacy Policy</a>
+      <a href="/terms" id="footerTerms">Terms of Service</a>
     </div>
   </footer>
 
