@@ -669,6 +669,7 @@ input { font-family: inherit; }
 
 @media (max-width: 768px) {
   .hamburger-menu { display: inline-flex !important; }
+  .drawer-close-btn { display: inline-flex !important; }
   .sidebar {
     top: 0;
     left: 0;
@@ -697,11 +698,14 @@ input { font-family: inherit; }
     
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="sidebar-header">
+      <div class="sidebar-header" style="justify-content:space-between; align-items:center;">
         <a href="<?= (\App\Core\Auth::user() && in_array(\App\Core\Auth::user()->role, ['admin', 'college_admin'])) ? '/admin/dashboard' : '/dashboard' ?>" class="logo">
           Alumni Connect
           <span>Modern Collegiate</span>
         </a>
+        <button type="button" class="drawer-close-btn" id="drawerCloseBtn" onclick="document.querySelector('.sidebar').classList.remove('active','open');" aria-label="Close menu" style="display:none; background:none; border:none; cursor:pointer; padding:6px; color:var(--color-text-muted);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <?php $currentRole = \App\Core\Auth::user() ? \App\Core\Auth::user()->role : ''; ?>
@@ -890,6 +894,24 @@ input { font-family: inherit; }
     }
     document.addEventListener('click', function() {
       document.getElementById('notif-dropdown').style.display = 'none';
+    });
+    document.addEventListener('submit', function(e) {
+      const form = e.target;
+      if (form && form.method && form.method.toUpperCase() === 'POST') {
+        let csrfInput = form.querySelector('input[name="csrf_token"]');
+        if (!csrfInput) {
+          csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrf_token';
+          form.appendChild(csrfInput);
+        }
+        if (!csrfInput.value) {
+          const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+          if (match) {
+            csrfInput.value = decodeURIComponent(match[1]);
+          }
+        }
+      }
     });
   </script>
   

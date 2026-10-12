@@ -104,6 +104,11 @@ class AuthController {
         $user = $this->userRepo->findByEmail($_POST['email']);
         if (!$user || !password_verify($_POST['password'], $user->password)) {
             $this->userRepo->logLoginAttempt($email, $ip);
+            try {
+                $pdo = \App\Core\Database::getConnection();
+                $stmt = $pdo->prepare("INSERT INTO audit_log (event_type, actor_id, actor_email, ip_address, details) VALUES ('login_failed', NULL, ?, ?, 'Failed login attempt: invalid credentials')");
+                $stmt->execute([$email, $ip]);
+            } catch (\Throwable $t) {}
             echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
             return;
         }
@@ -137,6 +142,11 @@ class AuthController {
         }
 
         $this->userRepo->clearLoginAttempts($email);
+        try {
+            $pdo = \App\Core\Database::getConnection();
+            $stmt = $pdo->prepare("INSERT INTO audit_log (event_type, actor_id, actor_email, ip_address, details) VALUES ('user_login', ?, ?, ?, ?)");
+            $stmt->execute([$user->id, $user->email, $ip, 'Successful login for role: ' . $user->role]);
+        } catch (\Throwable $t) {}
 
         // Regenerate session id on login to prevent session fixation
         if (session_status() === PHP_SESSION_NONE) {
@@ -172,6 +182,19 @@ class AuthController {
             'httponly' => true,
             'samesite' => 'Lax'
         ]);
+
+        if (empty($_COOKIE['csrf_token'])) {
+            $csrf = bin2hex(random_bytes(32));
+            setcookie('csrf_token', $csrf, [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'domain' => '',
+                'secure' => $isSecure,
+                'httponly' => false,
+                'samesite' => 'Lax'
+            ]);
+            $_COOKIE['csrf_token'] = $csrf;
+        }
 
         // Determine role-based landing page or safe return URL
         $redirect = '/dashboard';

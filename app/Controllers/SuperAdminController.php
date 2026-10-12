@@ -155,6 +155,13 @@ class SuperAdminController {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("UPDATE colleges SET plan = ? WHERE id = ?");
             $stmt->execute([$plan, $id]);
+            try {
+                $adminId = \App\Core\Auth::user()->id ?? null;
+                $adminEmail = \App\Core\Auth::user()->email ?? 'superadmin@alumni.test';
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $stmt = $pdo->prepare("INSERT INTO audit_log (event_type, actor_id, actor_email, ip_address, details) VALUES ('tier_updated', ?, ?, ?, ?)");
+                $stmt->execute([$adminId, $adminEmail, $ip, "Institution ID {$id} subscription tier updated to {$plan}"]);
+            } catch (\Throwable $t) {}
         }
 
         header("Location: /super-admin/institutions?tier_updated=1");
@@ -274,6 +281,13 @@ class SuperAdminController {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
             $stmt->execute([$status, $userId]);
+            try {
+                $adminId = \App\Core\Auth::user()->id ?? null;
+                $adminEmail = \App\Core\Auth::user()->email ?? 'superadmin@alumni.test';
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                $stmt = $pdo->prepare("INSERT INTO audit_log (event_type, actor_id, actor_email, ip_address, details) VALUES ('user_status_updated', ?, ?, ?, ?)");
+                $stmt->execute([$adminId, $adminEmail, $ip, "User ID {$userId} status changed to {$status}"]);
+            } catch (\Throwable $t) {}
         }
         header("Location: /super-admin/users?updated=1");
         exit;
@@ -331,9 +345,18 @@ class SuperAdminController {
     public function security() {
         $this->checkAccess();
         $pdo = Database::getConnection();
-        $attempts = $pdo->query("SELECT * FROM login_attempts ORDER BY attempt_time DESC LIMIT 25")->fetchAll(\PDO::FETCH_OBJ);
-        $totalAttempts = (int)$pdo->query("SELECT COUNT(*) FROM login_attempts")->fetchColumn();
-        $failedAttempts = (int)$pdo->query("SELECT COUNT(*) FROM login_attempts WHERE action = 'failed' OR action = 'login'")->fetchColumn();
+        $pdo->exec("CREATE TABLE IF NOT EXISTS audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event_type TEXT NOT NULL,
+            actor_id INTEGER,
+            actor_email TEXT,
+            ip_address TEXT,
+            details TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )");
+        $attempts = $pdo->query("SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 50")->fetchAll(\PDO::FETCH_OBJ);
+        $totalAttempts = (int)$pdo->query("SELECT COUNT(*) FROM audit_log")->fetchColumn();
+        $failedAttempts = (int)$pdo->query("SELECT COUNT(*) FROM audit_log WHERE event_type LIKE '%fail%' OR event_type LIKE '%denied%'")->fetchColumn();
 
         return View::render('super-admin/security', [
             'title' => 'Security & Audit Logs — Alumni Connect',

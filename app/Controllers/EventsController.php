@@ -8,8 +8,17 @@ class EventsController {
     public function index() {
         $pdo = Database::getConnection();
         $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $userId = \App\Core\Auth::id() ?? null;
+        $filter = $_GET['filter'] ?? 'upcoming';
+        $sort = $_GET['sort'] ?? 'upcoming';
+
         $sql = "SELECT * FROM events WHERE college_id = ?";
         $params = [$collegeId];
+
+        if ($filter === 'registered' && $userId) {
+            $sql .= " AND id IN (SELECT event_id FROM event_registrations WHERE user_id = ?)";
+            $params[] = $userId;
+        }
 
         if (!empty($_GET['type']) && is_array($_GET['type'])) {
             $placeholders = str_repeat('?,', count($_GET['type']) - 1) . '?';
@@ -18,34 +27,50 @@ class EventsController {
         }
 
         if (!empty($_GET['search'])) {
-            $sql .= " AND title LIKE ?";
-            $params[] = '%' . $_GET['search'] . '%';
+            $sql .= " AND (title LIKE ? OR description LIKE ? OR location LIKE ?)";
+            $term = '%' . $_GET['search'] . '%';
+            $params[] = $term;
+            $params[] = $term;
+            $params[] = $term;
         }
 
         // Count total for pagination
         $countSql = "SELECT COUNT(*) as total FROM events WHERE college_id = ?";
+        $countParams = [$collegeId];
+        if ($filter === 'registered' && $userId) {
+            $countSql .= " AND id IN (SELECT event_id FROM event_registrations WHERE user_id = ?)";
+            $countParams[] = $userId;
+        }
         if (!empty($_GET['type']) && is_array($_GET['type'])) {
             $placeholders = str_repeat('?,', count($_GET['type']) - 1) . '?';
             $countSql .= " AND type IN ($placeholders)";
+            $countParams = array_merge($countParams, $_GET['type']);
         }
         if (!empty($_GET['search'])) {
-            $countSql .= " AND title LIKE ?";
+            $countSql .= " AND (title LIKE ? OR description LIKE ? OR location LIKE ?)";
+            $term = '%' . $_GET['search'] . '%';
+            $countParams[] = $term;
+            $countParams[] = $term;
+            $countParams[] = $term;
         }
         $countStmt = $pdo->prepare($countSql);
-        $countStmt->execute($params);
+        $countStmt->execute($countParams);
         $totalEvents = (int)($countStmt->fetch(\PDO::FETCH_OBJ)->total ?? 0);
 
         $page = max(1, intval($_GET['page'] ?? 1));
-        $perPage = 6;
+        $perPage = 24;
         $offset = ($page - 1) * $perPage;
         $totalPages = max(1, ceil($totalEvents / $perPage));
 
-        $sql .= " ORDER BY date ASC LIMIT $perPage OFFSET $offset";
+        if ($sort === 'newest') {
+            $sql .= " ORDER BY id DESC LIMIT $perPage OFFSET $offset";
+        } else {
+            $sql .= " ORDER BY date ASC, id DESC LIMIT $perPage OFFSET $offset";
+        }
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $events = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        
-        $userId = \App\Core\Auth::id() ?? null;
         
         // Fetch user's registered events
         $registeredEventIds = [];
@@ -77,6 +102,9 @@ class EventsController {
             'registeredEventIds' => $registeredEventIds,
             'currentPage' => $page,
             'totalPages' => $totalPages,
+            'totalEvents' => $totalEvents,
+            'filter' => $filter,
+            'sort' => $sort,
         ], 'app');
     }
 
@@ -146,6 +174,14 @@ class EventsController {
         if (!$userId) die("Unauthorized");
 
         $pdo = Database::getConnection();
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $check = $pdo->prepare("SELECT college_id FROM events WHERE id = ?");
+        $check->execute([$eventId]);
+        $evCol = $check->fetchColumn();
+        if ($evCol !== false && $evCol != $collegeId) {
+            http_response_code(403);
+            die("Forbidden: Cross-college event");
+        }
         $stmt = $pdo->prepare("DELETE FROM event_registrations WHERE event_id = ? AND user_id = ?");
         $stmt->execute([$eventId, $userId]);
 

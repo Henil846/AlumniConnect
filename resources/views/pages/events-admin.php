@@ -516,7 +516,7 @@
                 <button type="button" onclick="document.getElementById('create-event-modal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
                 <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:16px;">Create Campus Event</h3>
                 <form method="POST" action="/events-admin/create" id="create-event-form" style="display:flex; flex-direction:column; gap:14px;">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Core\View::csrfToken()) ?>">
                     <div>
                         <label style="font-size:0.8rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Event Title</label>
                         <input type="text" name="title" required placeholder="e.g. Founders & VC Mixer 2027" style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; font-size:0.9rem;">
@@ -580,7 +580,7 @@
             <div class="form-box-card" style="background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px; margin-bottom:24px;">
                 <h3 class="font-bold text-lg mb-4">QR Check-In</h3>
                 <form method="POST" action="/events-admin/checkin">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Core\View::csrfToken()) ?>">
                     <div class="form-group mb-4">
                         <label class="form-label" style="font-size:0.8rem; font-weight:700;">Scan or Enter QR Code Hash</label>
                         <input type="text" name="qr_code" class="form-input" placeholder="Enter QR hash..." style="background:#f8fafc; border:1px solid var(--color-border);" required />
@@ -593,7 +593,7 @@
             <div class="form-box-card" style="background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:24px;">
                 <h3 class="font-bold text-lg mb-4">Event Gallery</h3>
                 <form method="POST" action="/events-admin/upload-gallery" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_COOKIE['csrf_token'] ?? '') ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Core\View::csrfToken()) ?>">
                     <input type="hidden" name="event_id" value="<?= $selectedEvent->id ?>">
                     <div class="form-group mb-4">
                         <input type="file" name="gallery_image" class="form-input" accept="image/jpeg,image/png,image/gif" required />

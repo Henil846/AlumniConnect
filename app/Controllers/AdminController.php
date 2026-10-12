@@ -192,6 +192,12 @@ class AdminController {
 
         if ($userId > 0 && $collegeId) {
             $pdo = Database::getConnection();
+            $check = $pdo->prepare("SELECT id FROM users WHERE id = ? AND college_id = ?");
+            $check->execute([$userId, $collegeId]);
+            if (!$check->fetch()) {
+                http_response_code(403);
+                die("Forbidden: User does not belong to this college");
+            }
             $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ? AND college_id = ?");
             $stmt->execute([$role, $userId, $collegeId]);
         }

@@ -487,6 +487,73 @@
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 16px;
 }
+/* ---- Events Page Grid & Cards ---- */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.event-card-modern {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.event-card-modern:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.event-img-wrap {
+  height: 180px;
+  position: relative;
+  background: #f1f5f9;
+}
+.event-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.event-date-pill {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-weight: 800;
+  line-height: 1.1;
+  z-index: 2;
+}
+.event-date-pill .mth { font-size: 0.65rem; color: var(--color-accent-dark); text-transform: uppercase; letter-spacing: 0.05em; }
+.event-date-pill .day { font-size: 1.25rem; color: var(--color-text); }
+.event-card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+.avatar-stack img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-white);
+  margin-left: -8px;
+  object-fit: cover;
+}
+.avatar-stack img:first-child {
+  margin-left: 0;
+}
 
 </style>
 <div class="content-scrollable">
@@ -498,10 +565,16 @@
             <p class="page-subtitle mb-0">Connect with fellow alumni, attend exclusive workshops, and return to campus for memorable reunions.</p>
         </div>
         
-        <!-- Toggle Pills -->
-        <div style="background:#f1f5f9; padding:4px; border-radius:32px; display:flex;">
-            <button type="button" onclick="window.location.href='/events'" class="btn-primary" style="background:#ffffff; color:var(--color-text); padding:12px 28px; border-radius:28px; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-weight:700;">Upcoming</button>
-            <button type="button" onclick="window.location.href='/events?filter=registered'" class="btn-cancel" style="background:transparent; border:none; padding:12px 24px; font-weight:600;">Registered (<?= count($registeredEventIds) ?>)</button>
+        <!-- Toggle Pills & Sort -->
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <div style="background:#f1f5f9; padding:4px; border-radius:32px; display:flex;">
+                <button type="button" onclick="window.location.href='/events'" class="btn-primary" style="<?= ($filter ?? 'upcoming') !== 'registered' ? 'background:#ffffff; color:var(--color-text); box-shadow:0 2px 8px rgba(0,0,0,0.08);' : 'background:transparent; border:none; color:var(--color-text-muted);' ?> padding:10px 24px; border-radius:28px; font-weight:700; cursor:pointer;">Upcoming</button>
+                <button type="button" onclick="window.location.href='/events?filter=registered'" class="btn-cancel" style="<?= ($filter ?? '') === 'registered' ? 'background:#ffffff; color:var(--color-text); box-shadow:0 2px 8px rgba(0,0,0,0.08);' : 'background:transparent; border:none; color:var(--color-text-muted);' ?> padding:10px 24px; border-radius:28px; font-weight:700; cursor:pointer;">Registered (<?= count($registeredEventIds) ?>)</button>
+            </div>
+            <select onchange="location.href='/events?sort=' + this.value + '<?= !empty($_GET['filter']) ? '&filter=' . urlencode($_GET['filter']) : '' ?>'" style="padding:10px 16px; border-radius:28px; border:1px solid var(--color-border); background:#fff; font-size:0.85rem; font-weight:600; cursor:pointer;">
+                <option value="upcoming" <?= ($sort ?? '') === 'upcoming' ? 'selected' : '' ?>>Sort: Date (Earliest First)</option>
+                <option value="newest" <?= ($sort ?? '') === 'newest' ? 'selected' : '' ?>>Sort: Newly Created First</option>
+            </select>
         </div>
         </div>
         
@@ -521,6 +594,13 @@
 
         <!-- Events 3-Column Grid -->
         <div class="events-grid">
+        <?php if (count($events) === 0): ?>
+            <div style="grid-column: 1 / -1; background:#fff; border:1px dashed var(--color-border); border-radius:16px; padding:48px; text-align:center;">
+                <span style="font-size:2.5rem; display:block; margin-bottom:12px;">📅</span>
+                <h3 style="font-weight:700; font-size:1.15rem; margin-bottom:6px;">No Events Found</h3>
+                <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:0;">There are currently no events matching this filter for your institution.</p>
+            </div>
+        <?php endif; ?>
         
         <?php foreach($events as $event): 
             $isRegistered = in_array($event->id, $registeredEventIds);
@@ -574,6 +654,20 @@
         <?php endforeach; ?>
 
         </div>
+
+        <?php if (($totalPages ?? 1) > 1): ?>
+            <div style="display:flex; justify-content:center; gap:8px; margin-top:20px; margin-bottom:32px; align-items:center;">
+                <?php if ($currentPage > 1): ?>
+                    <a href="/events?page=<?= $currentPage - 1 ?><?= !empty($_GET['filter']) ? '&filter=' . urlencode($_GET['filter']) : '' ?><?= !empty($_GET['sort']) ? '&sort=' . urlencode($_GET['sort']) : '' ?>" style="padding:8px 16px; border:1px solid var(--color-border); border-radius:8px; text-decoration:none; color:var(--color-text); font-weight:600;">Previous</a>
+                <?php endif; ?>
+                <?php for($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="/events?page=<?= $i ?><?= !empty($_GET['filter']) ? '&filter=' . urlencode($_GET['filter']) : '' ?><?= !empty($_GET['sort']) ? '&sort=' . urlencode($_GET['sort']) : '' ?>" style="padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:700; <?= $i === $currentPage ? 'background:#0f172a; color:#fff;' : 'background:#fff; border:1px solid var(--color-border); color:var(--color-text);' ?>"><?= $i ?></a>
+                <?php endfor; ?>
+                <?php if ($currentPage < $totalPages): ?>
+                    <a href="/events?page=<?= $currentPage + 1 ?><?= !empty($_GET['filter']) ? '&filter=' . urlencode($_GET['filter']) : '' ?><?= !empty($_GET['sort']) ? '&sort=' . urlencode($_GET['sort']) : '' ?>" style="padding:8px 16px; border:1px solid var(--color-border); border-radius:8px; text-decoration:none; color:var(--color-text); font-weight:600;">Next</a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Bottom Area: 2 Columns (Host Mixer & Statistics) -->
         <div class="layout-2col" style="margin-top: 40px;">

@@ -220,6 +220,15 @@ class EventsAdminController {
             die("CSRF validation failed.");
         }
         $eventId = (int)($_POST['event_id'] ?? 0);
+        $collegeId = \App\Core\Auth::user()->college_id ?? null;
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$eventId]);
+        $event = $stmt->fetch(\PDO::FETCH_OBJ);
+        if (!$event || ($event->college_id != $collegeId && \App\Core\Auth::user()->role !== 'super_admin')) {
+            http_response_code(403);
+            die("Unauthorized: Event outside college");
+        }
         
         if (!isset($_FILES['gallery_image']) || $_FILES['gallery_image']['error'] !== UPLOAD_ERR_OK) {
             header("Location: /events-admin?error=Upload+Failed&event_id=$eventId");

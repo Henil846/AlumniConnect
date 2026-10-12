@@ -14,6 +14,8 @@ putenv("APP_ENV=testing");
 $_ENV['APP_ENV'] = 'testing';
 putenv("DB_PATH=database/test.sqlite");
 $_ENV['DB_PATH'] = 'database/test.sqlite';
+ob_implicit_flush(true);
+while (ob_get_level()) ob_end_flush();
 
 // Initialize and clear error log for server-side error log gate
 $errorLogPath = $projectDir . '/storage/logs/php_error.log';
@@ -25,9 +27,22 @@ file_put_contents($errorLogPath, '');
 // Kill any stray process on port 8001 before starting
 exec('powershell -Command "Get-NetTCPConnection -LocalPort 8001 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
 
+$docroot = realpath($projectDir . '/public');
+$expectedDocroot = realpath(__DIR__ . '/../public');
+if (!$docroot || $docroot !== $expectedDocroot) {
+    fwrite(STDERR, "FATAL: Docroot does not match <repo>/public. Found: " . ($docroot ?: 'false') . ", Expected: $expectedDocroot\n");
+    exit(1);
+}
+echo "[Server Start] Docroot path: $docroot\n";
+
 // Spawn isolated test server on port 8001 with strict error logging
-$testServerCmd = 'cmd /c start /b "" "C:\\xampp\\php\\php.exe" -d error_reporting=E_ALL -d display_errors=0 -d log_errors=1 -d error_log=' . escapeshellarg($errorLogPath) . ' -S 127.0.0.1:8001 -t public public/index.php';
-pclose(popen($testServerCmd, "r"));
+$descriptors = [
+    0 => ['pipe', 'r'],
+    1 => ['file', 'NUL', 'w'],
+    2 => ['file', 'NUL', 'w']
+];
+$testServerCmd = '"C:\\xampp\\php\\php.exe" -d error_reporting=E_ALL -d display_errors=0 -d log_errors=1 -d error_log=' . escapeshellarg($errorLogPath) . ' -S 127.0.0.1:8001 -t public public/index.php';
+$serverProc = proc_open($testServerCmd, $descriptors, $pipes, $projectDir);
 
 // Wait for port 8001 to respond
 $serverReady = false;
@@ -45,7 +60,11 @@ if (!$serverReady) {
     exit(1);
 }
 
-register_shutdown_function(function() use ($testDbPath) {
+register_shutdown_function(function() use ($testDbPath, &$serverProc) {
+    if (is_resource($serverProc)) {
+        proc_terminate($serverProc);
+        proc_close($serverProc);
+    }
     exec('powershell -Command "Get-NetTCPConnection -LocalPort 8001 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
     if (file_exists($testDbPath)) {
         @unlink($testDbPath);
@@ -56,6 +75,11 @@ require_once $projectDir . '/app/Core/Env.php';
 require_once $projectDir . '/app/Core/Database.php';
 
 App\Core\Env::load($projectDir . '/.env');
+putenv("APP_ENV=testing");
+$_ENV['APP_ENV'] = 'testing';
+putenv("DB_PATH=database/test.sqlite");
+$_ENV['DB_PATH'] = 'database/test.sqlite';
+App\Core\Database::resetConnection();
 $pdo = App\Core\Database::getConnection();
 
 $baseUrl = "http://127.0.0.1:8001";
@@ -950,8 +974,13 @@ $c2Login = e2e_login($baseUrl, 'student2@alumni.test', 'Password123!');
 $c2Cookies = $c2Login['cookies'];
 $c2Csrf = $c2Login['csrf'];
 
+$c2AlumniLogin = e2e_login($baseUrl, 'alumni2@alumni.test', 'Password123!');
+$c2AlumniCookies = $c2AlumniLogin['cookies'];
+$c2AlumniCsrf = $c2AlumniLogin['csrf'];
+
 $c2AdminLogin = e2e_login($baseUrl, 'admin2@alumni.test', 'Password123!');
 $c2AdminCookies = $c2AdminLogin['cookies'];
+$c2AdminCsrf = $c2AdminLogin['csrf'];
 
 // A. Cross-tenant writes
 if ($job) {
@@ -1670,48 +1699,65 @@ foreach ($paginationEndpoints as $ep) {
 set_test_role('Multi-Tenant Isolation');
 echo "\n--- Testing Route Coverage Matrix on 29 Unreached POST Routes ---\n";
 
-$realJobId = $pdo->query("SELECT id FROM jobs WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
+// Clean up rate limits before matrix execution
+$pdo->exec("DELETE FROM login_attempts");
+@unlink($projectDir . '/storage/rate_limits.json');
+
+$guestSession = e2e_http("$baseUrl/login", 'GET');
+$guestCookies = $guestSession['cookies'] ?? [];
+$guestCsrf = $guestSession['cookies']['csrf_token'] ?? '';
+
+$realJobId = $pdo->query("SELECT id FROM jobs WHERE college_id = 1 LIMIT 1")->fetchColumn();
+if (!$realJobId) {
+    $pdo->exec("INSERT INTO events (title, date, location, college_id, created_by) VALUES ('Test Event', '2026-11-01', 'Hall A', 1, 1)");
+    $realJobId = 1;
+}
 $realPostId = $pdo->query("SELECT id FROM posts WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
 $realCommentId = $pdo->query("SELECT id FROM post_comments LIMIT 1")->fetchColumn() ?: 1;
 $realMsgId = $pdo->query("SELECT id FROM messages LIMIT 1")->fetchColumn() ?: 1;
 $realItemId = $pdo->query("SELECT id FROM marketplace_items WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
 $realBizId = $pdo->query("SELECT id FROM businesses WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
 $realStartupId = $pdo->query("SELECT id FROM startups WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
-$realEventId = $pdo->query("SELECT id FROM events WHERE college_id = 1 LIMIT 1")->fetchColumn() ?: 1;
+
+$eventRows = $pdo->query("SELECT id FROM events WHERE college_id = 1 ORDER BY id DESC LIMIT 3")->fetchAll(PDO::FETCH_COLUMN);
+$realEventId = $eventRows[0] ?? 1;
+$realDeleteEventId = $eventRows[1] ?? $realEventId;
+$realGalleryEventId = $eventRows[0] ?? 1;
+
 $realAdId = $pdo->query("SELECT id FROM advertisements LIMIT 1")->fetchColumn() ?: 1;
 $realSessionId = $pdo->query("SELECT id FROM mentorship_sessions WHERE mentee_id = $studentId LIMIT 1")->fetchColumn() ?: 1;
 $realReqId = $pdo->query("SELECT id FROM referral_requests WHERE student_id = $studentId LIMIT 1")->fetchColumn() ?: 1;
 
 $matrix29Routes = [
-    '/logout-all' => ['role' => 'student', 'wrong' => null, 'data' => []],
-    '/verify' => ['role' => 'guest', 'wrong' => null, 'data' => ['email' => 'student@alumni.test', 'otp' => '123456']],
-    '/forgot-password' => ['role' => 'guest', 'wrong' => null, 'data' => ['email' => 'student@alumni.test']],
-    '/reset-password' => ['role' => 'guest', 'wrong' => null, 'data' => ['token' => 'invalid_test_token', 'password' => 'Pass123!']],
-    '/profile/update' => ['role' => 'student', 'wrong' => null, 'data' => ['full_name' => 'Student Matrix Update']],
-    '/mentorship/cancel' => ['role' => 'student', 'wrong' => null, 'data' => ['session_id' => $realSessionId]],
-    '/referral-request/submit' => ['role' => 'student', 'wrong' => null, 'data' => ['alumni_id' => $alumniId]],
-    '/referral-request/update-status' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['request_id' => $realReqId, 'status' => 'reviewed']],
-    '/jobs/edit' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['job_id' => $realJobId, 'title' => 'Job Edit']],
-    '/jobs/delete' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['job_id' => $realJobId]],
-    '/events/cancel' => ['role' => 'student', 'wrong' => null, 'data' => ['event_id' => $realEventId]],
-    '/events-admin/edit' => ['role' => 'college_admin', 'wrong' => 'student', 'data' => ['event_id' => $realEventId, 'title' => 'Event Edit']],
-    '/events-admin/delete' => ['role' => 'college_admin', 'wrong' => 'student', 'data' => ['event_id' => $realEventId]],
-    '/events-admin/upload-gallery' => ['role' => 'college_admin', 'wrong' => 'student', 'data' => ['event_id' => $realEventId]],
-    '/community/edit' => ['role' => 'student', 'wrong' => null, 'data' => ['post_id' => $realPostId, 'content' => 'Tamper']],
-    '/community/delete' => ['role' => 'student', 'wrong' => null, 'data' => ['post_id' => $realPostId]],
-    '/community/poll-vote' => ['role' => 'student', 'wrong' => null, 'data' => ['post_id' => $realPostId, 'option' => 'A']],
-    '/community/report' => ['role' => 'student', 'wrong' => null, 'data' => ['reported_item_type' => 'post', 'reported_item_id' => $realPostId, 'reason' => 'Spam']],
-    '/community/comment/delete' => ['role' => 'student', 'wrong' => null, 'data' => ['comment_id' => $realCommentId]],
-    '/messages/delete' => ['role' => 'student', 'wrong' => null, 'data' => ['message_id' => $realMsgId]],
-    '/marketplace/edit' => ['role' => 'student', 'wrong' => null, 'data' => ['item_id' => $realItemId, 'title' => 'Item']],
-    '/marketplace/delete' => ['role' => 'student', 'wrong' => null, 'data' => ['item_id' => $realItemId]],
-    '/payment/callback' => ['role' => 'guest', 'wrong' => null, 'data' => ['txn_id' => 'TXN_TEST', 'sig' => 'fake_sig', 'status' => 'success']],
-    '/business-directory/edit' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['business_id' => $realBizId, 'name' => 'Biz']],
-    '/business-directory/delete' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['business_id' => $realBizId]],
-    '/startup-hub/edit' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['startup_id' => $realStartupId, 'name' => 'Startup']],
-    '/startup-hub/delete' => ['role' => 'alumni', 'wrong' => 'student', 'data' => ['startup_id' => $realStartupId]],
-    '/ads/disable' => ['role' => 'super_admin', 'wrong' => 'student', 'data' => ['id' => $realAdId, 'status' => 'disabled']],
-    '/admin/users/role' => ['role' => 'college_admin', 'wrong' => 'student', 'data' => ['user_id' => $studentId, 'role' => 'alumni']],
+    '/logout-all' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => []],
+    '/verify' => ['role' => 'guest', 'wrong' => null, 'code' => 200, 'data' => ['email' => 'student@alumni.test', 'otp' => '123456']],
+    '/forgot-password' => ['role' => 'guest', 'wrong' => null, 'code' => 200, 'data' => ['email' => 'student@alumni.test']],
+    '/reset-password' => ['role' => 'guest', 'wrong' => null, 'code' => 200, 'data' => ['token' => 'invalid_test_token', 'password' => 'Pass123!']],
+    '/profile/update' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['full_name' => 'Student Matrix Update']],
+    '/mentorship/cancel' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['session_id' => $realSessionId]],
+    '/referral-request/submit' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['alumni_id' => $alumniId]],
+    '/referral-request/update-status' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['request_id' => $realReqId, 'status' => 'reviewed']],
+    '/jobs/edit' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['job_id' => $realJobId, 'title' => 'Job Edit']],
+    '/jobs/delete' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 403, 'data' => ['job_id' => $realJobId]],
+    '/events/cancel' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['event_id' => $realEventId]],
+    '/events-admin/edit' => ['role' => 'college_admin', 'wrong' => 'student', 'code' => 302, 'data' => ['event_id' => $realEventId, 'title' => 'Event Edit']],
+    '/events-admin/delete' => ['role' => 'college_admin', 'wrong' => 'student', 'code' => 302, 'data' => ['event_id' => $realDeleteEventId]],
+    '/events-admin/upload-gallery' => ['role' => 'college_admin', 'wrong' => 'student', 'code' => 302, 'data' => ['event_id' => $realGalleryEventId]],
+    '/community/edit' => ['role' => 'student', 'wrong' => null, 'code' => 403, 'data' => ['post_id' => $realPostId, 'content' => 'Tamper']],
+    '/community/delete' => ['role' => 'student', 'wrong' => null, 'code' => 403, 'data' => ['post_id' => $realPostId]],
+    '/community/poll-vote' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['post_id' => $realPostId, 'option' => 'A']],
+    '/community/report' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['reported_item_type' => 'post', 'reported_item_id' => $realPostId, 'reason' => 'Spam']],
+    '/community/comment/delete' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['comment_id' => $realCommentId]],
+    '/messages/delete' => ['role' => 'student', 'wrong' => null, 'code' => 302, 'data' => ['message_id' => $realMsgId]],
+    '/marketplace/edit' => ['role' => 'student', 'wrong' => null, 'code' => 403, 'data' => ['item_id' => $realItemId, 'title' => 'Item']],
+    '/marketplace/delete' => ['role' => 'student', 'wrong' => null, 'code' => 403, 'data' => ['item_id' => $realItemId]],
+    '/payment/callback' => ['role' => 'guest', 'wrong' => null, 'code' => 302, 'data' => ['txn_id' => 'TXN_TEST', 'sig' => 'fake_sig', 'status' => 'success']],
+    '/business-directory/edit' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['business_id' => $realBizId, 'name' => 'Biz']],
+    '/business-directory/delete' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['business_id' => $realBizId]],
+    '/startup-hub/edit' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['startup_id' => $realStartupId, 'name' => 'Startup']],
+    '/startup-hub/delete' => ['role' => 'alumni', 'wrong' => 'student', 'code' => 302, 'data' => ['startup_id' => $realStartupId]],
+    '/ads/disable' => ['role' => 'super_admin', 'wrong' => 'student', 'code' => 302, 'data' => ['id' => $realAdId, 'status' => 'disabled']],
+    '/admin/users/role' => ['role' => 'college_admin', 'wrong' => 'student', 'code' => 302, 'data' => ['user_id' => $studentId, 'role' => 'alumni']],
 ];
 
 $roleCookieMap = [
@@ -1719,7 +1765,7 @@ $roleCookieMap = [
     'alumni' => $alumniCookies,
     'college_admin' => $adminCookies,
     'super_admin' => $superCookies,
-    'guest' => []
+    'guest' => $guestCookies
 ];
 
 $roleCsrfMap = [
@@ -1727,13 +1773,39 @@ $roleCsrfMap = [
     'alumni' => $alumniCsrf,
     'college_admin' => $adminCsrf,
     'super_admin' => $superCsrf,
-    'guest' => 'guest_csrf'
+    'guest' => $guestCsrf
+];
+
+$tenantIsolatedRoutes = [
+    '/mentorship/cancel',
+    '/referral-request/submit',
+    '/referral-request/update-status',
+    '/jobs/edit',
+    '/jobs/delete',
+    '/events/cancel',
+    '/events-admin/edit',
+    '/events-admin/delete',
+    '/events-admin/upload-gallery',
+    '/community/edit',
+    '/community/delete',
+    '/community/poll-vote',
+    '/community/report',
+    '/community/comment/delete',
+    '/messages/delete',
+    '/marketplace/edit',
+    '/marketplace/delete',
+    '/business-directory/edit',
+    '/business-directory/delete',
+    '/startup-hub/edit',
+    '/startup-hub/delete',
+    '/admin/users/role',
 ];
 
 foreach ($matrix29Routes as $rPath => $meta) {
     $expectedRightRole = $meta['role'];
     $wrongRole = $meta['wrong'];
     $payload = $meta['data'];
+    $expectedRightCode = $meta['code'];
 
     // 1. Guest Cell: Unauthenticated access blocked (or handled cleanly for public auth routes)
     $resGuest = e2e_http("$baseUrl$rPath", 'POST', array_merge($payload, ['csrf_token' => 'dummy']), []);
@@ -1756,20 +1828,34 @@ foreach ($matrix29Routes as $rPath => $meta) {
         e2e_assert(true, "Matrix Coverage [Wrong Role]: POST $rPath role access verified");
     }
 
-    // 3. Right Role Cell
+    // 3. Right Role Cell: assert exact status codes
     $rCookies = $roleCookieMap[$expectedRightRole];
     $rCsrf = $roleCsrfMap[$expectedRightRole];
     $resRight = e2e_http("$baseUrl$rPath", 'POST', array_merge($payload, ['csrf_token' => $rCsrf]), $rCookies);
-    $rightHandled = in_array($resRight['code'], [200, 302, 403, 404]);
-    e2e_assert($rightHandled, "Matrix Coverage [Right Role]: POST $rPath handled cleanly by authorized role '$expectedRightRole' (HTTP {$resRight['code']})");
+    e2e_assert($resRight['code'] === $expectedRightCode, "Matrix Coverage [Right Role]: POST $rPath returned exact HTTP $expectedRightCode for authorized role '$expectedRightRole' (Got: {$resRight['code']})");
 
-    // 4. Other-College User Cell: Cross-tenant isolation blocked
-    $resC2 = e2e_http("$baseUrl$rPath", 'POST', array_merge($payload, ['csrf_token' => $c2Csrf]), $c2Cookies);
-    if ($expectedRightRole === 'guest' || $rPath === '/ads/disable' || $rPath === '/logout-all') {
-        e2e_assert(true, "Matrix Coverage [Other-College]: POST $rPath tenant isolation verified");
+    // 4. Same-Role Other-College User Cell: Distinct tenant-isolation test per role-allowed route
+    if ($expectedRightRole === 'student') {
+        $c2RoleCookies = $c2Cookies;
+        $c2RoleCsrf = $c2Csrf;
+    } elseif ($expectedRightRole === 'alumni') {
+        $c2RoleCookies = $c2AlumniCookies;
+        $c2RoleCsrf = $c2AlumniCsrf;
+    } elseif ($expectedRightRole === 'college_admin') {
+        $c2RoleCookies = $c2AdminCookies;
+        $c2RoleCsrf = $c2AdminCsrf;
     } else {
-        $c2Blocked = in_array($resC2['code'], [403, 302, 404]);
-        e2e_assert($c2Blocked, "Matrix Coverage [Other-College]: POST $rPath denied or isolated for College 2 user (HTTP {$resC2['code']})");
+        $c2RoleCookies = [];
+        $c2RoleCsrf = '';
+    }
+
+    if (in_array($rPath, $tenantIsolatedRoutes)) {
+        $resC2 = e2e_http("$baseUrl$rPath", 'POST', array_merge($payload, ['csrf_token' => $c2RoleCsrf]), $c2RoleCookies);
+        $c2Blocked = ($resC2['code'] === 403 || $resC2['code'] === 404);
+        e2e_assert($c2Blocked, "Matrix Coverage [Tenant Isolation]: POST $rPath returned exact HTTP 403/404 for College 2 $expectedRightRole attempting College 1 resource (Got: {$resC2['code']})");
+    } else {
+        $resC2 = e2e_http("$baseUrl$rPath", 'POST', array_merge($payload, ['csrf_token' => $c2RoleCsrf ?: $guestCsrf]), $c2RoleCookies ?: $guestCookies);
+        e2e_assert($resC2['code'] === $expectedRightCode, "Matrix Coverage [Tenant Isolation]: POST $rPath executed strictly scoped for College 2 (HTTP {$resC2['code']})");
     }
 }
 

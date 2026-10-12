@@ -64,7 +64,15 @@ async function ensureTestServer() {
   fs.writeFileSync(ERROR_LOG_PATH, '');
   console.log(`Cleared server error log at ${ERROR_LOG_PATH}`);
 
-  const projectRoot = path.join(__dirname, '..');
+  const projectRoot = path.resolve(__dirname, '..');
+  const docroot = path.resolve(projectRoot, 'public');
+  const expectedDocroot = path.resolve(projectRoot, 'public');
+  if (!fs.existsSync(docroot) || docroot !== expectedDocroot) {
+    console.error(`FATAL: Docroot does not match <repo>/public. Found: ${docroot}, Expected: ${expectedDocroot}`);
+    process.exit(1);
+  }
+  console.log(`[Server Start] Docroot path: ${docroot}`);
+
   const dbFile = path.join(projectRoot, 'database', 'database.sqlite');
   const testDbFile = path.join(projectRoot, 'database', 'test.sqlite');
 
@@ -432,30 +440,83 @@ async function runSmoke() {
       const hamburgerSelector = (r.role === 'super_admin') ? '#mobileMenuBtn' : '.hamburger-menu';
       const menuNavSelector = (r.role === 'super_admin') ? '.admin-sidebar .admin-nav a.admin-nav-item' : '.sidebar .sidebar-nav a.nav-item';
 
-      const hamburgerExists = await page.evaluate((hSel) => {
-        const btn = document.querySelector(hSel);
-        if (btn) {
-          btn.click();
-          const sidebar = document.querySelector('.sidebar') || document.querySelector('.admin-sidebar');
-          const isOpen = sidebar && (sidebar.classList.contains('active') || sidebar.classList.contains('open') || sidebar.classList.contains('mobile-open'));
-          btn.click();
-          return isOpen;
-        }
-        return false;
-      }, hamburgerSelector);
+      // 1. Assert drawer is hidden on initial load at 375px
+      const drawerHiddenOnLoad = await page.evaluate((rRole) => {
+        const sidebar = (rRole === 'super_admin') 
+          ? document.querySelector('.admin-sidebar') 
+          : document.querySelector('.sidebar');
+        if (!sidebar) return { isHidden: false, details: 'Sidebar element missing' };
+        const rect = sidebar.getBoundingClientRect();
+        const style = window.getComputedStyle(sidebar);
+        const transform = style.transform;
+        const isHidden = (rect.right <= 0 || transform.includes('matrix(1, 0, 0, 1, -') || style.left.startsWith('-'));
+        return {
+          isHidden,
+          rectRight: Math.round(rect.right),
+          transform,
+          left: style.left
+        };
+      }, r.role);
+
+      // 2. Assert links inside drawer are NOT clickable before drawer is opened
+      let linkClickableBeforeOpen = false;
+      try {
+        const testLink = await page.locator(menuNavSelector).first();
+        await testLink.click({ timeout: 400 });
+        linkClickableBeforeOpen = true;
+      } catch (err) {
+        linkClickableBeforeOpen = false;
+      }
+
+      // 3. Click hamburger menu to open drawer
+      const hamburgerBtn = await page.locator(hamburgerSelector);
+      await hamburgerBtn.click();
+      await page.waitForTimeout(100);
+
+      const drawerOpenAfterClick = await page.evaluate((rRole) => {
+        const sidebar = (rRole === 'super_admin') 
+          ? document.querySelector('.admin-sidebar') 
+          : document.querySelector('.sidebar');
+        if (!sidebar) return false;
+        const rect = sidebar.getBoundingClientRect();
+        return rect.left >= 0 && rect.right > 0;
+      }, r.role);
+
+      // 4. Assert Close button exists and is visible in drawer
+      const closeSelector = (r.role === 'super_admin') ? '#adminDrawerCloseBtn' : '#drawerCloseBtn';
+      const closeBtn = await page.locator(closeSelector);
+      const closeVisible = await closeBtn.isVisible();
+
+      // 5. Click Close button and assert drawer closes
+      await closeBtn.click();
+      await page.waitForTimeout(100);
+
+      const drawerClosedAfterCloseBtn = await page.evaluate((rRole) => {
+        const sidebar = (rRole === 'super_admin') 
+          ? document.querySelector('.admin-sidebar') 
+          : document.querySelector('.sidebar');
+        if (!sidebar) return false;
+        const rect = sidebar.getBoundingClientRect();
+        const style = window.getComputedStyle(sidebar);
+        return rect.right <= 0 || style.left.startsWith('-');
+      }, r.role);
+
+      // Re-open via hamburger so subsequent drawer navigation clicks can run
+      await hamburgerBtn.click();
+      await page.waitForTimeout(100);
 
       const mobScreenshot = `${r.role}_dashboard_375px.png`;
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, mobScreenshot), fullPage: true });
 
-      const mobPassed = !mobileOverflow;
+      const mobPassed = !mobileOverflow && drawerHiddenOnLoad.isHidden && !linkClickableBeforeOpen && drawerOpenAfterClick && closeVisible && drawerClosedAfterCloseBtn;
       if (!mobPassed) totalErrors++;
       recordRoster(
-        `Mobile Dashboard Responsive & Hamburger (${r.role})`,
+        `Mobile Dashboard Responsive & Hamburger Drawer (${r.role})`,
         r.role,
         '375x667',
-        'Zero horizontal overflow at 375px width, hamburger menu toggle verified, screenshot captured',
+        'Drawer hidden on load at 375px (links unclickable), opens on hamburger, Close button verified & functional, zero overflow',
         mobPassed ? 'PASS' : 'FAIL',
-        `Overflow: ${mobileOverflow} | Hamburger toggle: ${hamburgerExists ? 'Functional' : 'Verified'}`
+        `Hidden on load: ${drawerHiddenOnLoad.isHidden} | Links unclickable: ${!linkClickableBeforeOpen} | Open: ${drawerOpenAfterClick} | Close btn visible: ${closeVisible} | Closed on close: ${drawerClosedAfterCloseBtn} | Overflow: ${mobileOverflow}`
       );
 
       // Click every nav link in the hamburger menu at 375px
@@ -852,6 +913,10 @@ async function runSmoke() {
         );
 
         // (3) Resolve Moderation Report via real UI button click
+        const pendingCheck = queryTestDb("SELECT id FROM reports WHERE college_id = 1 AND status = 'pending' LIMIT 1");
+        if (pendingCheck.length === 0) {
+          queryTestDb("INSERT INTO reports (reporter_id, reported_item_type, reported_item_id, reason, status, college_id) VALUES (6, 'post', 1, 'Inappropriate post content', 'pending', 1)");
+        }
         await page.goto(BASE_URL + '/admin/moderation', { waitUntil: 'domcontentloaded', timeout: 15000 });
         const resolveBtn = await page.$('form[action="/admin/moderation/resolve"] button[type="submit"]');
         let modPassed = false;

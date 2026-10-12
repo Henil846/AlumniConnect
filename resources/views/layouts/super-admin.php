@@ -981,6 +981,7 @@ body {
 
 @media(max-width: 768px) {
   #mobileMenuBtn { display: block !important; }
+  .admin-drawer-close-btn { display: inline-flex !important; }
   .admin-sidebar { position: fixed !important; left: -100% !important; top: 0 !important; bottom: 0 !important; width: 280px !important; z-index: 999999 !important; transition: none !important; }
   .admin-sidebar.mobile-open, .admin-sidebar.open, .admin-sidebar.active { left: 0 !important; display: flex !important; visibility: visible !important; opacity: 1 !important; }
   .admin-sidebar.mobile-open .admin-nav, .admin-sidebar.open .admin-nav, .admin-sidebar.active .admin-nav { display: flex !important; visibility: visible !important; flex-direction: column !important; }
@@ -994,11 +995,14 @@ body {
     <!-- ADMIN SIDEBAR -->
     <aside class="admin-sidebar">
       <div>
-        <div class="admin-sidebar-header">
+        <div class="admin-sidebar-header" style="display:flex; justify-content:space-between; align-items:center;">
           <a href="/super-admin/dashboard" style="text-decoration:none;">
             <h1>AlumniConnect</h1>
             <span class="sub">Platform Administration</span>
           </a>
+          <button type="button" class="admin-drawer-close-btn" id="adminDrawerCloseBtn" onclick="document.querySelector('.admin-sidebar').classList.remove('mobile-open','open','active');" aria-label="Close menu" style="display:none; background:none; border:none; cursor:pointer; padding:6px; color:#64748b;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
         
         <nav class="admin-nav">
@@ -1090,5 +1094,25 @@ body {
     </main>
 
   </div>
+  <script>
+    document.addEventListener('submit', function(e) {
+      const form = e.target;
+      if (form && form.method && form.method.toUpperCase() === 'POST') {
+        let csrfInput = form.querySelector('input[name="csrf_token"]');
+        if (!csrfInput) {
+          csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrf_token';
+          form.appendChild(csrfInput);
+        }
+        if (!csrfInput.value) {
+          const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+          if (match) {
+            csrfInput.value = decodeURIComponent(match[1]);
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

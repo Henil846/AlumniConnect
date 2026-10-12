@@ -11,6 +11,23 @@ class View {
         return 'data:image/svg+xml;utf8,' . rawurlencode($svg);
     }
 
+    public static function csrfToken(): string {
+        if (empty($_COOKIE['csrf_token'])) {
+            $csrf = bin2hex(random_bytes(32));
+            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            setcookie('csrf_token', $csrf, [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'domain' => '',
+                'secure' => $isSecure,
+                'httponly' => false,
+                'samesite' => 'Lax'
+            ]);
+            $_COOKIE['csrf_token'] = $csrf;
+        }
+        return (string)$_COOKIE['csrf_token'];
+    }
+
     public static function render($view, $data = [], $layout = 'app') {
         extract($data);
         

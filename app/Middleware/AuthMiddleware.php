@@ -21,14 +21,15 @@ class AuthMiddleware {
         }
 
         // Ensure CSRF token exists
-        if (!isset($_COOKIE['csrf_token'])) {
+        if (empty($_COOKIE['csrf_token'])) {
+            $csrf = bin2hex(random_bytes(32));
             $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
             setcookie('csrf_token', $csrf, [
-                'expires' => time() + (86400 * 7),
+                'expires' => time() + (86400 * 30),
                 'path' => '/',
                 'domain' => '',
                 'secure' => $isSecure,
-                'httponly' => true,
+                'httponly' => false,
                 'samesite' => 'Lax'
             ]);
             $_COOKIE['csrf_token'] = $csrf;
@@ -36,7 +37,9 @@ class AuthMiddleware {
 
         // CSRF validation for POST/PUT/DELETE
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            if (!isset($_POST['csrf_token']) || !isset($_COOKIE['csrf_token']) || $_POST['csrf_token'] !== $_COOKIE['csrf_token']) {
+            $postToken = $_POST['csrf_token'] ?? '';
+            $cookieToken = $_COOKIE['csrf_token'] ?? '';
+            if (empty($postToken) || empty($cookieToken) || !hash_equals($cookieToken, $postToken)) {
                 header('HTTP/1.0 403 Forbidden');
                 echo "Unauthorized (CSRF middleware failure due to missing/invalid CSRF token in form payload)";
                 exit;

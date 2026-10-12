@@ -14,18 +14,39 @@ $pdo = App\Core\Database::getConnection();
 @unlink(__DIR__ . '/../storage/rate_limits.json');
 $pdo->exec("DELETE FROM login_attempts");
 
+$repoDir = realpath(__DIR__ . '/..');
+$docroot = realpath($repoDir . '/public');
+$expectedDocroot = realpath(__DIR__ . '/../public');
+
+if (!$docroot || $docroot !== $expectedDocroot) {
+    fwrite(STDERR, "FATAL: Docroot does not match <repo>/public. Found: " . ($docroot ?: 'false') . ", Expected: $expectedDocroot\n");
+    exit(1);
+}
+echo "[Server Start] Docroot path: $docroot\n";
+
 $baseUrl = 'http://127.0.0.1:8000';
 
-$fp = @fsockopen('127.0.0.1', 8000, $errno, $errstr, 0.2);
-if (!$fp) {
-    pclose(popen('cmd /c start /b "" "C:\\xampp\\php\\php.exe" -S 127.0.0.1:8000 -t public public/index.php', 'r'));
-    for ($i = 0; $i < 30; $i++) {
-        $check = @fsockopen('127.0.0.1', 8000, $errno, $errstr, 0.2);
-        if ($check) { fclose($check); break; }
-        usleep(100000);
+exec('powershell -Command "Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
+$descriptors = [
+    0 => ['pipe', 'r'],
+    1 => ['file', 'NUL', 'w'],
+    2 => ['file', 'NUL', 'w']
+];
+$cmd = '"C:\\xampp\\php\\php.exe" -S 127.0.0.1:8000 -t public public/index.php';
+$serverProc = proc_open($cmd, $descriptors, $pipes, $repoDir);
+
+register_shutdown_function(function() use (&$serverProc) {
+    if (is_resource($serverProc)) {
+        proc_terminate($serverProc);
+        proc_close($serverProc);
     }
-} else {
-    fclose($fp);
+    exec('powershell -Command "Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"');
+});
+
+for ($i = 0; $i < 40; $i++) {
+    $check = @fsockopen('127.0.0.1', 8000, $errno, $errstr, 0.2);
+    if ($check) { fclose($check); break; }
+    usleep(100000);
 }
 
 function httpReq($url, $method = 'GET', $postData = [], $cookies = []) {

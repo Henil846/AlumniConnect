@@ -246,6 +246,16 @@ class CommunityController {
         $reportedUserId = (int)($_POST['reported_user_id'] ?? 0);
 
         $pdo = Database::getConnection();
+        if ($itemType === 'post') {
+            $postCheck = $pdo->prepare("SELECT college_id FROM posts WHERE id = ?");
+            $postCheck->execute([$itemId]);
+            $pColl = $postCheck->fetchColumn();
+            if ($pColl !== false && $pColl != $collegeId) {
+                http_response_code(403);
+                die("Forbidden: Cross-college report");
+            }
+        }
+
         $stmt = $pdo->prepare("INSERT INTO reports (reporter_id, reported_item_type, reported_item_id, reason, status, college_id) VALUES (?, ?, ?, ?, 'pending', ?)");
         $stmt->execute([$userId, $itemType, $itemId, $reason, $collegeId]);
 
